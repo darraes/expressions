@@ -45,15 +45,17 @@ public class Expression {
     /**
      * Evaluates the final value of the expression and returns that value.
      * <p>
-     * All arguments must be registered int the @registry object and all user
-     * inputted arguments must be available on the @provider.
+     * All arguments must be registered int the [@registry] object and all user
+     * inputted arguments must be available on the [@provider].
+     *
+     * [@session] will record all events and be used as cache to prevent re-computations.
      * <p>
      *
      * @param registry The engine's argument registry
      * @param provider The caller's argument provider
      * @param session  Session of the individual request
+     *
      * @return Result of the expression computation
-     * @session will record all events and be used as cache to prevent re-computations.
      */
     public final Object eval(ArgumentRegistry registry,
                              ArgumentProvider provider,

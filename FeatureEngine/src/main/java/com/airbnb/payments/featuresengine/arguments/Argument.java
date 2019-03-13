@@ -3,7 +3,6 @@ package com.airbnb.payments.featuresengine.arguments;
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,5 +84,5 @@ public abstract class Argument {
                                     ArgumentProvider provider,
                                     EvalSession session) throws EvaluationException;
 
-    abstract boolean fromExpression();
+    public abstract boolean fromExpression();
 }
