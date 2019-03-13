@@ -10,7 +10,9 @@ import org.codehaus.janino.ExpressionEvaluator;
 import java.lang.reflect.InvocationTargetException;
 
 public class Expression {
+    // Original expression text
     private String expressionText;
+    // Actual expression evaluator
     private ExpressionEvaluator eval;
 
     public Expression(String expression)
@@ -29,6 +31,11 @@ public class Expression {
         this.eval.cook(expression);
     }
 
+    /**
+     * Getter.
+     *
+     * @return The original expression text before compiling it
+     */
     public String getExpressionText() {
         return expressionText;
     }
@@ -39,12 +46,12 @@ public class Expression {
      * All arguments must be registered int the @registry object and all user
      * inputted arguments must be available on the @provider.
      * <p>
-     * @session will record all events and be used as cache to prevent re-computations.
      *
      * @param registry The engine's argument registry
      * @param provider The caller's argument provider
      * @param session  Session of the individual request
      * @return Result of the expression computation
+     * @session will record all events and be used as cache to prevent re-computations.
      */
     public Object eval(ArgumentRegistry registry,
                        ArgumentProvider provider,

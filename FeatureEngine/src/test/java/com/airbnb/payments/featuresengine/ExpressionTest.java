@@ -1,7 +1,6 @@
 package com.airbnb.payments.featuresengine;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import com.airbnb.payments.featuresengine.arguments.ArgumentProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
