@@ -1,6 +1,7 @@
 package com.airbnb.payments.featuresengine.arguments;
 
 import com.airbnb.payments.featuresengine.EvalSession;
+import com.airbnb.payments.featuresengine.EvaluationException;
 
 import java.util.HashMap;
 
@@ -21,7 +22,7 @@ public class ArgumentRegistry {
 
     public Object value(String key,
                         ArgumentProvider provider,
-                        EvalSession session) {
+                        EvalSession session) throws EvaluationException {
         return this.arguments.get(key).value(this, provider, session);
     }
 }

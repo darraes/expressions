@@ -4,10 +4,14 @@ import com.airbnb.payments.featuresengine.EvalSession;
 
 public class SimpleArgument extends Argument {
     public SimpleArgument(String name, Class<?> returnType) {
-        super(name, returnType);
+        this(name, returnType, true);
     }
 
-    protected Object fetch(ArgumentRegistry registry,
+    public SimpleArgument(String name, Class<?> returnType, boolean cacheable) {
+        super(name, returnType, cacheable);
+    }
+
+    protected final Object fetch(ArgumentRegistry registry,
                            ArgumentProvider provider,
                            EvalSession session) {
         return provider.get(this.getName());

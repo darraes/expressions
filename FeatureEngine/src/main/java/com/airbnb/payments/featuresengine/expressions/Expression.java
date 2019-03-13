@@ -1,6 +1,7 @@
 package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.EvalSession;
+import com.airbnb.payments.featuresengine.EvaluationException;
 import com.airbnb.payments.featuresengine.arguments.ArgumentProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 
@@ -25,6 +26,7 @@ public class Expression {
         this.eval.setParameters(
                 new String[]{"registry", "provider", "session"},
                 new Class[]{ArgumentRegistry.class, ArgumentProvider.class, EvalSession.class});
+        this.eval.setThrownExceptions(new Class[]{EvaluationException.class});
 
         // TODO (darraes) Check if when the expression gets destructed this compilation doesn't leak
         // Leave the expression already compiled for faster performance on evaluation
@@ -36,7 +38,7 @@ public class Expression {
      *
      * @return The original expression text before compiling it
      */
-    public String getExpressionText() {
+    public final String getExpressionText() {
         return expressionText;
     }
 
@@ -53,9 +55,15 @@ public class Expression {
      * @return Result of the expression computation
      * @session will record all events and be used as cache to prevent re-computations.
      */
-    public Object eval(ArgumentRegistry registry,
-                       ArgumentProvider provider,
-                       EvalSession session) throws InvocationTargetException {
-        return this.eval.evaluate(new Object[]{registry, provider, session});
+    public final Object eval(ArgumentRegistry registry,
+                             ArgumentProvider provider,
+                             EvalSession session) throws EvaluationException {
+        try {
+            return this.eval.evaluate(new Object[]{registry, provider, session});
+        } catch (InvocationTargetException e) {
+            throw new EvaluationException(
+                    String.format("Error evaluation expression %s", this.getExpressionText()), e);
+        }
+
     }
 }

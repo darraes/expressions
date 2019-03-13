@@ -10,9 +10,8 @@ import com.airbnb.payments.featuresengine.expressions.Expression;
 import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
-
 public class ExpressionTest {
+
     @Test
     public void accessProperties() throws CompileException {
         Expression expression = new Expression("1 + 3");
@@ -20,7 +19,7 @@ public class ExpressionTest {
     }
 
     @Test
-    public void evaluateSimple() throws CompileException, InvocationTargetException {
+    public void evaluateSimple() throws CompileException, EvaluationException {
 
         ArgumentProvider provider = new ArgumentProvider();
         provider.put("a", 1);
@@ -40,7 +39,7 @@ public class ExpressionTest {
     }
 
     @Test
-    public void evaluateRecursive() throws CompileException, InvocationTargetException {
+    public void evaluateRecursive() throws CompileException, EvaluationException {
 
         ArgumentProvider provider = new ArgumentProvider();
         provider.put("a", 1);

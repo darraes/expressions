@@ -1,6 +1,7 @@
 package com.airbnb.payments.featuresengine.arguments;
 
 import com.airbnb.payments.featuresengine.EvalSession;
+import com.airbnb.payments.featuresengine.EvaluationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 import org.codehaus.commons.compiler.CompileException;
 
@@ -11,13 +12,18 @@ public class ExpressionArgument extends Argument {
 
     public ExpressionArgument(String name, Class<?> returnType, String expression)
             throws CompileException {
-        super(name, returnType);
+        this(name, returnType, expression, true);
+    }
+
+    public ExpressionArgument(String name, Class<?> returnType, String expression, boolean cacheable)
+            throws CompileException {
+        super(name, returnType, cacheable);
         this.expression = new Expression(expression);
     }
 
     protected Object fetch(ArgumentRegistry registry,
                            ArgumentProvider provider,
-                           EvalSession session) throws InvocationTargetException {
+                           EvalSession session) throws EvaluationException {
         return this.expression.eval(registry, provider, session);
     }
 
