@@ -1,4 +1,4 @@
-package com.airbnb.payments.featuresengine;
+package com.airbnb.payments.featuresengine.arguments;
 
 import java.util.HashMap;
 

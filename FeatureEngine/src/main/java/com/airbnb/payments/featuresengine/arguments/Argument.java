@@ -1,12 +1,14 @@
-package com.airbnb.payments.featuresengine;
+package com.airbnb.payments.featuresengine.arguments;
+
+import com.airbnb.payments.featuresengine.EvalSession;
 
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class Argument<TReturn> {
+public abstract class Argument {
     private String name;
-    private Class<TReturn> returnType;
+    private Class<?> returnType;
 
-    Argument(String name, Class<TReturn> returnType) {
+    Argument(String name, Class<?> returnType) {
         this.name = name;
         this.returnType = returnType;
     }
@@ -15,22 +17,21 @@ public abstract class Argument<TReturn> {
         return name;
     }
 
-    Class<TReturn> getReturnType() {
+    Class<?> getReturnType() {
         return returnType;
     }
 
-    @SuppressWarnings(value = "unchecked")
-    public TReturn get(ArgumentRegistry registry,
-                       ArgumentProvider provider,
-                       EvalSession session) {
+    Object value(ArgumentRegistry registry,
+                        ArgumentProvider provider,
+                        EvalSession session) {
         try {
             Object result = this.fetch(registry, provider, session);
             if (this.returnType.isInstance(result)
                     || this.returnType.isAssignableFrom(result.getClass())) {
-                return (TReturn) result;
+                return result;
             }
         } catch (InvocationTargetException e) {
-            System.out.println("InvocationTargetException");
+            //TODO handle
         }
         return null; // TODO throw
     }

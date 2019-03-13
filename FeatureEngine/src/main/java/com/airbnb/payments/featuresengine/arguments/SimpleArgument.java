@@ -1,7 +1,9 @@
-package com.airbnb.payments.featuresengine;
+package com.airbnb.payments.featuresengine.arguments;
 
-public class SimpleArgument<TReturn> extends Argument<TReturn> {
-    public SimpleArgument(String name, Class<TReturn> returnType) {
+import com.airbnb.payments.featuresengine.EvalSession;
+
+public class SimpleArgument extends Argument {
+    public SimpleArgument(String name, Class<?> returnType) {
         super(name, returnType);
     }
 

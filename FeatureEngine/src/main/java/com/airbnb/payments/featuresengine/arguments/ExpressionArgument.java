@@ -1,15 +1,15 @@
-package com.airbnb.payments.featuresengine;
+package com.airbnb.payments.featuresengine.arguments;
 
+import com.airbnb.payments.featuresengine.EvalSession;
+import com.airbnb.payments.featuresengine.expressions.Expression;
 import org.codehaus.commons.compiler.CompileException;
-import org.codehaus.janino.ExpressionEvaluator;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class ExpressionArgument<TReturn> extends Argument<TReturn> {
+public class ExpressionArgument extends Argument {
     private Expression expression;
-    private ExpressionEvaluator eval;
 
-    public ExpressionArgument(String name, Class<TReturn> returnType, String expression)
+    public ExpressionArgument(String name, Class<?> returnType, String expression)
             throws CompileException {
         super(name, returnType);
         this.expression = new Expression(expression);
