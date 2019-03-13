@@ -1,4 +1,4 @@
-package com.airbnb.payments;
+package com.airbnb.payments.featuresengine;
 
 import static org.junit.Assert.assertTrue;
 
