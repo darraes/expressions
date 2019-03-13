@@ -13,12 +13,7 @@ public class ArgumentProvider {
         this.arguments.put(key, value);
     }
 
-    @SuppressWarnings(value = "unchecked")
-    public <T> T get(String key, Class<T> type) {
-        Object result = this.arguments.get(key);
-        if (type.isInstance(result) || type.isAssignableFrom(result.getClass())) {
-            return (T) result;
-        }
-        return null; // TODO throw
+    public Object get(String key) {
+        return this.arguments.get(key);
     }
 }

@@ -29,8 +29,8 @@ public abstract class Argument<TReturn> {
                     || this.returnType.isAssignableFrom(result.getClass())) {
                 return (TReturn) result;
             }
-        } catch (Exception e) {
-            System.out.println("Exception");
+        } catch (InvocationTargetException e) {
+            System.out.println("InvocationTargetException");
         }
         return null; // TODO throw
     }
