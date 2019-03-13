@@ -14,8 +14,11 @@ public class App
             System.out.println( "Hello World!" );
             System.out.println( Math.abs(-4) );
             ExpressionEvaluator ee = new ExpressionEvaluator();
-            ee.cook("Math.sqrt(3 + 6)");
-            System.out.println(ee.evaluate(null));
+            ee.setParameters(
+                    new String[]{"a"},
+                    new Class[]{int.class});
+            ee.cook("(int) Math.sqrt(a + 6)");
+            System.out.println(ee.evaluate(new Object[]{3}));
         } catch (Exception e) {
             System.out.println( "Exception" );
         }

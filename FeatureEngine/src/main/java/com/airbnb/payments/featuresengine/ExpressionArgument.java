@@ -3,7 +3,9 @@ package com.airbnb.payments.featuresengine;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ExpressionEvaluator;
 
-public class ExpressionArgument<TReturn> extends ArgumentBase<TReturn> {
+import java.lang.reflect.InvocationTargetException;
+
+public class ExpressionArgument<TReturn> extends Argument<TReturn> {
     private String expressionText;
     private ExpressionEvaluator eval;
 
@@ -11,15 +13,19 @@ public class ExpressionArgument<TReturn> extends ArgumentBase<TReturn> {
             throws CompileException {
         super(name, returnType);
 
+        this.expressionText = expression;
+
         this.eval = new ExpressionEvaluator();
         this.eval.setParameters(
-                new String[]{"provider", "session"},
-                new Class[]{int.class, int.class});
+                new String[]{"registry", "provider", "session"},
+                new Class[]{ArgumentRegistry.class, ArgumentProvider.class, EvalSession.class});
         this.eval.cook(expression);
     }
 
-    protected Object fetch(ArgumentProvider provider, EvalSession session) {
-        return provider.get(this.getName(), this.getReturnType());
+    protected Object fetch(ArgumentRegistry registry,
+                           ArgumentProvider provider,
+                           EvalSession session) throws InvocationTargetException {
+        return this.eval.evaluate(new Object[]{registry, provider, session});
     }
 
     public boolean fromExpression() {
