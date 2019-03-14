@@ -9,6 +9,10 @@ public class HashMapArgumentProvider implements IArgumentProvider {
         this.arguments = new HashMap<>();
     }
 
+    public HashMapArgumentProvider(HashMap<String, Object> args) {
+        this.arguments = args;
+    }
+
     public void put(String key, Object value) {
         this.arguments.put(key, value);
     }

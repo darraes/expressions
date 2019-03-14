@@ -18,6 +18,9 @@ public abstract class Argument {
     private static final Map<Class<?>, Class<?>> primitiveEquivalenceMap
             = new HashMap<>(32);
 
+    /**
+     * 
+     */
     static {
         primitiveEquivalenceMap.put(Boolean.class, boolean.class);
         primitiveEquivalenceMap.put(Byte.class, byte.class);
@@ -38,24 +41,50 @@ public abstract class Argument {
         primitiveEquivalenceMap.put(short.class, Short.class);
     }
 
+    /**
+     *
+     * @param name
+     * @param returnType
+     * @param cacheable
+     */
     public Argument(String name, Class<?> returnType, boolean cacheable) {
         this.name = name;
         this.returnType = returnType;
         this.cacheable = cacheable;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return
+     */
     public Class<?> getReturnType() {
         return returnType;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isCacheable() {
         return this.cacheable;
     }
 
+    /**
+     *
+     * @param registry
+     * @param provider
+     * @param session
+     * @return
+     * @throws EvaluationException
+     */
     final Object value(ArgumentRegistry registry,
                        IArgumentProvider provider,
                        EvalSession session) throws EvaluationException {
@@ -80,6 +109,15 @@ public abstract class Argument {
                 String.format("Argument %s not found", this.getName()));
     }
 
+    /**
+     * Does the actual fetching of the argument.
+     *
+     * @param registry Registry where all argument information is stored
+     * @param provider User provided argument provider object. Used to fetch raw arguments.
+     * @param session  The current evaluation session
+     * @return The actual argument value
+     * @throws EvaluationException
+     */
     protected abstract Object fetch(ArgumentRegistry registry,
                                     IArgumentProvider provider,
                                     EvalSession session) throws EvaluationException;
