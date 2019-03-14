@@ -2,9 +2,9 @@ package com.airbnb.payments.featuresengine;
 
 import static org.junit.Assert.assertEquals;
 
-import com.airbnb.payments.featuresengine.arguments.ArgumentProvider;
+import com.airbnb.payments.featuresengine.arguments.HashMapArgumentProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
-import com.airbnb.payments.featuresengine.arguments.ExpressionArgument;
+import com.airbnb.payments.featuresengine.arguments.DerivedArgument;
 import com.airbnb.payments.featuresengine.arguments.SimpleArgument;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 import org.codehaus.commons.compiler.CompileException;
@@ -21,7 +21,7 @@ public class ExpressionTest {
     @Test
     public void evaluateSimple() throws CompileException, EvaluationException {
 
-        ArgumentProvider provider = new ArgumentProvider();
+        HashMapArgumentProvider provider = new HashMapArgumentProvider();
         provider.put("a", 1);
         provider.put("b", 8);
 
@@ -41,7 +41,7 @@ public class ExpressionTest {
     @Test
     public void evaluateRecursive() throws CompileException, EvaluationException {
 
-        ArgumentProvider provider = new ArgumentProvider();
+        HashMapArgumentProvider provider = new HashMapArgumentProvider();
         provider.put("a", 1);
         provider.put("b", 8);
 
@@ -50,7 +50,7 @@ public class ExpressionTest {
         ArgumentRegistry registry = new ArgumentRegistry();
         registry.put(new SimpleArgument("a", Integer.class));
         registry.put(new SimpleArgument("b", Integer.class));
-        registry.put(new ExpressionArgument(
+        registry.put(new DerivedArgument(
                 "c", Integer.class,
                 "((Integer)registry.value(\"a\", provider, session))"
                         + " + ((Integer)registry.value(\"b\", provider, session))"));

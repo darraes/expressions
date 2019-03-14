@@ -16,13 +16,17 @@ public class ArgumentRegistry {
         this.arguments.put(arg.getName(), arg);
     }
 
-    public Argument get(String key) {
-        return this.arguments.get(key);
+    public boolean exists(String key) {
+        return this.arguments.containsKey(key);
     }
 
     public Object value(String key,
-                        ArgumentProvider provider,
+                        IArgumentProvider provider,
                         EvalSession session) throws EvaluationException {
+        if (!this.exists(key)) {
+            throw new EvaluationException("Argument %s not registered", key);
+        }
+
         return this.arguments.get(key).value(this, provider, session);
     }
 }

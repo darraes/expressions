@@ -4,6 +4,7 @@ import com.airbnb.payments.featuresengine.arguments.*;
 import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
 
+
 import static org.junit.Assert.*;
 
 public class ArgumentTest {
@@ -12,7 +13,7 @@ public class ArgumentTest {
         {
             Argument arg1 = new SimpleArgument("a", Integer.class);
 
-            assertFalse(arg1.fromExpression());
+            assertFalse(arg1.derived());
             assertTrue(arg1.isCacheable());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
@@ -21,7 +22,7 @@ public class ArgumentTest {
         {
             Argument arg1 = new SimpleArgument("a", Integer.class, true);
 
-            assertFalse(arg1.fromExpression());
+            assertFalse(arg1.derived());
             assertTrue(arg1.isCacheable());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
@@ -30,26 +31,26 @@ public class ArgumentTest {
         {
             Argument arg1 = new SimpleArgument("a", Integer.class, false);
 
-            assertFalse(arg1.fromExpression());
+            assertFalse(arg1.derived());
             assertFalse(arg1.isCacheable());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
         }
 
         {
-            Argument arg1 = new ExpressionArgument("a", Integer.class, "3 + 7");
+            Argument arg1 = new DerivedArgument("a", Integer.class, "3 + 7");
 
-            assertTrue(arg1.fromExpression());
+            assertTrue(arg1.derived());
             assertTrue(arg1.isCacheable());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
         }
 
         {
-            Argument arg1 = new ExpressionArgument(
+            Argument arg1 = new DerivedArgument(
                     "a", Integer.class, "3 + 7", false);
 
-            assertTrue(arg1.fromExpression());
+            assertTrue(arg1.derived());
             assertFalse(arg1.isCacheable());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
@@ -57,8 +58,8 @@ public class ArgumentTest {
     }
 
     @Test
-    public void expressionArgument() throws Throwable {
-        ArgumentProvider provider = new ArgumentProvider();
+    public void expressionArgument() throws EvaluationException, CompileException {
+        HashMapArgumentProvider provider = new HashMapArgumentProvider();
         provider.put("a", 1);
         provider.put("b", 8);
 
@@ -69,13 +70,19 @@ public class ArgumentTest {
             // Using class 'int' to test the boxed type checking
             registry.put(new SimpleArgument("a", Integer.class));
             registry.put(new SimpleArgument("b", Integer.class));
-            registry.put(new ExpressionArgument(
+            registry.put(new DerivedArgument(
                     "c", Integer.class,
                     "((Integer)registry.value(\"a\", provider, session))"
                             + " + ((Integer)registry.value(\"b\", provider, session))"));
-            registry.put(new ExpressionArgument(
+            registry.put(new DerivedArgument(
                     "d", Integer.class,
                     "10 * ((Integer)registry.value(\"c\", provider, session))"));
+
+            assertTrue(registry.exists("a"));
+            assertTrue(registry.exists("b"));
+            assertTrue(registry.exists("c"));
+            assertTrue(registry.exists("d"));
+            assertFalse(registry.exists("e"));
 
             assertEquals(90, registry.value("d", provider, session));
         }
@@ -85,13 +92,19 @@ public class ArgumentTest {
 
             registry.put(new SimpleArgument("a", int.class));
             registry.put(new SimpleArgument("b", int.class));
-            registry.put(new ExpressionArgument(
+            registry.put(new DerivedArgument(
                     "c", Integer.class,
                     "((Integer)registry.value(\"a\", provider, session))"
                             + " + ((Integer)registry.value(\"b\", provider, session))"));
-            registry.put(new ExpressionArgument(
+            registry.put(new DerivedArgument(
                     "d", Integer.class,
                     "10 * ((Integer)registry.value(\"c\", provider, session))"));
+
+            assertTrue(registry.exists("a"));
+            assertTrue(registry.exists("b"));
+            assertTrue(registry.exists("c"));
+            assertTrue(registry.exists("d"));
+            assertFalse(registry.exists("e"));
 
             assertEquals(90, registry.value("d", provider, session));
         }

@@ -2,7 +2,7 @@ package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
-import com.airbnb.payments.featuresengine.arguments.ArgumentProvider;
+import com.airbnb.payments.featuresengine.arguments.IArgumentProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 
 import org.codehaus.commons.compiler.CompileException;
@@ -25,7 +25,7 @@ public class Expression {
         // registry, the argument provider and the evaluation session
         this.eval.setParameters(
                 new String[]{"registry", "provider", "session"},
-                new Class[]{ArgumentRegistry.class, ArgumentProvider.class, EvalSession.class});
+                new Class[]{ArgumentRegistry.class, IArgumentProvider.class, EvalSession.class});
         this.eval.setThrownExceptions(new Class[]{EvaluationException.class});
 
         // TODO (darraes) Check if when the expression gets destructed this compilation doesn't leak
@@ -47,18 +47,17 @@ public class Expression {
      * <p>
      * All arguments must be registered int the [@registry] object and all user
      * inputted arguments must be available on the [@provider].
-     *
+     * <p>
      * [@session] will record all events and be used as cache to prevent re-computations.
      * <p>
      *
      * @param registry The engine's argument registry
      * @param provider The caller's argument provider
      * @param session  Session of the individual request
-     *
      * @return Result of the expression computation
      */
     public final Object eval(ArgumentRegistry registry,
-                             ArgumentProvider provider,
+                             IArgumentProvider provider,
                              EvalSession session) throws EvaluationException {
         try {
             return this.eval.evaluate(new Object[]{registry, provider, session});

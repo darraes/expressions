@@ -57,7 +57,7 @@ public abstract class Argument {
     }
 
     final Object value(ArgumentRegistry registry,
-                       ArgumentProvider provider,
+                       IArgumentProvider provider,
                        EvalSession session) throws EvaluationException {
 
         Object result = this.fetch(registry, provider, session);
@@ -81,8 +81,13 @@ public abstract class Argument {
     }
 
     protected abstract Object fetch(ArgumentRegistry registry,
-                                    ArgumentProvider provider,
+                                    IArgumentProvider provider,
                                     EvalSession session) throws EvaluationException;
 
-    public abstract boolean fromExpression();
+    /**
+     * If this argument is derived from an expression.
+     *
+     * @return True if the current instance is derived. False otherwise.
+     */
+    public abstract boolean derived();
 }
