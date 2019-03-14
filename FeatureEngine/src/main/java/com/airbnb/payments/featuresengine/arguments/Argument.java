@@ -2,13 +2,17 @@ package com.airbnb.payments.featuresengine.arguments;
 
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
+import org.codehaus.commons.compiler.CompileException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Argument {
+    // Name (or key) of the argument
     private String name;
+    // Argument type
     private Class<?> returnType;
+    // If the argument is cacheable
     private boolean cacheable;
 
     /**
@@ -19,7 +23,7 @@ public abstract class Argument {
             = new HashMap<>(32);
 
     /**
-     * 
+     * Initiates the type equivalence map
      */
     static {
         primitiveEquivalenceMap.put(Boolean.class, boolean.class);
@@ -42,10 +46,11 @@ public abstract class Argument {
     }
 
     /**
+     * Constructor
      *
-     * @param name
-     * @param returnType
-     * @param cacheable
+     * @param name       The name of the argument
+     * @param returnType The type of the argument
+     * @param cacheable  If the argument, once computed, should be cached on further fetches
      */
     public Argument(String name, Class<?> returnType, boolean cacheable) {
         this.name = name;
@@ -54,40 +59,45 @@ public abstract class Argument {
     }
 
     /**
-     *
-     * @return
+     * @return the name (or key) of this argument
      */
     public String getName() {
         return name;
     }
 
     /**
-     *
-     * @return
+     * @return the argument type
      */
     public Class<?> getReturnType() {
         return returnType;
     }
 
     /**
+     * Cacheable arguments, once fetched, will never be fetched again
      *
-     * @return
+     * @return True if the argument is cacheable. False otherwise.
      */
     public boolean isCacheable() {
         return this.cacheable;
     }
 
     /**
+     * Gets the value of of the current argument. If the argument is cacheable, the
+     * first call will cache the result and further calls will grab the result from
+     * the session cache.
      *
-     * @param registry
-     * @param provider
-     * @param session
-     * @return
+     * @param registry The engine's argument registry
+     * @param provider The caller's argument provider
+     * @param session  Session of the individual request
+     * @return Result of the argument fetching
      * @throws EvaluationException
      */
     final Object value(ArgumentRegistry registry,
                        IArgumentProvider provider,
                        EvalSession session) throws EvaluationException {
+        if (this.isCacheable() && session.inCache(this.getName())) {
+            return session.getFromCache(this.getName());
+        }
 
         Object result = this.fetch(registry, provider, session);
 
@@ -96,6 +106,10 @@ public abstract class Argument {
                     || this.returnType.isAssignableFrom(result.getClass())
                     || (primitiveEquivalenceMap.containsKey(this.returnType)
                     && primitiveEquivalenceMap.get(this.returnType).isInstance(result))) {
+                if (this.isCacheable()) {
+                    session.putInCache(this.getName(), result);
+                }
+
                 return result;
             } else {
                 throw new EvaluationException(
