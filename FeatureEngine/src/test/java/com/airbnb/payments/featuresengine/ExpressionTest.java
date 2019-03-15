@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.airbnb.payments.featuresengine.arguments.HashMapArgumentProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
-import com.airbnb.payments.featuresengine.arguments.DerivedArgument;
+import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 import com.airbnb.payments.featuresengine.arguments.SimpleArgument;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 import org.codehaus.commons.compiler.CompileException;
@@ -51,7 +51,7 @@ public class ExpressionTest {
         ArgumentRegistry registry = new ArgumentRegistry();
         registry.put(new SimpleArgument("a", Integer.class));
         registry.put(new SimpleArgument("b", Integer.class));
-        registry.put(new DerivedArgument(
+        registry.put(new NamedExpression(
                 "c", Integer.class,
                 "((Integer)registry.value(\"a\", provider, session))"
                         + " + ((Integer)registry.value(\"b\", provider, session))"));

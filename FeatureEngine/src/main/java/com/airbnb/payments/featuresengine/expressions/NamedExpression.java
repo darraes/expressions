@@ -1,15 +1,17 @@
-package com.airbnb.payments.featuresengine.arguments;
+package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
-import com.airbnb.payments.featuresengine.expressions.Expression;
+import com.airbnb.payments.featuresengine.arguments.Argument;
+import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
+import com.airbnb.payments.featuresengine.arguments.IArgumentProvider;
 import org.codehaus.commons.compiler.CompileException;
 
 /**
  * Derived arguments are not access from an argument provided. They are computed from
  * an expression if necessary.
  */
-public class DerivedArgument extends Argument {
+public class NamedExpression extends Argument {
 
     // The expression that evaluates to this argument
     private Expression expression;
@@ -22,7 +24,7 @@ public class DerivedArgument extends Argument {
      * @param expression The computing expression that evaluates to the argument
      * @throws CompileException Thrown if the expression can't be compiled
      */
-    public DerivedArgument(String name, Class<?> returnType, String expression)
+    public NamedExpression(String name, Class<?> returnType, String expression)
             throws CompileException {
         this(name, returnType, expression, true);
     }
@@ -36,7 +38,7 @@ public class DerivedArgument extends Argument {
      * @param cacheable  If the argument, once computed, should be cached on further fetches
      * @throws CompileException Thrown if the expression can't be compiled
      */
-    public DerivedArgument(String name, Class<?> returnType, String expression, boolean cacheable)
+    public NamedExpression(String name, Class<?> returnType, String expression, boolean cacheable)
             throws CompileException {
         super(name, returnType, cacheable);
         this.expression = new Expression(expression, returnType);

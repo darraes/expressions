@@ -1,6 +1,7 @@
 package com.airbnb.payments.featuresengine;
 
 import com.airbnb.payments.featuresengine.arguments.*;
+import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ public class ArgumentTest {
         }
 
         {
-            Argument arg1 = new DerivedArgument("a", Integer.class, "3 + 7");
+            Argument arg1 = new NamedExpression("a", Integer.class, "3 + 7");
 
             assertTrue(arg1.derived());
             assertTrue(arg1.isCacheable());
@@ -47,7 +48,7 @@ public class ArgumentTest {
         }
 
         {
-            Argument arg1 = new DerivedArgument(
+            Argument arg1 = new NamedExpression(
                     "a", Integer.class, "3 + 7", false);
 
             assertTrue(arg1.derived());
@@ -70,11 +71,11 @@ public class ArgumentTest {
             // Using class 'int' to test the boxed type checking
             registry.put(new SimpleArgument("a", Integer.class));
             registry.put(new SimpleArgument("b", Integer.class));
-            registry.put(new DerivedArgument(
+            registry.put(new NamedExpression(
                     "c", Integer.class,
                     "((Integer)registry.value(\"a\", provider, session))"
                             + " + ((Integer)registry.value(\"b\", provider, session))"));
-            registry.put(new DerivedArgument(
+            registry.put(new NamedExpression(
                     "d", Integer.class,
                     "10 * ((Integer)registry.value(\"c\", provider, session))"));
 
@@ -92,11 +93,11 @@ public class ArgumentTest {
 
             registry.put(new SimpleArgument("a", int.class));
             registry.put(new SimpleArgument("b", int.class));
-            registry.put(new DerivedArgument(
+            registry.put(new NamedExpression(
                     "c", Integer.class,
                     "((Integer)registry.value(\"a\", provider, session))"
                             + " + ((Integer)registry.value(\"b\", provider, session))"));
-            registry.put(new DerivedArgument(
+            registry.put(new NamedExpression(
                     "d", Integer.class,
                     "10 * ((Integer)registry.value(\"c\", provider, session))"));
 
