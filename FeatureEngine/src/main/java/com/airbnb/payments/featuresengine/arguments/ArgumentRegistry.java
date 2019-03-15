@@ -12,7 +12,7 @@ public class ArgumentRegistry {
         this.arguments = new HashMap<>();
     }
 
-    public void put(Argument arg) {
+    public void register(Argument arg) {
         this.arguments.put(arg.getName(), arg);
     }
 

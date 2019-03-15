@@ -1,17 +1,16 @@
 package com.airbnb.payments.featuresengine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import com.airbnb.payments.featuresengine.arguments.ArgumentFactory;
 import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
-import com.airbnb.payments.featuresengine.arguments.InputArgument;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class ExpressionTest {
 
@@ -31,8 +30,9 @@ public class ExpressionTest {
         provider.put("b", 8);
 
         ArgumentRegistry registry = new ArgumentRegistry();
-        registry.put(new InputArgument("a", Integer.class));
-        registry.put(new InputArgument("b", Integer.class));
+
+        ArgumentFactory.create(registry, "a", Integer.class, true);
+        ArgumentFactory.create(registry, "b", Integer.class, true);
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -52,12 +52,16 @@ public class ExpressionTest {
         provider.put("b", 8);
 
         ArgumentRegistry registry = new ArgumentRegistry();
-        registry.put(new InputArgument("a", Integer.class));
-        registry.put(new InputArgument("b", Integer.class));
-        registry.put(new NamedExpression(
-                "c", Integer.class,
+
+        ArgumentFactory.create(registry, "a", Integer.class, true);
+        ArgumentFactory.create(registry, "b", Integer.class, true);
+
+        ArgumentFactory.create(registry,
+                "c",
+                Integer.class,
                 "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))"));
+                        + " + ((Integer)session.registry().value(\"b\", session))",
+                true);
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -75,10 +79,12 @@ public class ExpressionTest {
         HashMapInputProvider provider = new HashMapInputProvider();
         ArgumentRegistry registry = new ArgumentRegistry();
 
-        registry.put(new NamedExpression(
-                "c", Integer.class,
+        ArgumentFactory.create(registry,
+                "c",
+                Integer.class,
                 "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))"));
+                        + " + ((Integer)session.registry().value(\"b\", session))",
+                true);
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -88,7 +94,7 @@ public class ExpressionTest {
 
         try {
             var res = expression.eval(session);
-            assertTrue(false);
+            fail();
         } catch (EvaluationException e) {
 
         }

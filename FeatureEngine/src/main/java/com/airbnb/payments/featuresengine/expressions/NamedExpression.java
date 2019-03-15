@@ -10,24 +10,13 @@ import org.codehaus.commons.compiler.CompileException;
  * Eg.: expName1 = 1 + 2
  * expName2 = Math.PI
  * expName3 = $expName1 * $expName2
+ * <p>
+ * Since they have "names", they can be used in the same way as user provided arguments.
  */
 public class NamedExpression extends Argument {
 
     // The expression that evaluates to this argument
     private Expression expression;
-
-    /**
-     * Constructor
-     *
-     * @param name       The name of the argument
-     * @param returnType The type of the argument
-     * @param expression The computing expression that evaluates to the desired value
-     * @throws CompileException Thrown if the expression can't be compiled
-     */
-    public NamedExpression(String name, Class<?> returnType, String expression)
-            throws CompileException {
-        this(name, returnType, expression, true);
-    }
 
     /**
      * Constructor
