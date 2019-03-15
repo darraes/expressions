@@ -13,12 +13,15 @@ import java.lang.reflect.InvocationTargetException;
 public class Expression {
     // Original expression text
     private String expressionText;
+    // The class type this expression evaluates to
+    private Class<?> expressionType;
     // Actual expression evaluator
     private ExpressionEvaluator eval;
 
-    public Expression(String expression)
+    public Expression(String expression, Class<?> type)
             throws CompileException {
         this.expressionText = expression;
+        this.expressionType = type;
         this.eval = new ExpressionEvaluator();
 
         // All expressions will only feed of the arguments therefore all we need are the argument
@@ -40,6 +43,13 @@ public class Expression {
      */
     public final String getExpressionText() {
         return expressionText;
+    }
+
+    /**
+     * @return The class type this expression evaluates to
+     */
+    public Class<?> getExpressionType() {
+        return expressionType;
     }
 
     /**

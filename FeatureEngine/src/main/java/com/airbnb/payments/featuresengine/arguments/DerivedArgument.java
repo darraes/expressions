@@ -39,7 +39,7 @@ public class DerivedArgument extends Argument {
     public DerivedArgument(String name, Class<?> returnType, String expression, boolean cacheable)
             throws CompileException {
         super(name, returnType, cacheable);
-        this.expression = new Expression(expression);
+        this.expression = new Expression(expression, returnType);
     }
 
     /**
