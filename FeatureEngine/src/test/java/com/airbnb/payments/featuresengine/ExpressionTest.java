@@ -7,7 +7,7 @@ import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
-import com.airbnb.payments.featuresengine.arguments.SimpleArgument;
+import com.airbnb.payments.featuresengine.arguments.InputArgument;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
@@ -30,8 +30,8 @@ public class ExpressionTest {
         provider.put("b", 8);
 
         ArgumentRegistry registry = new ArgumentRegistry();
-        registry.put(new SimpleArgument("a", Integer.class));
-        registry.put(new SimpleArgument("b", Integer.class));
+        registry.put(new InputArgument("a", Integer.class));
+        registry.put(new InputArgument("b", Integer.class));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -51,8 +51,8 @@ public class ExpressionTest {
         provider.put("b", 8);
 
         ArgumentRegistry registry = new ArgumentRegistry();
-        registry.put(new SimpleArgument("a", Integer.class));
-        registry.put(new SimpleArgument("b", Integer.class));
+        registry.put(new InputArgument("a", Integer.class));
+        registry.put(new InputArgument("b", Integer.class));
         registry.put(new NamedExpression(
                 "c", Integer.class,
                 "((Integer)session.registry().value(\"a\", session))"

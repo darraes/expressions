@@ -14,7 +14,7 @@ public class ArgumentTest {
     @Test
     public void accessProperties() throws CompileException {
         {
-            Argument arg1 = new SimpleArgument("a", Integer.class);
+            Argument arg1 = new InputArgument("a", Integer.class);
 
             assertTrue(arg1.isCacheable());
             assertEquals(Integer.class, arg1.getReturnType());
@@ -22,7 +22,7 @@ public class ArgumentTest {
         }
 
         {
-            Argument arg1 = new SimpleArgument("a", Integer.class, true);
+            Argument arg1 = new InputArgument("a", Integer.class, true);
 
             assertTrue(arg1.isCacheable());
             assertEquals(Integer.class, arg1.getReturnType());
@@ -30,7 +30,7 @@ public class ArgumentTest {
         }
 
         {
-            Argument arg1 = new SimpleArgument("a", Integer.class, false);
+            Argument arg1 = new InputArgument("a", Integer.class, false);
 
             assertFalse(arg1.isCacheable());
             assertEquals(Integer.class, arg1.getReturnType());
@@ -66,8 +66,8 @@ public class ArgumentTest {
         {
             ArgumentRegistry registry = new ArgumentRegistry();
             // Using class 'int' to test the boxed type checking
-            registry.put(new SimpleArgument("a", Integer.class));
-            registry.put(new SimpleArgument("b", Integer.class));
+            registry.put(new InputArgument("a", Integer.class));
+            registry.put(new InputArgument("b", Integer.class));
             registry.put(new NamedExpression(
                     "c", Integer.class,
                     "((Integer)session.registry().value(\"a\", session))"
@@ -90,8 +90,8 @@ public class ArgumentTest {
         { // Using class 'int' to test the boxed type checking
             ArgumentRegistry registry = new ArgumentRegistry();
 
-            registry.put(new SimpleArgument("a", int.class));
-            registry.put(new SimpleArgument("b", int.class));
+            registry.put(new InputArgument("a", int.class));
+            registry.put(new InputArgument("b", int.class));
             registry.put(new NamedExpression(
                     "c", Integer.class,
                     "((Integer)session.registry().value(\"a\", session))"

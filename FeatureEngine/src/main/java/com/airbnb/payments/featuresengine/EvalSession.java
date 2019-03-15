@@ -16,7 +16,7 @@ public class EvalSession {
         this.arguments = provider;
     }
 
-    public IArgumentProvider arguments() {
+    public IArgumentProvider inputs() {
         return this.arguments;
     }
 
