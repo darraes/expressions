@@ -1,24 +1,30 @@
 package com.airbnb.payments.featuresengine;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
+import com.airbnb.payments.featuresengine.arguments.IArgumentProvider;
+import com.airbnb.payments.featuresengine.cache.ICache;
+
 
 public class EvalSession {
-    private Map<String, Object> cache;
+    private ICache cache;
+    private ArgumentRegistry registry;
+    private IArgumentProvider arguments;
 
-    public EvalSession() {
-        this.cache = new HashMap<>();
+    public EvalSession(IArgumentProvider provider, ArgumentRegistry registry, ICache cache) {
+        this.cache = cache;
+        this.registry = registry;
+        this.arguments = provider;
     }
 
-    public void putInCache(String key, Object value) {
-        this.cache.put(key, value);
+    public IArgumentProvider arguments() {
+        return this.arguments;
     }
 
-    public boolean inCache(String key) {
-        return this.cache.containsKey(key);
+    public ArgumentRegistry registry() {
+        return this.registry;
     }
 
-    public Object getFromCache(String key) {
-        return this.cache.get(key);
+    public ICache cache() {
+        return this.cache;
     }
 }

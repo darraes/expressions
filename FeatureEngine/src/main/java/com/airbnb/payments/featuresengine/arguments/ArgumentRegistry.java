@@ -21,12 +21,11 @@ public class ArgumentRegistry {
     }
 
     public Object value(String key,
-                        IArgumentProvider provider,
                         EvalSession session) throws EvaluationException {
         if (!this.exists(key)) {
             throw new EvaluationException("Argument %s not registered", key);
         }
 
-        return this.arguments.get(key).value(this, provider, session);
+        return this.arguments.get(key).value(session);
     }
 }

@@ -8,8 +8,10 @@ import com.airbnb.payments.featuresengine.arguments.IArgumentProvider;
 import org.codehaus.commons.compiler.CompileException;
 
 /**
- * Derived arguments are not access from an argument provided. They are computed from
- * an expression if necessary.
+ * Those expressions can be accessed from any other expression using their names.
+ * Eg.: expName1 = 1 + 2
+ * expName2 = Math.PI
+ * expName3 = $expName1 * $expName2
  */
 public class NamedExpression extends Argument {
 
@@ -21,7 +23,7 @@ public class NamedExpression extends Argument {
      *
      * @param name       The name of the argument
      * @param returnType The type of the argument
-     * @param expression The computing expression that evaluates to the argument
+     * @param expression The computing expression that evaluates to the desired value
      * @throws CompileException Thrown if the expression can't be compiled
      */
     public NamedExpression(String name, Class<?> returnType, String expression)
@@ -32,10 +34,11 @@ public class NamedExpression extends Argument {
     /**
      * Constructor
      *
-     * @param name       The name of the argument
-     * @param returnType The type of the argument
-     * @param expression The computing expression that evaluates to the argument
-     * @param cacheable  If the argument, once computed, should be cached on further fetches
+     * @param name       The name of the expression
+     * @param returnType The type of the expression
+     * @param expression The computing expression that evaluates to the desired value
+     * @param cacheable  If the expression, once computed, should be cached on further fetches
+     *                   for this particular session
      * @throws CompileException Thrown if the expression can't be compiled
      */
     public NamedExpression(String name, Class<?> returnType, String expression, boolean cacheable)
@@ -45,18 +48,10 @@ public class NamedExpression extends Argument {
     }
 
     /**
-     * See |Argument| class for details
+     * Fetches the value by actually computing the evaluation of the compiled expression
      */
-    protected Object fetch(ArgumentRegistry registry,
-                           IArgumentProvider provider,
-                           EvalSession session) throws EvaluationException {
-        return this.expression.eval(registry, provider, session);
-    }
-
-    /**
-     * See |Argument| class for details
-     */
-    public boolean derived() {
-        return true;
+    @Override
+    protected Object fetch(EvalSession session) throws EvaluationException {
+        return this.expression.eval(session);
     }
 }

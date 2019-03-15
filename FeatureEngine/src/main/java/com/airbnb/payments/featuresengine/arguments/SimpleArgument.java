@@ -22,23 +22,15 @@ public class SimpleArgument extends Argument {
     }
 
     /**
-     * See |Argument| class for details
+     * Fetches the argument from the IArgumentProvider provided by the caller
      */
-    protected final Object fetch(ArgumentRegistry registry,
-                                 IArgumentProvider provider,
-                                 EvalSession session) throws EvaluationException {
-        if (!provider.exists(this.getName())) {
+    @Override
+    protected final Object fetch(EvalSession session) throws EvaluationException {
+        if (!session.arguments().exists(this.getName())) {
             throw new EvaluationException(
                     "Argument %s not found on argument provider", this.getName());
         }
 
-        return provider.get(this.getName());
-    }
-
-    /**
-     * See |Argument| class for details
-     */
-    public boolean derived() {
-        return false;
+        return session.arguments().get(this.getName());
     }
 }

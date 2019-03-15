@@ -86,20 +86,16 @@ public abstract class Argument {
      * first call will cache the result and further calls will grab the result from
      * the session cache.
      *
-     * @param registry The engine's argument registry
-     * @param provider The caller's argument provider
      * @param session  Session of the individual request
      * @return Result of the argument fetching
      * @throws EvaluationException
      */
-    final Object value(ArgumentRegistry registry,
-                       IArgumentProvider provider,
-                       EvalSession session) throws EvaluationException {
-        if (this.isCacheable() && session.inCache(this.getName())) {
-            return session.getFromCache(this.getName());
+    final Object value(EvalSession session) throws EvaluationException {
+        if (this.isCacheable() && session.cache().contains(this.getName())) {
+            return session.cache().get(this.getName());
         }
 
-        Object result = this.fetch(registry, provider, session);
+        Object result = this.fetch(session);
 
         if (result != null) {
             if (this.returnType.isInstance(result)
@@ -107,7 +103,7 @@ public abstract class Argument {
                     || (primitiveEquivalenceMap.containsKey(this.returnType)
                     && primitiveEquivalenceMap.get(this.returnType).isInstance(result))) {
                 if (this.isCacheable()) {
-                    session.putInCache(this.getName(), result);
+                    session.cache().put(this.getName(), result);
                 }
 
                 return result;
@@ -126,20 +122,9 @@ public abstract class Argument {
     /**
      * Does the actual fetching of the argument.
      *
-     * @param registry Registry where all argument information is stored
-     * @param provider User provided argument provider object. Used to fetch raw arguments.
      * @param session  The current evaluation session
      * @return The actual argument value
-     * @throws EvaluationException
+     * @throws EvaluationException If anything goes wrong with the evaluation of the value
      */
-    protected abstract Object fetch(ArgumentRegistry registry,
-                                    IArgumentProvider provider,
-                                    EvalSession session) throws EvaluationException;
-
-    /**
-     * If this argument is derived from an expression.
-     *
-     * @return True if the current instance is derived. False otherwise.
-     */
-    public abstract boolean derived();
+    protected abstract Object fetch(EvalSession session) throws EvaluationException;
 }

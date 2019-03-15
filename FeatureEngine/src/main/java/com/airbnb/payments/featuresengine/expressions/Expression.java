@@ -27,11 +27,11 @@ public class Expression {
         // All expressions will only feed of the arguments therefore all we need are the argument
         // registry, the argument provider and the evaluation session
         this.eval.setParameters(
-                new String[]{"registry", "provider", "session"},
-                new Class[]{ArgumentRegistry.class, IArgumentProvider.class, EvalSession.class});
+                new String[]{"session"},
+                new Class[]{EvalSession.class});
         this.eval.setThrownExceptions(new Class[]{EvaluationException.class});
 
-        // TODO (darraes) Check if when the expression gets destructed this compilation doesn't leak
+        // TODO Check if when the expression gets destructed this compilation doesn't leak
         // Leave the expression already compiled for faster performance on evaluation
         this.eval.cook(expression);
     }
@@ -55,22 +55,18 @@ public class Expression {
     /**
      * Evaluates the final value of the expression and returns that value.
      * <p>
-     * All arguments must be registered int the [@registry] object and all user
-     * inputted arguments must be available on the [@provider].
+     * All arguments must be registered int the [@session.registry()] object and all user
+     * inputted arguments must be available on the [@session.provider()].
      * <p>
      * [@session] will record all events and be used as cache to prevent re-computations.
      * <p>
      *
-     * @param registry The engine's argument registry
-     * @param provider The caller's argument provider
      * @param session  Session of the individual request
      * @return Result of the expression computation
      */
-    public final Object eval(ArgumentRegistry registry,
-                             IArgumentProvider provider,
-                             EvalSession session) throws EvaluationException {
+    public final Object eval(EvalSession session) throws EvaluationException {
         try {
-            return this.eval.evaluate(new Object[]{registry, provider, session});
+            return this.eval.evaluate(new Object[]{session});
         } catch (InvocationTargetException e) {
             throw new EvaluationException(
                     String.format("Error evaluation expression %s", this.getExpressionText()), e);
