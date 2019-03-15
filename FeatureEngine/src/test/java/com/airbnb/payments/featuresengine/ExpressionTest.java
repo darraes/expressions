@@ -1,6 +1,7 @@
 package com.airbnb.payments.featuresengine;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
@@ -65,5 +66,31 @@ public class ExpressionTest {
                 int.class);
 
         assertEquals(3.0, expression.eval(session));
+    }
+
+    @Test
+    public void handleExceptions() throws CompileException, EvaluationException {
+        ICache cache = new HashMapCache();
+
+        HashMapInputProvider provider = new HashMapInputProvider();
+        ArgumentRegistry registry = new ArgumentRegistry();
+
+        registry.put(new NamedExpression(
+                "c", Integer.class,
+                "((Integer)session.registry().value(\"a\", session))"
+                        + " + ((Integer)session.registry().value(\"b\", session))"));
+
+        EvalSession session = new EvalSession(provider, registry, cache);
+
+        Expression expression = new Expression(
+                "Math.sqrt(((Integer)session.registry().value(\"c\", session)))",
+                int.class);
+
+        try {
+            var res = expression.eval(session);
+            assertTrue(false);
+        } catch (EvaluationException e) {
+
+        }
     }
 }

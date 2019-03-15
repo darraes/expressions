@@ -1,5 +1,7 @@
 package com.airbnb.payments.featuresengine.arguments;
 
+import java.util.concurrent.CompletableFuture;
+
 public class ArgumentFactory {
     private ArgumentRegistry registry;
 

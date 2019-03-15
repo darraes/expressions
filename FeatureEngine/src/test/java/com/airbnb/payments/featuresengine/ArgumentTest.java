@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine;
 import com.airbnb.payments.featuresengine.arguments.*;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
+import com.airbnb.payments.featuresengine.expressions.Expression;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
@@ -109,6 +110,28 @@ public class ArgumentTest {
             assertFalse(registry.exists("e"));
 
             assertEquals(90, registry.value("d", session));
+        }
+    }
+
+    @Test
+    public void handleExceptions() throws CompileException, EvaluationException {
+        ICache cache = new HashMapCache();
+
+        HashMapInputProvider provider = new HashMapInputProvider();
+        ArgumentRegistry registry = new ArgumentRegistry();
+
+        registry.put(new NamedExpression(
+                "c", Integer.class,
+                "((Integer)session.registry().value(\"a\", session))"
+                        + " + ((Integer)session.registry().value(\"b\", session))"));
+
+        EvalSession session = new EvalSession(provider, registry, cache);
+
+        try {
+            var res = registry.value("c", session);
+            assertTrue(false);
+        } catch (EvaluationException e) {
+
         }
     }
 }
