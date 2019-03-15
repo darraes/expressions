@@ -20,7 +20,7 @@ public abstract class Argument {
      * Used for type checking on the argument fetching.
      */
     private static final Map<Class<?>, Class<?>> primitiveEquivalenceMap
-            = new HashMap<>(32);
+            = new HashMap<>(16);
 
     /**
      * Initiates the type equivalence map

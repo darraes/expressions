@@ -1,9 +1,17 @@
 package com.airbnb.payments.featuresengine.arguments;
 
 public interface IInputProvider {
-    void put(String key, Object value);
-
+    /**
+     *
+     * @param key
+     * @return
+     */
     Object get(String key);
 
+    /**
+     *
+     * @param key
+     * @return
+     */
     boolean exists(String key);
 }
