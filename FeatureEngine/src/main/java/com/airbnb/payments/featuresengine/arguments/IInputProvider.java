@@ -1,6 +1,6 @@
 package com.airbnb.payments.featuresengine.arguments;
 
-public interface IArgumentProvider {
+public interface IInputProvider {
     void put(String key, Object value);
 
     Object get(String key);

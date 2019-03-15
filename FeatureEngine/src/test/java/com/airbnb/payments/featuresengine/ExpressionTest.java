@@ -2,7 +2,7 @@ package com.airbnb.payments.featuresengine;
 
 import static org.junit.Assert.assertEquals;
 
-import com.airbnb.payments.featuresengine.arguments.HashMapArgumentProvider;
+import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
@@ -25,7 +25,7 @@ public class ExpressionTest {
     public void evaluateSimple() throws CompileException, EvaluationException {
         ICache cache = new HashMapCache();
 
-        HashMapArgumentProvider provider = new HashMapArgumentProvider();
+        HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("a", 1);
         provider.put("b", 8);
 
@@ -46,7 +46,7 @@ public class ExpressionTest {
     public void evaluateRecursive() throws CompileException, EvaluationException {
         ICache cache = new HashMapCache();
 
-        HashMapArgumentProvider provider = new HashMapArgumentProvider();
+        HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("a", 1);
         provider.put("b", 8);
 

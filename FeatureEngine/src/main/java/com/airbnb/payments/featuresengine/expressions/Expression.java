@@ -2,8 +2,6 @@ package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
-import com.airbnb.payments.featuresengine.arguments.IArgumentProvider;
-import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ExpressionEvaluator;

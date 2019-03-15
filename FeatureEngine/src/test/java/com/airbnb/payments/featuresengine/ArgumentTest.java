@@ -59,7 +59,7 @@ public class ArgumentTest {
     public void expressionArgument() throws EvaluationException, CompileException {
         ICache cache = new HashMapCache();
 
-        HashMapArgumentProvider provider = new HashMapArgumentProvider();
+        HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("a", 1);
         provider.put("b", 8);
 

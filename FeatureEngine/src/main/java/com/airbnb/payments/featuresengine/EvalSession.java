@@ -1,22 +1,22 @@
 package com.airbnb.payments.featuresengine;
 
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
-import com.airbnb.payments.featuresengine.arguments.IArgumentProvider;
+import com.airbnb.payments.featuresengine.arguments.IInputProvider;
 import com.airbnb.payments.featuresengine.cache.ICache;
 
 
 public class EvalSession {
     private ICache cache;
     private ArgumentRegistry registry;
-    private IArgumentProvider arguments;
+    private IInputProvider arguments;
 
-    public EvalSession(IArgumentProvider provider, ArgumentRegistry registry, ICache cache) {
+    public EvalSession(IInputProvider provider, ArgumentRegistry registry, ICache cache) {
         this.cache = cache;
         this.registry = registry;
         this.arguments = provider;
     }
 
-    public IArgumentProvider inputs() {
+    public IInputProvider inputs() {
         return this.arguments;
     }
 

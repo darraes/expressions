@@ -2,14 +2,14 @@ package com.airbnb.payments.featuresengine.arguments;
 
 import java.util.HashMap;
 
-public class HashMapArgumentProvider implements IArgumentProvider {
+public class HashMapInputProvider implements IInputProvider {
     private HashMap<String, Object> arguments;
 
-    public HashMapArgumentProvider() {
+    public HashMapInputProvider() {
         this.arguments = new HashMap<>();
     }
 
-    public HashMapArgumentProvider(HashMap<String, Object> args) {
+    public HashMapInputProvider(HashMap<String, Object> args) {
         this.arguments = args;
     }
 

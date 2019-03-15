@@ -4,7 +4,7 @@ import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
 
 /**
- * Represents an |Argument| that is directed provided by an IArgumentProvider.
+ * Represents an |Argument| that is directed provided by an IInputProvider.
  */
 public class InputArgument extends Argument {
     /**
@@ -22,7 +22,7 @@ public class InputArgument extends Argument {
     }
 
     /**
-     * Fetches the argument from the IArgumentProvider provided by the caller
+     * Fetches the argument from the IInputProvider provided by the caller
      */
     @Override
     protected final Object fetch(EvalSession session) throws EvaluationException {
