@@ -5,7 +5,7 @@ import com.airbnb.payments.featuresengine.EvaluationException;
 
 /**
  * Represents an |Argument| that is directed provided by an IInputProvider.
- * Those are most likely the parameters provided by the user of the enging.
+ * Those are most likely the parameters provided by the user of the engine.
  */
 public class InputArgument extends Argument {
 
