@@ -24,18 +24,22 @@ public class NamedExpression extends Argument {
      * @param name       The name of the expression
      * @param returnType The type of the expression
      * @param expression The computing expression that evaluates to the desired value
-     * @param cacheable  If the expression, once computed, should be cached on further fetches
-     *                   for this particular session
+     * @param cacheable  If the expression, once computed, should be cached on further
+     *                   fetches for this particular session
      * @throws CompilationException Thrown if the expression can't be compiled
      */
-    public NamedExpression(String name, Class<?> returnType, String expression, boolean cacheable)
+    public NamedExpression(String name,
+                           Class<?> returnType,
+                           String expression,
+                           boolean cacheable)
             throws CompilationException {
         super(name, returnType, cacheable);
         this.expression = new Expression(expression, returnType);
     }
 
     /**
-     * Fetches the value by actually computing the evaluation of the compiled expression
+     * Fetches the value by actually computing the evaluation of the compiled
+     * expression
      */
     @Override
     protected Object fetch(EvalSession session) throws EvaluationException {

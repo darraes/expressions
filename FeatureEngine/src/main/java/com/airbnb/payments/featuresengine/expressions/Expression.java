@@ -23,14 +23,14 @@ public class Expression {
         this.expressionType = type;
         this.eval = new ExpressionEvaluator();
 
-        // All expressions will only feed of the arguments therefore all we need are the argument
-        // registry, the argument provider and the evaluation session
+        // All expressions will only feed of the arguments therefore all we need are
+        // the argument registry, the argument provider and the evaluation session
         this.eval.setParameters(
                 new String[]{"session"},
                 new Class[]{EvalSession.class});
         this.eval.setThrownExceptions(new Class[]{EvaluationException.class});
 
-        // TODO Check if when the expression gets destructed this compilation doesn't leak
+        // TODO Check when the expression gets destructed the compilation doesn't leak
         // Leave the expression already compiled for faster performance on evaluation
         try {
             this.eval.cook(expression);
@@ -58,10 +58,11 @@ public class Expression {
     /**
      * Evaluates the final value of the expression and returns that value.
      * <p>
-     * All arguments must be registered int the [@session.registry()] object and all user
-     * inputted arguments must be available on the [@session.provider()].
+     * All arguments must be registered int the [@session.registry()] object and all
+     * user inputted arguments must be available on the [@session.provider()].
      * <p>
-     * [@session] will record all events and be used as cache to prevent re-computations.
+     * [@session] will record all events and be used as cache to prevent
+     * re-computations.
      * <p>
      *
      * @param session  Session of the individual request

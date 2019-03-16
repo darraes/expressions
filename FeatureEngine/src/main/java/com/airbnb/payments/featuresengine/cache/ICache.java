@@ -1,5 +1,7 @@
 package com.airbnb.payments.featuresengine.cache;
 
+import com.airbnb.payments.featuresengine.EvaluationException;
+
 public interface ICache {
     /**
      * If the @key is present in the cache
@@ -22,7 +24,7 @@ public interface ICache {
      *
      * @param key The key to search for
      * @return The value stored under the key
-     * @throws RuntimeException If @key is not present
+     * @throws EvaluationException If @key is not present
      */
-    Object get(String key) throws RuntimeException;
+    Object get(String key) throws EvaluationException;
 }
