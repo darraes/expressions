@@ -53,13 +53,13 @@ public class ArgumentTest {
 
     @Test
     public void expressionArgument() throws EvaluationException, CompilationException {
-        ICache cache = new HashMapCache();
-
         HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("a", 1);
         provider.put("b", 8);
 
         {
+            ICache cache = new HashMapCache();
+
             ArgumentRegistry registry = new ArgumentRegistry();
             // Using class 'int' to test the boxed type checking
             ArgumentFactory.create(registry, "a", Integer.class, true);
@@ -88,6 +88,8 @@ public class ArgumentTest {
         }
 
         { // Using class 'int' to test the boxed type checking
+            ICache cache = new HashMapCache();
+
             ArgumentRegistry registry = new ArgumentRegistry();
             // Using class 'int' to test the boxed type checking
             ArgumentFactory.create(registry, "a", int.class, true);
@@ -117,7 +119,12 @@ public class ArgumentTest {
     }
 
     @Test
-    public void handleExceptions() throws CompilationException, EvaluationException {
+    public void cachingEvaluations() throws CompilationException {
+        // TODO
+    }
+
+    @Test
+    public void handleExceptions() throws CompilationException {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();

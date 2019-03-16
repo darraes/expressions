@@ -12,15 +12,7 @@ import static org.junit.Assert.*;
 
 public class ExpressionTest {
 
-    @Test
-    public void accessProperties() throws CompilationException {
-        Expression expression = new Expression("1 + 3", int.class);
-        assertEquals("1 + 3", expression.getExpressionText());
-        assertEquals(int.class, expression.getExpressionType());
-    }
-
-    @Test
-    public void evaluateSimple() throws CompilationException, EvaluationException {
+    private static EvalSession createTestSession() throws CompilationException {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();
@@ -32,7 +24,26 @@ public class ExpressionTest {
         ArgumentFactory.create(registry, "a", Integer.class, true);
         ArgumentFactory.create(registry, "b", Integer.class, true);
 
-        EvalSession session = new EvalSession(provider, registry, cache);
+        ArgumentFactory.create(registry,
+                "c",
+                Integer.class,
+                "((Integer)session.registry().value(\"a\", session))"
+                        + " + ((Integer)session.registry().value(\"b\", session))",
+                true);
+
+        return new EvalSession(provider, registry, cache);
+    }
+
+    @Test
+    public void accessProperties() throws CompilationException {
+        Expression expression = new Expression("1 + 3", int.class);
+        assertEquals("1 + 3", expression.getExpressionText());
+        assertEquals(int.class, expression.getExpressionType());
+    }
+
+    @Test
+    public void evaluateSimple() throws CompilationException, EvaluationException {
+        EvalSession session = createTestSession();
 
         Expression expression = new Expression(
                 "((Integer)session.registry().value(\"a\", session))"
@@ -43,25 +54,7 @@ public class ExpressionTest {
 
     @Test
     public void evaluateRecursive() throws CompilationException, EvaluationException {
-        ICache cache = new HashMapCache();
-
-        HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("a", 1);
-        provider.put("b", 8);
-
-        ArgumentRegistry registry = new ArgumentRegistry();
-
-        ArgumentFactory.create(registry, "a", Integer.class, true);
-        ArgumentFactory.create(registry, "b", Integer.class, true);
-
-        ArgumentFactory.create(registry,
-                "c",
-                Integer.class,
-                "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))",
-                true);
-
-        EvalSession session = new EvalSession(provider, registry, cache);
+        EvalSession session = createTestSession();
 
         Expression expression = new Expression(
                 "Math.sqrt(((Integer)session.registry().value(\"c\", session)))",
@@ -72,22 +65,10 @@ public class ExpressionTest {
 
     @Test
     public void handleExceptions() throws CompilationException, EvaluationException {
-        ICache cache = new HashMapCache();
-
-        HashMapInputProvider provider = new HashMapInputProvider();
-        ArgumentRegistry registry = new ArgumentRegistry();
-
-        ArgumentFactory.create(registry,
-                "c",
-                Integer.class,
-                "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))",
-                true);
-
-        EvalSession session = new EvalSession(provider, registry, cache);
+        EvalSession session = createTestSession();
 
         Expression expression = new Expression(
-                "Math.sqrt(((Integer)session.registry().value(\"c\", session)))",
+                "Math.sqrt(((Integer)session.registry().value(\"d\", session)))",
                 int.class);
 
         try {
