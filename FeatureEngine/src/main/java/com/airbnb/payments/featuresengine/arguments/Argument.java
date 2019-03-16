@@ -2,7 +2,6 @@ package com.airbnb.payments.featuresengine.arguments;
 
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
-import org.codehaus.commons.compiler.CompileException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,7 @@ public abstract class Argument {
      * Used for type checking on the argument fetching.
      */
     private static final Map<Class<?>, Class<?>> primitiveEquivalenceMap
-            = new HashMap<>(16);
+            = new HashMap<>();
 
     /**
      * Initiates the type equivalence map
@@ -50,7 +49,8 @@ public abstract class Argument {
      *
      * @param name       The name of the argument
      * @param returnType The type of the argument
-     * @param cacheable  If the argument, once computed, should be cached on further fetches
+     * @param cacheable  If the argument, once computed, should be cached on further
+     *                   fetches
      */
     public Argument(String name, Class<?> returnType, boolean cacheable) {
         this.name = name;
@@ -86,7 +86,7 @@ public abstract class Argument {
      * first call will cache the result and further calls will grab the result from
      * the session cache.
      *
-     * @param session  Session of the individual request
+     * @param session Session of the individual request
      * @return Result of the argument fetching
      * @throws EvaluationException
      */
@@ -101,7 +101,8 @@ public abstract class Argument {
             if (this.returnType.isInstance(result)
                     || this.returnType.isAssignableFrom(result.getClass())
                     || (primitiveEquivalenceMap.containsKey(this.returnType)
-                    && primitiveEquivalenceMap.get(this.returnType).isInstance(result))) {
+                    && primitiveEquivalenceMap.get(
+                    this.returnType).isInstance(result))) {
                 if (this.isCacheable()) {
                     session.cache().put(this.getName(), result);
                 }
@@ -110,8 +111,11 @@ public abstract class Argument {
             } else {
                 throw new EvaluationException(
                         String.format(
-                                "Argument %s (type: %s) is not assinable to expected type %s",
-                                this.getName(), result.getClass(), this.getReturnType()));
+                                "Argument %s (type: %s) is not assignable to"
+                                        + " expected type %s",
+                                this.getName(),
+                                result.getClass(),
+                                this.getReturnType()));
             }
         }
 
@@ -122,9 +126,10 @@ public abstract class Argument {
     /**
      * Does the actual fetching of the argument.
      *
-     * @param session  The current evaluation session
+     * @param session The current evaluation session
      * @return The actual argument value
-     * @throws EvaluationException If anything goes wrong with the evaluation of the value
+     * @throws EvaluationException If anything goes wrong with the evaluation of the
+     *                             value
      */
     protected abstract Object fetch(EvalSession session) throws EvaluationException;
 }
