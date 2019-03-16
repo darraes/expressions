@@ -119,7 +119,7 @@ public class ArgumentTest {
     }
 
     @Test
-    public void cachingEvaluations() throws CompilationException {
+    public void cachingEvaluations() throws EvaluationException {
         // TODO
     }
 

@@ -42,7 +42,32 @@ public class ExpressionTest {
     }
 
     @Test
-    public void evaluateSimple() throws CompilationException, EvaluationException {
+    public void evaluateStaticMethod()
+            throws CompilationException, EvaluationException {
+        // TODO
+    }
+
+    @Test
+    public void evaluateInstanceMethod()
+            throws CompilationException, EvaluationException {
+        // TODO
+    }
+
+    @Test
+    public void evaluateConstructor()
+            throws CompilationException, EvaluationException {
+        // TODO
+    }
+
+    @Test
+    public void evaluateWriteExpression()
+            throws CompilationException, EvaluationException {
+        // TODO
+    }
+
+    @Test
+    public void evaluateInputArgument()
+            throws CompilationException, EvaluationException {
         EvalSession session = createTestSession();
 
         Expression expression = new Expression(
@@ -53,7 +78,8 @@ public class ExpressionTest {
     }
 
     @Test
-    public void evaluateRecursive() throws CompilationException, EvaluationException {
+    public void evaluateRecursiveArguments()
+            throws CompilationException, EvaluationException {
         EvalSession session = createTestSession();
 
         Expression expression = new Expression(
