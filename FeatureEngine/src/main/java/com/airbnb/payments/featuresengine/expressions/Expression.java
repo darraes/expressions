@@ -1,5 +1,6 @@
 package com.airbnb.payments.featuresengine.expressions;
 
+import com.airbnb.payments.featuresengine.CompilationException;
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
 
@@ -17,7 +18,7 @@ public class Expression {
     private ExpressionEvaluator eval;
 
     public Expression(String expression, Class<?> type)
-            throws CompileException {
+            throws CompilationException {
         this.expressionText = expression;
         this.expressionType = type;
         this.eval = new ExpressionEvaluator();
@@ -31,7 +32,11 @@ public class Expression {
 
         // TODO Check if when the expression gets destructed this compilation doesn't leak
         // Leave the expression already compiled for faster performance on evaluation
-        this.eval.cook(expression);
+        try {
+            this.eval.cook(expression);
+        } catch (CompileException e) {
+            throw new CompilationException(e, "Failed compiling %s", expression);
+        }
     }
 
     /**

@@ -5,9 +5,7 @@ import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
-import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 import com.airbnb.payments.featuresengine.expressions.Expression;
-import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -15,14 +13,14 @@ import static org.junit.Assert.*;
 public class ExpressionTest {
 
     @Test
-    public void accessProperties() throws CompileException {
+    public void accessProperties() throws CompilationException {
         Expression expression = new Expression("1 + 3", int.class);
         assertEquals("1 + 3", expression.getExpressionText());
         assertEquals(int.class, expression.getExpressionType());
     }
 
     @Test
-    public void evaluateSimple() throws CompileException, EvaluationException {
+    public void evaluateSimple() throws CompilationException, EvaluationException {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();
@@ -44,7 +42,7 @@ public class ExpressionTest {
     }
 
     @Test
-    public void evaluateRecursive() throws CompileException, EvaluationException {
+    public void evaluateRecursive() throws CompilationException, EvaluationException {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();
@@ -73,7 +71,7 @@ public class ExpressionTest {
     }
 
     @Test
-    public void handleExceptions() throws CompileException, EvaluationException {
+    public void handleExceptions() throws CompilationException, EvaluationException {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();

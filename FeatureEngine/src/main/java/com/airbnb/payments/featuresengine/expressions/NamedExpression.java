@@ -1,9 +1,9 @@
 package com.airbnb.payments.featuresengine.expressions;
 
+import com.airbnb.payments.featuresengine.CompilationException;
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
 import com.airbnb.payments.featuresengine.arguments.Argument;
-import org.codehaus.commons.compiler.CompileException;
 
 /**
  * Those expressions can be accessed from any other expression using their names.
@@ -26,10 +26,10 @@ public class NamedExpression extends Argument {
      * @param expression The computing expression that evaluates to the desired value
      * @param cacheable  If the expression, once computed, should be cached on further fetches
      *                   for this particular session
-     * @throws CompileException Thrown if the expression can't be compiled
+     * @throws CompilationException Thrown if the expression can't be compiled
      */
     public NamedExpression(String name, Class<?> returnType, String expression, boolean cacheable)
-            throws CompileException {
+            throws CompilationException {
         super(name, returnType, cacheable);
         this.expression = new Expression(expression, returnType);
     }

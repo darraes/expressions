@@ -1,5 +1,6 @@
 package com.airbnb.payments.featuresengine.arguments;
 
+import com.airbnb.payments.featuresengine.CompilationException;
 import com.airbnb.payments.featuresengine.EvalSession;
 import com.airbnb.payments.featuresengine.EvaluationException;
 
@@ -12,7 +13,11 @@ public class ArgumentRegistry {
         this.arguments = new HashMap<>();
     }
 
-    public void register(Argument arg) {
+    public void register(Argument arg) throws CompilationException {
+        if (this.exists(arg.getName())) {
+            throw new CompilationException("Argument %s already registered", arg.getName());
+        }
+
         this.arguments.put(arg.getName(), arg);
     }
 

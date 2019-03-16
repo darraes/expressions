@@ -27,4 +27,6 @@ public class EvalSession {
     public ICache cache() {
         return this.cache;
     }
+
+    // TODO save named expression stack to prevent cycles
 }

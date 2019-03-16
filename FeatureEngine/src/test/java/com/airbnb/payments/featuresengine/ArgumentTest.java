@@ -4,7 +4,6 @@ import com.airbnb.payments.featuresengine.arguments.*;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
-import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
 
 
@@ -12,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class ArgumentTest {
     @Test
-    public void accessProperties() throws CompileException {
+    public void accessProperties() throws CompilationException {
 
         {
             Argument arg1 = new InputArgument("a", Integer.class, true);
@@ -53,7 +52,7 @@ public class ArgumentTest {
     }
 
     @Test
-    public void expressionArgument() throws EvaluationException, CompileException {
+    public void expressionArgument() throws EvaluationException, CompilationException {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();
@@ -118,7 +117,7 @@ public class ArgumentTest {
     }
 
     @Test
-    public void handleExceptions() throws CompileException, EvaluationException {
+    public void handleExceptions() throws CompilationException, EvaluationException {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();
