@@ -91,35 +91,48 @@ public abstract class Argument {
      * @throws EvaluationException
      */
     final Object value(EvalSession session) throws EvaluationException {
-        if (this.isCacheable() && session.cache().contains(this.getName())) {
-            return session.cache().get(this.getName());
-        }
+        try {
+            session.stack().push(this.getName());
 
-        Object result = this.fetch(session);
+            if (this.isCacheable() && session.cache().contains(this.getName())) {
+                return session.cache().get(this.getName());
+            }
 
-        if (result != null) {
-            if (this.returnType.isInstance(result)
-                    || this.returnType.isAssignableFrom(result.getClass())
-                    || (primitiveEquivalenceMap.containsKey(this.returnType)
-                    && primitiveEquivalenceMap.get(
-                    this.returnType).isInstance(result))) {
-                if (this.isCacheable()) {
-                    session.cache().put(this.getName(), result);
+            Object result = this.fetch(session);
+
+            if (result != null) {
+                if (this.returnType.isInstance(result)
+                        || this.returnType.isAssignableFrom(result.getClass())
+                        || (primitiveEquivalenceMap.containsKey(this.returnType)
+                        && primitiveEquivalenceMap.get(
+                        this.returnType).isInstance(result))) {
+                    if (this.isCacheable()) {
+                        session.cache().put(this.getName(), result);
+                    }
+                    return result;
+                } else {
+                    throw new EvaluationException(
+                            String.format(
+                                    "Argument %s (type: %s) is not assignable to"
+                                            + " expected type %s",
+                                    this.getName(),
+                                    result.getClass(),
+                                    this.getReturnType()));
                 }
-                return result;
-            } else {
+            }
+
+            throw new EvaluationException(
+                    String.format("Argument %s not found", this.getName()));
+        } finally {
+            String name = session.stack().pop();
+            if (!name.equals(this.getName())) {
                 throw new EvaluationException(
-                        String.format(
-                                "Argument %s (type: %s) is not assignable to"
-                                        + " expected type %s",
+                        String.format("Expression frames inconsistent."
+                                        + " Expecting %s but got %s",
                                 this.getName(),
-                                result.getClass(),
-                                this.getReturnType()));
+                                name));
             }
         }
-
-        throw new EvaluationException(
-                String.format("Argument %s not found", this.getName()));
     }
 
     /**
