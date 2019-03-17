@@ -12,8 +12,9 @@ public class InputArgument extends Argument {
     /**
      * See |Argument| class for details
      */
-    public InputArgument(String name, Class<?> returnType, boolean cacheable) {
-        super(name, returnType, cacheable);
+    public InputArgument(
+            String name, Class<?>returnType, boolean cacheable, boolean isAsync) {
+        super(name, returnType, cacheable, isAsync);
     }
 
     /**

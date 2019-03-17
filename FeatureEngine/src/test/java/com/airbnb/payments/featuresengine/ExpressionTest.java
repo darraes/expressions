@@ -5,6 +5,7 @@ import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
+import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
@@ -24,15 +25,30 @@ public class ExpressionTest {
 
         ArgumentRegistry registry = new ArgumentRegistry();
 
-        ArgumentFactory.create(registry, "a", Integer.class, true);
-        ArgumentFactory.create(registry, "b", Integer.class, true);
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "a",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "b",
+                        Integer.class.getName(),
+                        true,
+                        false));
 
-        ArgumentFactory.create(registry,
-                "c",
-                Integer.class,
-                "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))",
-                true);
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "c",
+                        Integer.class.getName(),
+                        "((Integer)session.registry().value(\"a\", session))"
+                                + " + ((Integer)session.registry().value(\"b\", session))",
+                        true,
+                        false));
 
         return new EvalSession(provider, registry, cache);
     }
@@ -108,7 +124,7 @@ public class ExpressionTest {
                 int.class);
 
         try {
-            var res = expression.eval(session);
+            expression.eval(session);
             fail();
         } catch (EvaluationException e) {
 

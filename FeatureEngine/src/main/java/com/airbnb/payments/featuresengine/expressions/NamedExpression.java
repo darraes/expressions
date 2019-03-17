@@ -17,6 +17,8 @@ public class NamedExpression extends Argument {
 
     // The expression that evaluates to this argument
     private Expression expression;
+    // Text of the expression
+    private String expressionText;
 
     /**
      * Constructor
@@ -31,10 +33,19 @@ public class NamedExpression extends Argument {
     public NamedExpression(String name,
                            Class<?> returnType,
                            String expression,
-                           boolean cacheable)
+                           boolean cacheable,
+                           boolean isAsync)
             throws CompilationException {
-        super(name, returnType, cacheable);
+        super(name, returnType, cacheable, isAsync);
+        this.expressionText = expression;
         this.expression = new Expression(expression, returnType);
+    }
+
+    /**
+     * Gets the original expression text
+     */
+    public String getExpressionText() {
+        return this.expressionText;
     }
 
     /**

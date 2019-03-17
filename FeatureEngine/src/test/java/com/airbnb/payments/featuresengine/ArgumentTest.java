@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine;
 import com.airbnb.payments.featuresengine.arguments.*;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
+import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
@@ -55,17 +56,21 @@ public class ArgumentTest {
     @Test
     public void accessProperties() throws CompilationException {
         {
-            Argument arg1 = new InputArgument("a", Integer.class, true);
+            Argument arg1 = new InputArgument(
+                    "a", Integer.class, true, true);
 
             assertTrue(arg1.isCacheable());
+            assertTrue(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
         }
 
         {
-            Argument arg1 = new InputArgument("a", Integer.class, false);
+            Argument arg1 = new InputArgument(
+                    "a", Integer.class, false, false);
 
             assertFalse(arg1.isCacheable());
+            assertFalse(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
         }
@@ -75,20 +80,29 @@ public class ArgumentTest {
                     "a",
                     Integer.class,
                     "3 + 7",
+                    true,
                     true);
 
             assertTrue(arg1.isCacheable());
+            assertTrue(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
+            assertEquals("3 + 7", ((NamedExpression)arg1).getExpressionText());
         }
 
         {
             Argument arg1 = new NamedExpression(
-                    "a", Integer.class, "3 + 7", false);
+                    "a",
+                    Integer.class,
+                    "3 + 7",
+                    false,
+                    false);
 
             assertFalse(arg1.isCacheable());
+            assertFalse(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
+            assertEquals("3 + 7", ((NamedExpression)arg1).getExpressionText());
         }
     }
 
@@ -98,65 +112,48 @@ public class ArgumentTest {
         provider.put("a", 1);
         provider.put("b", 8);
 
-        {
-            ICache cache = new HashMapCache();
+        ICache cache = new HashMapCache();
 
-            ArgumentRegistry registry = new ArgumentRegistry();
-            // Using class 'int' to test the boxed type checking
-            ArgumentFactory.create(registry, "a", Integer.class, true);
-            ArgumentFactory.create(registry, "b", Integer.class, true);
-            ArgumentFactory.create(registry,
-                    "c",
-                    Integer.class,
-                    "((Integer)session.registry().value(\"a\", session))"
-                            + " + ((Integer)session.registry().value(\"b\", session))",
-                    true);
-            ArgumentFactory.create(registry,
-                    "d",
-                    Integer.class,
-                    "10 * ((Integer)session.registry().value(\"c\", session))",
-                    true);
+        ArgumentRegistry registry = new ArgumentRegistry();
+        // Using class 'int' to test the boxed type checking
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "a",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig("b",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(registry,
+                new ArgumentConfig(
+                        "c",
+                        Integer.class.getName(),
+                        "((Integer)session.registry().value(\"a\", session))"
+                                + " + ((Integer)session.registry().value(\"b\", session))",
+                        true,
+                        false));
+        ArgumentFactory.create(registry,
+                new ArgumentConfig(
+                        "d",
+                        Integer.class.getName(),
+                        "10 * ((Integer)session.registry().value(\"c\", session))",
+                        true,
+                        false));
 
-            EvalSession session = new EvalSession(provider, registry, cache);
+        EvalSession session = new EvalSession(provider, registry, cache);
 
-            assertTrue(registry.exists("a"));
-            assertTrue(registry.exists("b"));
-            assertTrue(registry.exists("c"));
-            assertTrue(registry.exists("d"));
-            assertFalse(registry.exists("e"));
+        assertTrue(registry.exists("a"));
+        assertTrue(registry.exists("b"));
+        assertTrue(registry.exists("c"));
+        assertTrue(registry.exists("d"));
+        assertFalse(registry.exists("e"));
 
-            assertEquals(90, registry.value("d", session));
-        }
-
-        { // Using class 'int' to test the boxed type checking
-            ICache cache = new HashMapCache();
-
-            ArgumentRegistry registry = new ArgumentRegistry();
-            // Using class 'int' to test the boxed type checking
-            ArgumentFactory.create(registry, "a", int.class, true);
-            ArgumentFactory.create(registry, "b", int.class, true);
-            ArgumentFactory.create(registry,
-                    "c",
-                    Integer.class,
-                    "((Integer)session.registry().value(\"a\", session))"
-                            + " + ((Integer)session.registry().value(\"b\", session))",
-                    true);
-            ArgumentFactory.create(registry,
-                    "d",
-                    Integer.class,
-                    "10 * ((Integer)session.registry().value(\"c\", session))",
-                    true);
-
-            EvalSession session = new EvalSession(provider, registry, cache);
-
-            assertTrue(registry.exists("a"));
-            assertTrue(registry.exists("b"));
-            assertTrue(registry.exists("c"));
-            assertTrue(registry.exists("d"));
-            assertFalse(registry.exists("e"));
-
-            assertEquals(90, registry.value("d", session));
-        }
+        assertEquals(90, registry.value("d", session));
     }
 
     @Test
@@ -170,14 +167,28 @@ public class ArgumentTest {
 
         ArgumentRegistry registry = new ArgumentRegistry();
         // Using class 'int' to test the boxed type checking
-        ArgumentFactory.create(registry, "a", Integer.class, true);
-        ArgumentFactory.create(registry, "b", Integer.class, true);
-        ArgumentFactory.create(registry,
-                "c",
-                Integer.class,
-                "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))",
-                true);
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "a",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "b",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "c",
+                        Integer.class.getName(),
+                        "((Integer)session.registry().value(\"a\", session))"
+                                + " + ((Integer)session.registry().value(\"b\", session))",
+                        true, false));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -195,7 +206,6 @@ public class ArgumentTest {
         assertTrue(cache.contains("a"));
         assertTrue(cache.contains("b"));
         assertTrue(cache.contains("c"));
-
     }
 
     @Test
@@ -206,11 +216,12 @@ public class ArgumentTest {
         ArgumentRegistry registry = new ArgumentRegistry();
 
         ArgumentFactory.create(registry,
-                "c",
-                Integer.class,
-                "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))",
-                true);
+                new ArgumentConfig(
+                        "c",
+                        Integer.class.getName(),
+                        "((Integer)session.registry().value(\"a\", session))"
+                                + " + ((Integer)session.registry().value(\"b\", session))",
+                        true, false));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -229,17 +240,21 @@ public class ArgumentTest {
         HashMapInputProvider provider = new HashMapInputProvider();
         ArgumentRegistry registry = new ArgumentRegistry();
 
-        ArgumentFactory.create(registry,
-                "a",
-                Integer.class,
-                "1 + ((Integer)session.registry().value(\"b\", session))",
-                true);
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "a",
+                        Integer.class.getName(),
+                        "1 + ((Integer)session.registry().value(\"b\", session))",
+                        true, false));
 
-        ArgumentFactory.create(registry,
-                "b",
-                Integer.class,
-                "1 + ((Integer)session.registry().value(\"a\", session))",
-                true);
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "b",
+                        Integer.class.getName(),
+                        "1 + ((Integer)session.registry().value(\"a\", session))",
+                        true, false));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 

@@ -13,6 +13,8 @@ public abstract class Argument {
     private Class<?> returnType;
     // If the argument is cacheable
     private boolean cacheable;
+    // If the given argument needs async fetching
+    private boolean isAsync;
 
     /**
      * Map with primitive type and their boxed versions as key->value.
@@ -51,11 +53,16 @@ public abstract class Argument {
      * @param returnType The type of the argument
      * @param cacheable  If the argument, once computed, should be cached on further
      *                   fetches
+     * @param isAsync    If the given argument needs async fetching
      */
-    public Argument(String name, Class<?> returnType, boolean cacheable) {
+    public Argument(String name,
+                    Class<?> returnType,
+                    boolean cacheable,
+                    boolean isAsync) {
         this.name = name;
         this.returnType = returnType;
         this.cacheable = cacheable;
+        this.isAsync = isAsync;
     }
 
     /**
@@ -79,6 +86,13 @@ public abstract class Argument {
      */
     public boolean isCacheable() {
         return this.cacheable;
+    }
+
+    /**
+     * If the argument requires async fetching
+     */
+    public boolean isAsync() {
+        return this.isAsync;
     }
 
     /**
