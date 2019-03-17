@@ -31,4 +31,8 @@ public class ExpressionStack {
         this.inProgressEvals.remove(key);
         return key;
     }
+
+    public boolean contains(String key) {
+        return this.inProgressEvals.contains(key);
+    }
 }

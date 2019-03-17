@@ -43,7 +43,7 @@ public class HashMapInputProvider implements IInputProvider {
     @Override
     public Object get(String name) throws EvaluationException {
         if (!this.exists(name)) {
-            throw new EvaluationException("Argument %s doesn't exist", name);
+            throw new EvaluationException("Argument %s not found", name);
         }
 
         return this.arguments.get(name);

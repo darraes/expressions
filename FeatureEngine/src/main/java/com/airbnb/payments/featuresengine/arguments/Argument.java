@@ -91,48 +91,49 @@ public abstract class Argument {
      * @throws EvaluationException
      */
     final Object value(EvalSession session) throws EvaluationException {
-        try {
-            session.stack().push(this.getName());
 
-            if (this.isCacheable() && session.cache().contains(this.getName())) {
-                return session.cache().get(this.getName());
-            }
-
-            Object result = this.fetch(session);
-
-            if (result != null) {
-                if (this.returnType.isInstance(result)
-                        || this.returnType.isAssignableFrom(result.getClass())
-                        || (primitiveEquivalenceMap.containsKey(this.returnType)
-                        && primitiveEquivalenceMap.get(
-                        this.returnType).isInstance(result))) {
-                    if (this.isCacheable()) {
-                        session.cache().put(this.getName(), result);
-                    }
-                    return result;
-                } else {
-                    throw new EvaluationException(
-                            String.format(
-                                    "Argument %s (type: %s) is not assignable to"
-                                            + " expected type %s",
-                                    this.getName(),
-                                    result.getClass(),
-                                    this.getReturnType()));
-                }
-            }
-
+        if (session.stack().contains(this.getName())) {
             throw new EvaluationException(
-                    String.format("Argument %s not found", this.getName()));
+                    "Circular dependency found on argument %s",
+                    this.getName());
+        }
+
+        session.stack().push(this.getName());
+
+        if (this.isCacheable() && session.cache().contains(this.getName())) {
+            return session.cache().get(this.getName());
+        }
+
+        Object result;
+        try {
+            result = this.fetch(session);
         } finally {
             String name = session.stack().pop();
-            if (!name.equals(this.getName())) {
+        }
+
+        if (result != null) {
+            if (this.returnType.isInstance(result)
+                    || this.returnType.isAssignableFrom(result.getClass())
+                    || (primitiveEquivalenceMap.containsKey(this.returnType)
+                    && primitiveEquivalenceMap.get(
+                    this.returnType).isInstance(result))) {
+                if (this.isCacheable()) {
+                    session.cache().put(this.getName(), result);
+                }
+                return result;
+            } else {
                 throw new EvaluationException(
-                        String.format("Expression frames inconsistent."
-                                        + " Expecting %s but got %s",
-                                this.getName(),
-                                name));
+                        "Argument %s (type: %s) is not assignable to"
+                                + " expected type %s",
+                        this.getName(),
+                        result.getClass(),
+                        this.getReturnType());
             }
         }
+
+        throw new EvaluationException(
+                String.format("Argument %s not found", this.getName()));
+
     }
 
     /**

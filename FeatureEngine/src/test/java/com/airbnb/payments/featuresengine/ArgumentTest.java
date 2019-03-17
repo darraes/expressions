@@ -199,7 +199,7 @@ public class ArgumentTest {
     }
 
     @Test
-    public void handleExceptions() throws CompilationException {
+    public void argumentNotRegistered() throws CompilationException {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();
@@ -218,7 +218,36 @@ public class ArgumentTest {
             registry.value("c", session);
             fail();
         } catch (EvaluationException e) {
+            assertTrue(e.getMessage().contains("not registered"));
+        }
+    }
 
+    @Test
+    public void circularDependency() throws CompilationException {
+        ICache cache = new HashMapCache();
+
+        HashMapInputProvider provider = new HashMapInputProvider();
+        ArgumentRegistry registry = new ArgumentRegistry();
+
+        ArgumentFactory.create(registry,
+                "a",
+                Integer.class,
+                "1 + ((Integer)session.registry().value(\"b\", session))",
+                true);
+
+        ArgumentFactory.create(registry,
+                "b",
+                Integer.class,
+                "1 + ((Integer)session.registry().value(\"a\", session))",
+                true);
+
+        EvalSession session = new EvalSession(provider, registry, cache);
+
+        try {
+            registry.value("a", session);
+            fail();
+        } catch (EvaluationException e) {
+            assertTrue(e.getMessage().contains("Circular"));
         }
     }
 }

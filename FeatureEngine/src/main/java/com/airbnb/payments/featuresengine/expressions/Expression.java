@@ -72,6 +72,10 @@ public class Expression {
         try {
             return this.eval.evaluate(new Object[]{session});
         } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof EvaluationException) {
+                throw (EvaluationException) e.getCause();
+            }
+
             throw new EvaluationException(
                     e, "Error evaluation expression %s", this.getExpressionText());
         }
