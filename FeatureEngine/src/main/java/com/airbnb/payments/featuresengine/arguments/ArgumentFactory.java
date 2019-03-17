@@ -1,6 +1,6 @@
 package com.airbnb.payments.featuresengine.arguments;
 
-import com.airbnb.payments.featuresengine.CompilationException;
+import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 
 /**

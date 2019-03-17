@@ -1,4 +1,4 @@
-package com.airbnb.payments.featuresengine;
+package com.airbnb.payments.featuresengine.errors;
 
 public class EvaluationException extends Exception {
     public EvaluationException(String msgFmt, Object... args) {

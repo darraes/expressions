@@ -1,6 +1,6 @@
 package com.airbnb.payments.featuresengine.cache;
 
-import com.airbnb.payments.featuresengine.EvaluationException;
+import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
 public interface ICache {
     /**

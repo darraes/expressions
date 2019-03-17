@@ -1,6 +1,6 @@
 package com.airbnb.payments.featuresengine.arguments;
 
-import com.airbnb.payments.featuresengine.EvaluationException;
+import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
 /**
  * All user input will be provided to the engine via an implementation of this interface

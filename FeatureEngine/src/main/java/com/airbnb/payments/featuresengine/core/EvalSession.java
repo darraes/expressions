@@ -1,4 +1,4 @@
-package com.airbnb.payments.featuresengine;
+package com.airbnb.payments.featuresengine.core;
 
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.arguments.IInputProvider;

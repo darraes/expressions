@@ -5,6 +5,9 @@ import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
+import com.airbnb.payments.featuresengine.core.EvalSession;
+import com.airbnb.payments.featuresengine.errors.CompilationException;
+import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 import org.junit.Test;
 
@@ -44,25 +47,31 @@ public class ExpressionTest {
     @Test
     public void evaluateStaticMethod()
             throws CompilationException, EvaluationException {
-        // TODO
+        Expression expression = new Expression(
+                "Math.max(3, 10)",
+                int.class);
+
+        assertEquals(10, expression.eval(null));
     }
 
     @Test
     public void evaluateInstanceMethod()
             throws CompilationException, EvaluationException {
-        // TODO
+        Expression expression = new Expression(
+                "\" trim_me \".trim()",
+                String.class);
+
+        assertEquals("trim_me", expression.eval(null));
     }
 
     @Test
     public void evaluateConstructor()
             throws CompilationException, EvaluationException {
-        // TODO
-    }
+        Expression expression = new Expression(
+                "(new String(\" trim_me \")).trim()",
+                String.class);
 
-    @Test
-    public void evaluateWriteExpression()
-            throws CompilationException, EvaluationException {
-        // TODO
+        assertEquals("trim_me", expression.eval(null));
     }
 
     @Test
@@ -72,7 +81,8 @@ public class ExpressionTest {
 
         Expression expression = new Expression(
                 "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))", int.class);
+                        + " + ((Integer)session.registry().value(\"b\", session))",
+                int.class);
 
         assertEquals(9, expression.eval(session));
     }
@@ -94,7 +104,7 @@ public class ExpressionTest {
         EvalSession session = createTestSession();
 
         Expression expression = new Expression(
-                "Math.sqrt(((Integer)session.registry().value(\"d\", session)))",
+                "session.registry().value(\"d\", session)",
                 int.class);
 
         try {

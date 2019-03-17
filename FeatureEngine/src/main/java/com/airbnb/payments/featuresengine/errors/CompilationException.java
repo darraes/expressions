@@ -1,4 +1,4 @@
-package com.airbnb.payments.featuresengine;
+package com.airbnb.payments.featuresengine.errors;
 
 public class CompilationException extends Exception {
     public CompilationException(String msgFmt, Object... args) {

@@ -1,7 +1,7 @@
 package com.airbnb.payments.featuresengine.arguments;
 
-import com.airbnb.payments.featuresengine.EvalSession;
-import com.airbnb.payments.featuresengine.EvaluationException;
+import com.airbnb.payments.featuresengine.core.EvalSession;
+import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
 /**
  * Represents an |Argument| that is directed provided by an IInputProvider.
