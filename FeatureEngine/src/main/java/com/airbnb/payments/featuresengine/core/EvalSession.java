@@ -3,12 +3,7 @@ package com.airbnb.payments.featuresengine.core;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.arguments.IInputProvider;
 import com.airbnb.payments.featuresengine.cache.ICache;
-import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.helpers.ExpressionStack;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
 
 /**
  * The evaluation session will hold all information pertinent to the current user

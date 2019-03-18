@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine.arguments;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
+import org.codehaus.commons.compiler.CompileException;
 
 import java.util.HashMap;
 
@@ -63,5 +64,13 @@ public class ArgumentRegistry {
         }
 
         return this.arguments.get(name).value(session);
+    }
+
+    public Argument get(String name) throws CompilationException {
+        if (!this.exists(name)) {
+            throw new CompilationException("Argument %s not registered", name);
+        }
+
+        return this.arguments.get(name);
     }
 }

@@ -45,8 +45,8 @@ public class ArgumentFactory {
                         config.isCacheable(),
                         config.isAsync());
             }
-            registry.register(argument);
 
+            registry.register(argument);
             return argument;
         } catch (ClassNotFoundException e) {
             throw new CompilationException
