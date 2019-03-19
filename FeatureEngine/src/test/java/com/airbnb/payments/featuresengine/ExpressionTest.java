@@ -10,49 +10,16 @@ import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
+import com.airbnb.payments.featuresengine.expressions.ExpressionPreProcessor;
 import org.junit.Test;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
 
 public class ExpressionTest {
-
-    private static EvalSession createTestSession() throws CompilationException {
-        ICache cache = new HashMapCache();
-
-        HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("a", 1);
-        provider.put("b", 8);
-
-        ArgumentRegistry registry = new ArgumentRegistry();
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "a",
-                        Integer.class.getName(),
-                        true,
-                        false));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "b",
-                        Integer.class.getName(),
-                        true,
-                        false));
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "c",
-                        Integer.class.getName(),
-                        "((Integer)session.registry().value(\"a\", session))"
-                                + " + ((Integer)session.registry().value(\"b\", session))",
-                        true,
-                        false));
-
-        return new EvalSession(provider, registry, cache);
-    }
-
     @Test
     public void accessProperties() throws CompilationException {
         Expression expression = new Expression("1 + 3", int.class);
@@ -116,7 +83,7 @@ public class ExpressionTest {
     }
 
     @Test
-    public void handleExceptions() throws CompilationException, EvaluationException {
+    public void handleExceptions() throws CompilationException {
         EvalSession session = createTestSession();
 
         Expression expression = new Expression(
@@ -129,5 +96,89 @@ public class ExpressionTest {
         } catch (EvaluationException e) {
 
         }
+    }
+
+    @Test
+    public void evaluateSimpleAsyncExpression()
+            throws CompilationException, ExecutionException, InterruptedException {
+        EvalSession session = createTestSession();
+
+        var executor = Executors.newFixedThreadPool(2);
+
+        {
+
+            Expression expression = new Expression(
+                    ExpressionPreProcessor.process(
+                            session.registry(),
+                            "ExpressionTest.someAsyncMethod($c)"),
+                    int.class,
+                    new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"});
+
+            expression.evalAsync(session, executor)
+                    .thenAccept(res -> assertEquals(19, res)).get();
+        }
+
+        {
+
+            Expression expression = new Expression(
+                    ExpressionPreProcessor.process(
+                            session.registry(),
+                            "ExpressionTest.someAsyncMethod2($c)"),
+                    int.class,
+                    new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"});
+
+            expression.evalAsync(session, executor)
+                    .thenAccept(res -> assertEquals(90, res)).get();
+        }
+    }
+
+    private static EvalSession createTestSession() throws CompilationException {
+        ICache cache = new HashMapCache();
+
+        HashMapInputProvider provider = new HashMapInputProvider();
+        provider.put("a", 1);
+        provider.put("b", 8);
+
+        ArgumentRegistry registry = new ArgumentRegistry();
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "a",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "b",
+                        Integer.class.getName(),
+                        true,
+                        false));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "c",
+                        Integer.class.getName(),
+                        "((Integer)session.registry().value(\"a\", session))"
+                                + " + ((Integer)session.registry().value(\"b\", session))",
+                        true,
+                        false));
+
+        return new EvalSession(provider, registry, cache);
+    }
+
+    public static CompletableFuture<Integer> someAsyncMethod(int x) {
+        CompletableFuture<Integer> result = new CompletableFuture<>();
+        CompletableFuture.runAsync(
+                () -> {
+                    result.complete(10 + x);
+                });
+        return result;
+    }
+
+    public static CompletableFuture<Integer> someAsyncMethod2(int x) {
+        return CompletableFuture.supplyAsync(() -> 10 * x);
     }
 }

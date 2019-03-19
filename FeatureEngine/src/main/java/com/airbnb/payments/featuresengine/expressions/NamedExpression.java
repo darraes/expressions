@@ -5,6 +5,10 @@ import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.arguments.Argument;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
+
 /**
  * Those expressions can be accessed from any other expression using their names.
  * Eg.: expName1 = 1 + 2
@@ -55,5 +59,14 @@ public class NamedExpression extends Argument {
     @Override
     protected Object fetch(EvalSession session) throws EvaluationException {
         return this.expression.eval(session);
+    }
+
+    /**
+     * Fetches the value by actually computing the evaluation of the compiled
+     * expression
+     */
+    protected CompletableFuture<Object> fetchAsync(
+            EvalSession session, Executor executor) throws EvaluationException {
+        return this.expression.evalAsync(session, executor);
     }
 }

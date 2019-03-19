@@ -39,7 +39,7 @@ public class ExpressionPreProcessor {
 
         // We must handle the lengthier names first to prevent arguments with matching
         // prefixes to harm the end expression.
-        // Eg.: $b + $big - If we process $b first, we will wrongly target ($b)ig
+        // Eg.: $b + $big. If we process $b first, we would wrongly target ($b)ig
         arguments.sort((a1, a2) -> a2.getName().length() - a1.getName().length());
 
         // Replaces the compressed syntax by the argument access logic
