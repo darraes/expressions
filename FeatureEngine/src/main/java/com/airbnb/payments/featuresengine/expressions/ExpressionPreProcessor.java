@@ -21,17 +21,17 @@ public class ExpressionPreProcessor {
     }
 
     public static String process(
-            ArgumentRegistry registry, String expression) {
+            ArgumentRegistry registry, String expression, boolean isAsyncExpression) {
         Matcher matcher = regex.matcher(expression);
 
         // Captures all argument reading
-        var matches = new ArrayList<String>();
+        ArrayList<String> matches = new ArrayList<>();
         while (matcher.find()) {
             matches.add(matcher.group(0));
         }
 
         // Gets the argument definition from the registry
-        var arguments = new ArrayList<Argument>();
+        ArrayList<Argument> arguments = new ArrayList<>();
         for (String s : matches) {
             arguments.add(registry.get(s.substring(1)));
         }

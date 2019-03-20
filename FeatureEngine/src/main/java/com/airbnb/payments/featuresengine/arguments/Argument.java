@@ -65,12 +65,6 @@ public abstract class Argument {
         this.returnType = returnType;
         this.cacheable = cacheable;
         this.isAsync = isAsync;
-
-        /*if (isAsync && !returnType.equals(CompletableFuture.class)
-                || !isAsync && returnType.equals(CompletableFuture.class)) {
-            throw new CompilationException("Async type mismatch on argument %s",
-                    this.getName());
-        }*/
     }
 
     /**

@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
@@ -103,14 +104,15 @@ public class ExpressionTest {
             throws CompilationException, ExecutionException, InterruptedException {
         EvalSession session = createTestSession();
 
-        var executor = Executors.newFixedThreadPool(2);
+        Executor executor = Executors.newFixedThreadPool(2);
 
         {
 
             Expression expression = new Expression(
                     ExpressionPreProcessor.process(
                             session.registry(),
-                            "ExpressionTest.someAsyncMethod($c)"),
+                            "ExpressionTest.someAsyncMethod($c)",
+                            false),
                     int.class,
                     new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"});
 
@@ -123,7 +125,8 @@ public class ExpressionTest {
             Expression expression = new Expression(
                     ExpressionPreProcessor.process(
                             session.registry(),
-                            "ExpressionTest.someAsyncMethod2($c)"),
+                            "ExpressionTest.someAsyncMethod2($c)",
+                            false),
                     int.class,
                     new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"});
 

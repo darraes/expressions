@@ -75,7 +75,7 @@ public class ExpressionPreProcessorTest {
         EvalSession session = createTestSession();
 
         String expressionText = ExpressionPreProcessor.process(
-                session.registry(), "$a + $b");
+                session.registry(), "$a + $b", false);
         assertEquals(
                 "((java.lang.Integer)session.registry().value(\"a\", session))"
                         + " + ((java.lang.Integer)session.registry().value(\"b\", session))",
@@ -93,7 +93,9 @@ public class ExpressionPreProcessorTest {
         EvalSession session = createTestSession();
 
         String expressionText = ExpressionPreProcessor.process(
-                session.registry(), "$a + $b - $C + $_d - $big");
+                session.registry(),
+                "$a + $b - $C + $_d - $big",
+                false);
 
         Expression expression = new Expression(
                 expressionText,
@@ -108,7 +110,7 @@ public class ExpressionPreProcessorTest {
 
         try{
             ExpressionPreProcessor.process(
-                    session.registry(), "$a + $d");
+                    session.registry(), "$a + $d", false);
             fail();
         } catch (Exception e) {
 

@@ -163,7 +163,7 @@ public class ArgumentTest {
         provider.put("b", 8);
 
 
-        var cache = new TestCache();
+        TestCache cache = new TestCache();
 
         ArgumentRegistry registry = new ArgumentRegistry();
         // Using class 'int' to test the boxed type checking
