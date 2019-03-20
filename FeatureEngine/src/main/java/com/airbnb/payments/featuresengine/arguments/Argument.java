@@ -22,30 +22,30 @@ public abstract class Argument {
      * Map with primitive type and their boxed versions as key->value.
      * Used for type checking on the argument fetching.
      */
-    private static final Map<Class<?>, Class<?>> primitiveEquivalenceMap
+    private static final Map<Class<?>, Class<?>> primitives
             = new HashMap<>();
 
     /**
      * Initiates the type equivalence map
      */
     static {
-        primitiveEquivalenceMap.put(Boolean.class, boolean.class);
-        primitiveEquivalenceMap.put(Byte.class, byte.class);
-        primitiveEquivalenceMap.put(Character.class, char.class);
-        primitiveEquivalenceMap.put(Double.class, double.class);
-        primitiveEquivalenceMap.put(Float.class, float.class);
-        primitiveEquivalenceMap.put(Integer.class, int.class);
-        primitiveEquivalenceMap.put(Long.class, long.class);
-        primitiveEquivalenceMap.put(Short.class, short.class);
+        primitives.put(Boolean.class, boolean.class);
+        primitives.put(Byte.class, byte.class);
+        primitives.put(Character.class, char.class);
+        primitives.put(Double.class, double.class);
+        primitives.put(Float.class, float.class);
+        primitives.put(Integer.class, int.class);
+        primitives.put(Long.class, long.class);
+        primitives.put(Short.class, short.class);
 
-        primitiveEquivalenceMap.put(boolean.class, Boolean.class);
-        primitiveEquivalenceMap.put(byte.class, Byte.class);
-        primitiveEquivalenceMap.put(char.class, Character.class);
-        primitiveEquivalenceMap.put(double.class, Double.class);
-        primitiveEquivalenceMap.put(float.class, Float.class);
-        primitiveEquivalenceMap.put(int.class, Integer.class);
-        primitiveEquivalenceMap.put(long.class, Long.class);
-        primitiveEquivalenceMap.put(short.class, Short.class);
+        primitives.put(boolean.class, Boolean.class);
+        primitives.put(byte.class, Byte.class);
+        primitives.put(char.class, Character.class);
+        primitives.put(double.class, Double.class);
+        primitives.put(float.class, Float.class);
+        primitives.put(int.class, Integer.class);
+        primitives.put(long.class, Long.class);
+        primitives.put(short.class, Short.class);
     }
 
     /**
@@ -106,15 +106,13 @@ public abstract class Argument {
      * @return Result of the argument fetching
      * @throws EvaluationException
      */
-    final Object value(EvalSession session) throws EvaluationException {
-
+    final Object value(EvalSession session) {
         if (session.stack().contains(this.getName())) {
             throw new EvaluationException(
                     "Circular dependency found on argument %s",
                     this.getName());
         }
 
-        session.stack().push(this.getName());
 
         if (this.isCacheable() && session.cache().contains(this.getName())) {
             return session.cache().get(this.getName());
@@ -122,16 +120,21 @@ public abstract class Argument {
 
         Object result;
         try {
+            // Push current argument into the nested stack to track circular
+            // dependency
+            session.stack().push(this.getName());
+
             result = this.fetch(session);
         } finally {
+            // Guarantee to pop the argument from the stack
             session.stack().pop();
         }
 
         if (result != null) {
             if (this.returnType.isInstance(result)
                     || this.returnType.isAssignableFrom(result.getClass())
-                    || (primitiveEquivalenceMap.containsKey(this.returnType)
-                    && primitiveEquivalenceMap.get(
+                    || (primitives.containsKey(this.returnType)
+                    && primitives.get(
                     this.returnType).isInstance(result))) {
                 if (this.isCacheable()) {
                     session.cache().put(this.getName(), result);
@@ -148,8 +151,79 @@ public abstract class Argument {
         }
 
         throw new EvaluationException(
-                String.format("Argument %s not found", this.getName()));
+                "Argument %s not found", this.getName());
 
+    }
+
+    /**
+     * Gets the value of of the current argument. If the argument is cacheable, the
+     * first call will cache the result and further calls will grab the result from
+     * the session cache.
+     *
+     * @param session  Session of the individual request
+     * @param executor Executor to run the fetching on
+     * @return Result of the argument fetching
+     * @throws EvaluationException
+     */
+    final CompletableFuture<Object> valueAsync(EvalSession session, Executor executor) {
+        CompletableFuture<Object> result = new CompletableFuture<>();
+        CompletableFuture.runAsync(
+                () -> {
+                    if (session.stack().contains(this.getName())) {
+                        result.completeExceptionally(new EvaluationException(
+                                "Circular dependency found on argument %s",
+                                this.getName()));
+                    }
+
+                    if (this.isCacheable()
+                            && session.cache().contains(this.getName())) {
+                        result.complete(session.cache().get(this.getName()));
+                        return;
+                    }
+
+                    // Push current argument into the nested stack to track circular
+                    // dependency
+                    session.stack().push(this.getName());
+
+                    this.fetchAsync(session, executor)
+                            .thenAccept((res) -> {
+                                // First thing is to pop the argument from the stack
+                                session.stack().pop();
+
+                                if (res != null) {
+                                    if (this.returnType.isInstance(res)
+                                            || this.returnType.isAssignableFrom(
+                                            res.getClass())
+                                            || (primitives.containsKey(this.returnType)
+                                            && primitives.get(
+                                            this.returnType).isInstance(res))) {
+                                        // Save fetched result on cache
+                                        if (this.isCacheable()) {
+                                            session.cache().put(this.getName(), res);
+                                        }
+
+                                        // Complete the fetching successfully
+                                        result.complete(res);
+                                    } else {
+                                        result.completeExceptionally(
+                                                new EvaluationException(
+                                                        "Argument %s (type: %s) is not"
+                                                                + " assignable to"
+                                                                + " expected type %s",
+                                                        this.getName(),
+                                                        res.getClass(),
+                                                        this.getReturnType()));
+                                    }
+                                } else {
+                                    result.completeExceptionally(
+                                            new EvaluationException(
+                                                    "Argument %s not found",
+                                                    this.getName()));
+                                }
+
+                            });
+                }, executor);
+        return result;
     }
 
     /**

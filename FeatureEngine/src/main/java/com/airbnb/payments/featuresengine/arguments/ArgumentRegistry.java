@@ -6,6 +6,8 @@ import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import org.codehaus.commons.compiler.CompileException;
 
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * Single access point to get the value of any argument.
@@ -65,6 +67,29 @@ public class ArgumentRegistry {
         return this.arguments.get(name).value(session);
     }
 
+    /**
+     * Fetches (or possibly computes) the value for the argument with the given @name
+     *
+     * @param name    Name of the argument
+     * @param session Current evaluation session
+     * @param executor Executor to run the fetching on
+     * @return The argument value
+     * @throws EvaluationException If the given argument is not registered or if the
+     *                             argument's fetching/computing fails
+     */
+    public CompletableFuture<Object> valueAsync(
+            String name, EvalSession session, Executor executor) {
+        if (!this.exists(name)) {
+            throw new EvaluationException("Argument %s not registered", name);
+        }
+
+        return this.arguments.get(name).valueAsync(session, executor);
+    }
+
+    /**
+     * Gets the Argument object, not its value
+     * @param name The name of the argument
+     */
     public Argument get(String name) {
         if (!this.exists(name)) {
             throw new CompilationException("Argument %s not registered", name);

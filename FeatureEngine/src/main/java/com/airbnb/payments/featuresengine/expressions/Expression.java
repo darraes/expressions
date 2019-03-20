@@ -99,6 +99,7 @@ public class Expression {
      * <p>
      *
      * @param session Session of the individual request
+     * @param executor Executor to run the fetching on
      * @return Result of the expression computation
      */
     @SuppressWarnings(value = "unchecked")

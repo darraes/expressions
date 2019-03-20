@@ -7,6 +7,7 @@ import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
+import com.airbnb.payments.featuresengine.expressions.ExpressionPreProcessor;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 import org.junit.Test;
 
@@ -15,6 +16,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
 
@@ -264,5 +269,65 @@ public class ArgumentTest {
         } catch (EvaluationException e) {
             assertTrue(e.getMessage().contains("Circular"));
         }
+    }
+
+    @Test
+    public void evaluateSimpleAsyncExpression()
+            throws CompilationException, ExecutionException, InterruptedException {
+        HashMapInputProvider provider = new HashMapInputProvider();
+        provider.put("a", 1);
+        provider.put("b", 8);
+
+
+        TestCache cache = new TestCache();
+
+        ArgumentRegistry registry = new ArgumentRegistry();
+        // Using class 'int' to test the boxed type checking
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "a",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "b",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "c",
+                        Integer.class.getName(),
+                        ExpressionPreProcessor.process(
+                                registry,
+                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)",
+                                true),
+                        true,
+                        true));
+
+        EvalSession session = new EvalSession(provider, registry, cache);
+        Executor executor = Executors.newFixedThreadPool(2);
+
+        registry.valueAsync("a", session, executor)
+                .thenAccept(res -> assertEquals(1, res)).get();
+
+        registry.valueAsync("c", session, executor)
+                    .thenAccept(res -> assertEquals(90, res)).get();
+
+        registry.valueAsync("b", session, executor)
+                .thenAccept(res -> assertEquals(8, res)).get();
+
+        registry.valueAsync("c", session, executor)
+                .thenAccept(res -> assertEquals(90, res)).get();
+
+    }
+
+
+    public static CompletableFuture<Integer> someAsyncMethod(int x) {
+        return CompletableFuture.supplyAsync(() -> 10 * x);
     }
 }
