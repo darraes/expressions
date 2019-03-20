@@ -415,13 +415,12 @@ public class ArgumentTest {
         se.cook("static Integer exec(AsyncEvalSession session) {\n"
                 + "    return ((Integer)session.registry().value(\"a\", session.inner())) + ((Integer) session.asyncValues().get(\"c\")) - ((Integer) session.asyncValues().get(\"d\"));\n"
                 + "}\n"
-                + "CompletableFuture<Integer> allAsyncDone = session.registry().allValuesAsync(new String[]{\"c\", \"d\"}, session, executor)\n" +
-                "                .thenApply(new Function<Map<String, Object>, Integer>() {\n" +
-                "                    public Integer apply(Map<String, Object> asyncValues) {\n" +
+                + "return session.registry().allValuesAsync(new String[]{\"c\", \"d\"}, session, executor)\n" +
+                "                .thenApply(new Function<Map, Integer>() {\n" +
+                "                    public Integer apply(Map asyncValues) {\n" +
                 "                        return ExpressionWOW.exec(new AsyncEvalSession(session, asyncValues));\n" +
                 "                    }\n" +
                 "                });"
-                + "return allAsyncDone;"
         );
         assertEquals(21, ((CompletableFuture)se.evaluate(new Object[]{session, executor})).get());
     }

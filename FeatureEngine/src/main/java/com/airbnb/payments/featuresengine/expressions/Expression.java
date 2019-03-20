@@ -43,7 +43,6 @@ public class Expression {
         this.eval.setParameters(
                 new String[]{"session", "executor"},
                 new Class[]{EvalSession.class, Executor.class});
-        this.eval.setThrownExceptions(new Class[]{EvaluationException.class});
 
         //Merge all imports (default and user) and set them
         String[] allImports =new String[defaultImports.length + imports.length];
