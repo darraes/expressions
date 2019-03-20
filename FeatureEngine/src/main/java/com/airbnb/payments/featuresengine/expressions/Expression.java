@@ -7,11 +7,11 @@ import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.commons.compiler.IScriptEvaluator;
 import org.codehaus.janino.ExpressionEvaluator;
+import org.codehaus.janino.ScriptEvaluator;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.stream.Stream;
 
 public class Expression {
     // Original expression text
@@ -36,26 +36,8 @@ public class Expression {
     public Expression(String expression, Class<?> type, String[] imports) {
         this.expressionText = expression;
         this.expressionType = type;
-        this.eval = new ExpressionEvaluator();
-
-        // All expressions will only feed of the arguments therefore all we need are
-        // the argument registry, the argument provider and the evaluation session
-        this.eval.setParameters(
-                new String[]{"session", "executor"},
-                new Class[]{EvalSession.class, Executor.class});
-
-        //Merge all imports (default and user) and set them
-        String[] allImports =new String[defaultImports.length + imports.length];
-        System.arraycopy(
-                defaultImports, 0, allImports, 0, defaultImports.length);
-        System.arraycopy(
-                imports, 0, allImports, defaultImports.length, imports.length);
-        this.eval.setDefaultImports(allImports);
-
-        // TODO Check when the expression gets destructed the compilation doesn't leak
-        // Leave the expression already compiled for faster performance on evaluation
         try {
-            this.eval.cook(expression);
+            this.eval = buildExpressionEvaluator(expression, type, imports);
         } catch (CompileException e) {
             throw new CompilationException(e, "Failed compiling %s", expression);
         }
@@ -148,4 +130,65 @@ public class Expression {
                 }, executor);
         return result;
     }
+
+    /**
+     * @param expression
+     * @param type
+     * @param imports
+     * @return
+     * @throws CompileException
+     */
+    private static IScriptEvaluator buildExpressionEvaluator(
+            String expression, Class<?> type, String[] imports) throws CompileException {
+        return buildEvaluator(new ExpressionEvaluator(), expression, type, imports);
+    }
+
+    /**
+     * @param expression
+     * @param type
+     * @param imports
+     * @return
+     * @throws CompileException
+     */
+    private static IScriptEvaluator buildScripEvaluator(
+            String expression, Class<?> type, String[] imports) throws CompileException {
+        ScriptEvaluator eval = new ScriptEvaluator();
+        eval.setReturnType(CompletableFuture.class);
+
+        return buildEvaluator(eval, expression, type, imports);
+    }
+
+    /**
+     * @param eval
+     * @param expression
+     * @param type
+     * @param imports
+     * @return
+     * @throws CompileException
+     */
+    private static IScriptEvaluator buildEvaluator(
+            IScriptEvaluator eval,
+            String expression,
+            Class<?> type,
+            String[] imports) throws CompileException {
+        // All expressions will only feed of the arguments therefore all we need are
+        // the argument registry, the argument provider and the evaluation session
+        eval.setParameters(
+                new String[]{"session", "executor"},
+                new Class[]{EvalSession.class, Executor.class});
+
+        //Merge all imports (default and user) and set them
+        String[] allImports = new String[defaultImports.length + imports.length];
+        System.arraycopy(
+                defaultImports, 0, allImports, 0, defaultImports.length);
+        System.arraycopy(
+                imports, 0, allImports, defaultImports.length, imports.length);
+        eval.setDefaultImports(allImports);
+
+        // TODO Check when the expression gets destructed the compilation doesn't leak
+        // Leave the expression already compiled for faster performance on evaluation
+        eval.cook(expression);
+        return eval;
+    }
+
 }

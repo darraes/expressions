@@ -422,7 +422,9 @@ public class ArgumentTest {
                 "                    }\n" +
                 "                });"
         );
-        assertEquals(21, ((CompletableFuture)se.evaluate(new Object[]{session, executor})).get());
+        assertEquals(21,
+                ((CompletableFuture)se.evaluate(
+                        new Object[]{session, executor})).get());
     }
 
 
