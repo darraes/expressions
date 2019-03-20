@@ -109,10 +109,9 @@ public class ExpressionTest {
         {
 
             Expression expression = new Expression(
-                    ExpressionFactory.process(
+                    ExpressionFactory.create(
                             session.registry(),
-                            "ExpressionTest.someAsyncMethod($c)",
-                            false),
+                            "ExpressionTest.someAsyncMethod($c)"),
                     int.class,
                     new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"});
 
@@ -123,10 +122,9 @@ public class ExpressionTest {
         {
 
             Expression expression = new Expression(
-                    ExpressionFactory.process(
+                    ExpressionFactory.create(
                             session.registry(),
-                            "ExpressionTest.someAsyncMethod2($c)",
-                            false),
+                            "ExpressionTest.someAsyncMethod2($c)"),
                     int.class,
                     new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"});
 
@@ -148,16 +146,12 @@ public class ExpressionTest {
                 registry,
                 new ArgumentConfig(
                         "a",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "b",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
 
         ArgumentFactory.create(
                 registry,
@@ -165,9 +159,7 @@ public class ExpressionTest {
                         "c",
                         Integer.class.getName(),
                         "((Integer)session.registry().value(\"a\", session))"
-                                + " + ((Integer)session.registry().value(\"b\", session))",
-                        true,
-                        false));
+                                + " + ((Integer)session.registry().value(\"b\", session))"));
 
         return new EvalSession(provider, registry, cache);
     }

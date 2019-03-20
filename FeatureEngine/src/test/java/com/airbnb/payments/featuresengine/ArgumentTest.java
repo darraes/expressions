@@ -130,30 +130,22 @@ public class ArgumentTest {
                 registry,
                 new ArgumentConfig(
                         "a",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig("b",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(registry,
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
                         "((Integer)session.registry().value(\"a\", session))"
-                                + " + ((Integer)session.registry().value(\"b\", session))",
-                        true,
-                        false));
+                                + " + ((Integer)session.registry().value(\"b\", session))"));
         ArgumentFactory.create(registry,
                 new ArgumentConfig(
                         "d",
                         Integer.class.getName(),
-                        "10 * ((Integer)session.registry().value(\"c\", session))",
-                        true,
-                        false));
+                        "10 * ((Integer)session.registry().value(\"c\", session))"));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -181,24 +173,19 @@ public class ArgumentTest {
                 registry,
                 new ArgumentConfig(
                         "a",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "b",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
                         "((Integer)session.registry().value(\"a\", session))"
-                                + " + ((Integer)session.registry().value(\"b\", session))",
-                        true, false));
+                                + " + ((Integer)session.registry().value(\"b\", session))"));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -292,25 +279,20 @@ public class ArgumentTest {
                 registry,
                 new ArgumentConfig(
                         "a",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "b",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        ExpressionFactory.process(
+                        ExpressionFactory.create(
                                 registry,
-                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)",
-                                true),
+                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)"),
                         true,
                         true));
 
@@ -347,25 +329,20 @@ public class ArgumentTest {
                 registry,
                 new ArgumentConfig(
                         "a",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "b",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        ExpressionFactory.process(
+                        ExpressionFactory.create(
                                 registry,
-                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)",
-                                true),
+                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)"),
                         true,
                         true));
 
@@ -374,10 +351,9 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "d",
                         Integer.class.getName(),
-                        ExpressionFactory.process(
+                        ExpressionFactory.create(
                                 registry,
-                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($b - $a)",
-                                true),
+                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($b - $a)"),
                         true,
                         true));
 

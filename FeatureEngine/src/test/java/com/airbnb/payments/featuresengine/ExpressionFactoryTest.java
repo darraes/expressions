@@ -31,40 +31,30 @@ public class ExpressionFactoryTest {
                 registry,
                 new ArgumentConfig(
                         "a",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "b",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
 
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "C",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
 
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "_d",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
 
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "big",
-                        Integer.class.getName(),
-                        true,
-                        false));
+                        Integer.class.getName()));
 
         return new EvalSession(provider, registry, cache);
     }
@@ -73,8 +63,8 @@ public class ExpressionFactoryTest {
     public void convertDoubleMatch() {
         EvalSession session = createTestSession();
 
-        String expressionText = ExpressionFactory.process(
-                session.registry(), "$a + $b", false);
+        String expressionText = ExpressionFactory.create(
+                session.registry(), "$a + $b");
         assertEquals(
                 "((java.lang.Integer)session.registry().value(\"a\", session))"
                         + " + ((java.lang.Integer)session.registry().value(\"b\", session))",
@@ -91,10 +81,9 @@ public class ExpressionFactoryTest {
     public void convertMultiMatch() {
         EvalSession session = createTestSession();
 
-        String expressionText = ExpressionFactory.process(
+        String expressionText = ExpressionFactory.create(
                 session.registry(),
-                "$a + $b - $C + $_d - $big",
-                false);
+                "$a + $b - $C + $_d - $big");
 
         Expression expression = new Expression(
                 expressionText,
@@ -107,9 +96,9 @@ public class ExpressionFactoryTest {
     public void argumentNotFound() {
         EvalSession session = createTestSession();
 
-        try{
-            ExpressionFactory.process(
-                    session.registry(), "$a + $d", false);
+        try {
+            ExpressionFactory.create(
+                    session.registry(), "$a + $d");
             fail();
         } catch (Exception e) {
 
