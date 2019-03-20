@@ -10,7 +10,7 @@ import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
-import com.airbnb.payments.featuresengine.expressions.ExpressionPreProcessor;
+import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
@@ -109,7 +109,7 @@ public class ExpressionTest {
         {
 
             Expression expression = new Expression(
-                    ExpressionPreProcessor.process(
+                    ExpressionFactory.process(
                             session.registry(),
                             "ExpressionTest.someAsyncMethod($c)",
                             false),
@@ -123,7 +123,7 @@ public class ExpressionTest {
         {
 
             Expression expression = new Expression(
-                    ExpressionPreProcessor.process(
+                    ExpressionFactory.process(
                             session.registry(),
                             "ExpressionTest.someAsyncMethod2($c)",
                             false),

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * understands the syntax $argumentName and will properly replace that for the right and
  * runnable way to access the argument.
  */
-public class ExpressionPreProcessor {
+public class ExpressionFactory {
     private static Pattern regex;
 
     static {

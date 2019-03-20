@@ -8,7 +8,7 @@ import com.airbnb.payments.featuresengine.core.AsyncEvalSession;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
-import com.airbnb.payments.featuresengine.expressions.ExpressionPreProcessor;
+import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ScriptEvaluator;
@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -308,7 +307,7 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        ExpressionPreProcessor.process(
+                        ExpressionFactory.process(
                                 registry,
                                 "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)",
                                 true),
@@ -363,7 +362,7 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        ExpressionPreProcessor.process(
+                        ExpressionFactory.process(
                                 registry,
                                 "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)",
                                 true),
@@ -375,7 +374,7 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "d",
                         Integer.class.getName(),
-                        ExpressionPreProcessor.process(
+                        ExpressionFactory.process(
                                 registry,
                                 "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($b - $a)",
                                 true),

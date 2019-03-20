@@ -8,14 +8,13 @@ import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
-import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
-import com.airbnb.payments.featuresengine.expressions.ExpressionPreProcessor;
+import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class ExpressionPreProcessorTest {
+public class ExpressionFactoryTest {
     private static EvalSession createTestSession() throws CompilationException {
         ICache cache = new HashMapCache();
 
@@ -74,7 +73,7 @@ public class ExpressionPreProcessorTest {
     public void convertDoubleMatch() {
         EvalSession session = createTestSession();
 
-        String expressionText = ExpressionPreProcessor.process(
+        String expressionText = ExpressionFactory.process(
                 session.registry(), "$a + $b", false);
         assertEquals(
                 "((java.lang.Integer)session.registry().value(\"a\", session))"
@@ -92,7 +91,7 @@ public class ExpressionPreProcessorTest {
     public void convertMultiMatch() {
         EvalSession session = createTestSession();
 
-        String expressionText = ExpressionPreProcessor.process(
+        String expressionText = ExpressionFactory.process(
                 session.registry(),
                 "$a + $b - $C + $_d - $big",
                 false);
@@ -109,7 +108,7 @@ public class ExpressionPreProcessorTest {
         EvalSession session = createTestSession();
 
         try{
-            ExpressionPreProcessor.process(
+            ExpressionFactory.process(
                     session.registry(), "$a + $d", false);
             fail();
         } catch (Exception e) {

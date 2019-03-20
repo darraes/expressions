@@ -154,6 +154,7 @@ public class Expression {
             String expression, Class<?> type, String[] imports) throws CompileException {
         ScriptEvaluator eval = new ScriptEvaluator();
         eval.setReturnType(CompletableFuture.class);
+        eval.setClassName("ExpressionWOW");
 
         return buildEvaluator(eval, expression, type, imports);
     }
