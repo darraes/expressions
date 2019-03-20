@@ -6,6 +6,7 @@ import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
+import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
@@ -60,34 +61,32 @@ public class ExpressionFactoryTest {
     }
 
     @Test
-    public void convertDoubleMatch() {
+    public void convertDoubleMatch() throws ClassNotFoundException {
         EvalSession session = createTestSession();
 
-        String expressionText = ExpressionFactory.create(
-                session.registry(), "$a + $b");
+        Expression expression = ExpressionFactory.create(
+                session.registry(), new ExpressionConfig(
+                        "foo", "$a + $b", Integer.class.getName()));
         assertEquals(
                 "((java.lang.Integer)session.registry().value(\"a\", session))"
                         + " + ((java.lang.Integer)session.registry().value(\"b\", session))",
-                expressionText);
+                expression.getExpressionText());
 
-        Expression expression = new Expression(
-                expressionText,
-                int.class);
 
         assertEquals(3, expression.eval(session));
     }
 
     @Test
-    public void convertMultiMatch() {
+    public void convertMultiMatch() throws ClassNotFoundException {
         EvalSession session = createTestSession();
 
-        String expressionText = ExpressionFactory.create(
+        Expression expression = ExpressionFactory.create(
                 session.registry(),
-                "$a + $b - $C + $_d - $big");
+                new ExpressionConfig(
+                        "foo",
+                        "$a + $b - $C + $_d - $big",
+                        Integer.class.getName()));
 
-        Expression expression = new Expression(
-                expressionText,
-                int.class);
 
         assertEquals(-1, expression.eval(session));
     }
@@ -98,7 +97,8 @@ public class ExpressionFactoryTest {
 
         try {
             ExpressionFactory.create(
-                    session.registry(), "$a + $d");
+                    session.registry(), new ExpressionConfig(
+                            "foo","$a + $d", Integer.class.getName()));
             fail();
         } catch (Exception e) {
 

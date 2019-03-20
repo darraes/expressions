@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine.expressions;
 import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
+import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,14 +41,24 @@ public class ExpressionFactory {
                 + "     });";
     }
 
-    public static String create(ArgumentRegistry registry, ArgumentConfig config) {
+    public static Expression create(ArgumentRegistry registry, ExpressionConfig config)
+            throws ClassNotFoundException {
+        List<Argument> arguments = parseArguments(registry, config.getExpression());
+
+        if (!config.isAsync()) {
+            String finalExpression = processExpression(config.getExpression(), arguments);
+            return new Expression(new ExpressionInfo(
+                    config.getName(),
+                    finalExpression,
+                    Class.forName(config.getReturnType()),
+                    arguments,
+                    false,
+                    config.getDependencies()));
+        }
         return null;
     }
 
-    public static String create(
-            ArgumentRegistry registry, String expression) {
-        List<Argument> arguments = parseArguments(registry, expression);
-
+    public static String processExpression(String expression, List<Argument> arguments) {
         // Replaces the compressed syntax by the argument access logic
         String result;
         result = expression;

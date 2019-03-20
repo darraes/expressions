@@ -6,6 +6,7 @@ import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
+import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
@@ -101,19 +102,21 @@ public class ExpressionTest {
 
     @Test
     public void evaluateSimpleAsyncExpression()
-            throws CompilationException, ExecutionException, InterruptedException {
+            throws CompilationException, ExecutionException, InterruptedException, ClassNotFoundException {
         EvalSession session = createTestSession();
 
         Executor executor = Executors.newFixedThreadPool(2);
 
         {
 
-            Expression expression = new Expression(
+            Expression expression =
                     ExpressionFactory.create(
                             session.registry(),
-                            "ExpressionTest.someAsyncMethod($c)"),
-                    int.class,
-                    new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"});
+                            new ExpressionConfig(
+                                    "foo",
+                                    "ExpressionTest.someAsyncMethod($c)",
+                                    Integer.class.getName(),
+                                    new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"}));
 
             expression.evalAsync(session, executor)
                     .thenAccept(res -> assertEquals(19, res)).get();
@@ -121,12 +124,14 @@ public class ExpressionTest {
 
         {
 
-            Expression expression = new Expression(
+            Expression expression =
                     ExpressionFactory.create(
                             session.registry(),
-                            "ExpressionTest.someAsyncMethod2($c)"),
-                    int.class,
-                    new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"});
+                            new ExpressionConfig(
+                                    "foo",
+                                    "ExpressionTest.someAsyncMethod2($c)",
+                                    Integer.class.getName(),
+                                    new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"}));
 
             expression.evalAsync(session, executor)
                     .thenAccept(res -> assertEquals(90, res)).get();

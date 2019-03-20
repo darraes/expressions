@@ -43,6 +43,17 @@ public class Expression {
         }
     }
 
+    public Expression(ExpressionInfo info) {
+        this.expressionText = info.getExpression();
+        this.expressionType = info.getReturnType();
+        try {
+            this.eval = buildExpressionEvaluator(
+                    this.expressionText, this.expressionType, info.getDependencies());
+        } catch (CompileException e) {
+            throw new CompilationException(e, "Failed compiling %s", this.expressionText);
+        }
+    }
+
     /**
      * Getter.
      *

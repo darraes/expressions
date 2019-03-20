@@ -263,6 +263,7 @@ public class ArgumentTest {
         }
     }
 
+    /*
     @Test
     public void evaluateSimpleAsyncExpression()
             throws CompilationException, ExecutionException, InterruptedException {
@@ -400,7 +401,7 @@ public class ArgumentTest {
         assertEquals(21,
                 ((CompletableFuture)se.evaluate(
                         new Object[]{session, executor})).get());
-    }
+    }*/
 
 
     public static CompletableFuture<Integer> someAsyncMethod(int x) {
