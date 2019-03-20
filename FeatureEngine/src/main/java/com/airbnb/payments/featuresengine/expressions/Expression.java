@@ -31,8 +31,8 @@ public class Expression {
         // All expressions will only feed of the arguments therefore all we need are
         // the argument registry, the argument provider and the evaluation session
         this.eval.setParameters(
-                new String[]{"session"},
-                new Class[]{EvalSession.class});
+                new String[]{"session", "executor"},
+                new Class[]{EvalSession.class, Executor.class});
         this.eval.setThrownExceptions(new Class[]{EvaluationException.class});
         this.eval.setDefaultImports(imports);
 
@@ -76,7 +76,7 @@ public class Expression {
      */
     public final Object eval(EvalSession session) {
         try {
-            return this.eval.evaluate(new Object[]{session});
+            return this.eval.evaluate(new Object[]{session, null});
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof EvaluationException) {
                 throw (EvaluationException) e.getCause();
@@ -111,7 +111,7 @@ public class Expression {
                     try {
                         ((CompletableFuture<Object>)
                                 this.eval.evaluate(
-                                        new Object[]{session}))
+                                        new Object[]{session, null}))
                                 .thenApply(result::complete);
                     } catch (InvocationTargetException e) {
                         if (e.getCause() instanceof EvaluationException) {

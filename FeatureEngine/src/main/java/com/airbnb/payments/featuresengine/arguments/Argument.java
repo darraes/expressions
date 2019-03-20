@@ -130,29 +130,7 @@ public abstract class Argument {
             session.stack().pop();
         }
 
-        if (result != null) {
-            if (this.returnType.isInstance(result)
-                    || this.returnType.isAssignableFrom(result.getClass())
-                    || (primitives.containsKey(this.returnType)
-                    && primitives.get(
-                    this.returnType).isInstance(result))) {
-                if (this.isCacheable()) {
-                    session.cache().put(this.getName(), result);
-                }
-                return result;
-            } else {
-                throw new EvaluationException(
-                        "Argument %s (type: %s) is not assignable to"
-                                + " expected type %s",
-                        this.getName(),
-                        result.getClass(),
-                        this.getReturnType());
-            }
-        }
-
-        throw new EvaluationException(
-                "Argument %s not found", this.getName());
-
+        return this.handleResult(session, result);
     }
 
     /**
@@ -187,43 +165,44 @@ public abstract class Argument {
 
                     this.fetchAsync(session, executor)
                             .thenAccept((res) -> {
-                                // First thing is to pop the argument from the stack
-                                session.stack().pop();
-
-                                if (res != null) {
-                                    if (this.returnType.isInstance(res)
-                                            || this.returnType.isAssignableFrom(
-                                            res.getClass())
-                                            || (primitives.containsKey(this.returnType)
-                                            && primitives.get(
-                                            this.returnType).isInstance(res))) {
-                                        // Save fetched result on cache
-                                        if (this.isCacheable()) {
-                                            session.cache().put(this.getName(), res);
-                                        }
-
-                                        // Complete the fetching successfully
-                                        result.complete(res);
-                                    } else {
-                                        result.completeExceptionally(
-                                                new EvaluationException(
-                                                        "Argument %s (type: %s) is not"
-                                                                + " assignable to"
-                                                                + " expected type %s",
-                                                        this.getName(),
-                                                        res.getClass(),
-                                                        this.getReturnType()));
-                                    }
-                                } else {
-                                    result.completeExceptionally(
-                                            new EvaluationException(
-                                                    "Argument %s not found",
-                                                    this.getName()));
+                                try {
+                                    res = handleResult(session, res);
+                                    // Complete the fetching successfully
+                                    result.complete(res);
+                                } catch (Exception e) {
+                                    result.completeExceptionally(e);
+                                } finally {
+                                    // Guarantee to pop the argument from the stack
+                                    session.stack().pop();
                                 }
-
                             });
                 }, executor);
         return result;
+    }
+
+    private Object handleResult(EvalSession session, Object result) {
+        if (result != null) {
+            if (this.returnType.isInstance(result)
+                    || this.returnType.isAssignableFrom(result.getClass())
+                    || (primitives.containsKey(this.returnType)
+                    && primitives.get(
+                    this.returnType).isInstance(result))) {
+                if (this.isCacheable()) {
+                    session.cache().put(this.getName(), result);
+                }
+                return result;
+            } else {
+                throw new EvaluationException(
+                        "Argument %s (type: %s) is not assignable to"
+                                + " expected type %s",
+                        this.getName(),
+                        result.getClass(),
+                        this.getReturnType());
+            }
+        } else {
+            throw new EvaluationException(
+                    "Argument %s not found", this.getName());
+        }
     }
 
     /**
