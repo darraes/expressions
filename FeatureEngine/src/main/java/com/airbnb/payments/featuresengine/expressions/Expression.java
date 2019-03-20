@@ -5,11 +5,13 @@ import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
 import org.codehaus.commons.compiler.CompileException;
+import org.codehaus.commons.compiler.IScriptEvaluator;
 import org.codehaus.janino.ExpressionEvaluator;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Stream;
 
 public class Expression {
     // Original expression text
@@ -17,7 +19,15 @@ public class Expression {
     // The class type this expression evaluates to
     private Class<?> expressionType;
     // Actual expression evaluator
-    private ExpressionEvaluator eval;
+    private IScriptEvaluator eval;
+
+    private static String[] defaultImports = {
+            "java.util.Map",
+            "java.util.concurrent.CompletableFuture",
+            "java.util.function.Function",
+            "com.airbnb.payments.featuresengine.core.EvalSession",
+            "com.airbnb.payments.featuresengine.core.AsyncEvalSession",
+    };
 
     public Expression(String expression, Class<?> type) {
         this(expression, type, new String[0]);
@@ -34,7 +44,14 @@ public class Expression {
                 new String[]{"session", "executor"},
                 new Class[]{EvalSession.class, Executor.class});
         this.eval.setThrownExceptions(new Class[]{EvaluationException.class});
-        this.eval.setDefaultImports(imports);
+
+        //Merge all imports (default and user) and set them
+        String[] allImports =new String[defaultImports.length + imports.length];
+        System.arraycopy(
+                defaultImports, 0, allImports, 0, defaultImports.length);
+        System.arraycopy(
+                imports, 0, allImports, defaultImports.length, imports.length);
+        this.eval.setDefaultImports(allImports);
 
         // TODO Check when the expression gets destructed the compilation doesn't leak
         // Leave the expression already compiled for faster performance on evaluation
@@ -98,7 +115,7 @@ public class Expression {
      * re-computations.
      * <p>
      *
-     * @param session Session of the individual request
+     * @param session  Session of the individual request
      * @param executor Executor to run the fetching on
      * @return Result of the expression computation
      */
@@ -109,21 +126,25 @@ public class Expression {
         CompletableFuture.runAsync(
                 () -> {
                     try {
-                        ((CompletableFuture<Object>)
-                                this.eval.evaluate(
-                                        new Object[]{session, null}))
-                                .thenApply(result::complete);
+                        Object res = this.eval.evaluate(
+                                new Object[]{session, executor});
+                        if (res instanceof CompletableFuture) {
+                            ((CompletableFuture<Object>)
+                                    res)
+                                    .thenApply(result::complete);
+                        } else {
+                            result.complete(res);
+                        }
                     } catch (InvocationTargetException e) {
                         if (e.getCause() instanceof EvaluationException) {
                             result.completeExceptionally(e.getCause());
-                            return;
+                        } else {
+                            result.completeExceptionally(
+                                    new EvaluationException(
+                                            e,
+                                            "Error evaluation expression %s",
+                                            this.getExpressionText()));
                         }
-
-                        result.completeExceptionally(
-                                new EvaluationException(
-                                        e,
-                                        "Error evaluation expression %s",
-                                        this.getExpressionText()));
                     }
                 }, executor);
         return result;

@@ -4,14 +4,18 @@ import com.airbnb.payments.featuresengine.arguments.*;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
+import com.airbnb.payments.featuresengine.core.AsyncEvalSession;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.expressions.ExpressionPreProcessor;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
+import org.codehaus.commons.compiler.CompileException;
+import org.codehaus.janino.ScriptEvaluator;
 import org.junit.Test;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,6 +24,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -92,7 +98,7 @@ public class ArgumentTest {
             assertTrue(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
-            assertEquals("3 + 7", ((NamedExpression)arg1).getExpressionText());
+            assertEquals("3 + 7", ((NamedExpression) arg1).getExpressionText());
         }
 
         {
@@ -107,7 +113,7 @@ public class ArgumentTest {
             assertFalse(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
-            assertEquals("3 + 7", ((NamedExpression)arg1).getExpressionText());
+            assertEquals("3 + 7", ((NamedExpression) arg1).getExpressionText());
         }
     }
 
@@ -316,7 +322,7 @@ public class ArgumentTest {
                 .thenAccept(res -> assertEquals(1, res)).get();
 
         registry.valueAsync("c", session, executor)
-                    .thenAccept(res -> assertEquals(90, res)).get();
+                .thenAccept(res -> assertEquals(90, res)).get();
 
         registry.valueAsync("b", session, executor)
                 .thenAccept(res -> assertEquals(8, res)).get();
@@ -324,6 +330,100 @@ public class ArgumentTest {
         registry.valueAsync("c", session, executor)
                 .thenAccept(res -> assertEquals(90, res)).get();
 
+    }
+
+    @Test
+    public void evaluateAllValuesAsync()
+            throws CompileException, CompilationException, ExecutionException, InterruptedException, InvocationTargetException {
+        HashMapInputProvider provider = new HashMapInputProvider();
+        provider.put("a", 1);
+        provider.put("b", 8);
+
+
+        TestCache cache = new TestCache();
+
+        ArgumentRegistry registry = new ArgumentRegistry();
+        // Using class 'int' to test the boxed type checking
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "a",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "b",
+                        Integer.class.getName(),
+                        true,
+                        false));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "c",
+                        Integer.class.getName(),
+                        ExpressionPreProcessor.process(
+                                registry,
+                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)",
+                                true),
+                        true,
+                        true));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "d",
+                        Integer.class.getName(),
+                        ExpressionPreProcessor.process(
+                                registry,
+                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($b - $a)",
+                                true),
+                        true,
+                        true));
+
+        EvalSession session = new EvalSession(provider, registry, cache);
+        Executor executor = Executors.newFixedThreadPool(2);
+
+        CompletableFuture<AsyncEvalSession> allAsyncDone = registry.allValuesAsync(new String[]{"c", "d"}, session, executor)
+                .thenApply(new Function<Map<String, Object>, AsyncEvalSession>() {
+                    public AsyncEvalSession apply(Map<String, Object> asyncValues) {
+                        return new AsyncEvalSession(session, asyncValues);
+                    }
+                });
+        int result = allAsyncDone.thenApply(
+                new Function<AsyncEvalSession, Integer>() {
+                    public Integer apply(AsyncEvalSession aSession) {
+                        return ((Integer) aSession.asyncValues().get("c"))
+                                - ((Integer) aSession.asyncValues().get("d"));
+                    }
+                })
+                .get();
+        assertEquals(20, result);
+
+        ScriptEvaluator se = new ScriptEvaluator();
+        se.setReturnType(CompletableFuture.class);
+        se.setParameters(
+                new String[]{"session", "executor"},
+                new Class[]{EvalSession.class, Executor.class});
+        se.setClassName("ExpressionWOW");
+        se.setDefaultImports(
+                "com.airbnb.payments.featuresengine.core.AsyncEvalSession",
+                "java.util.concurrent.CompletableFuture",
+                "java.util.function.Function");
+
+        se.cook("static Integer exec(AsyncEvalSession session) {\n"
+                + "    return ((Integer)session.registry().value(\"a\", session.inner())) + ((Integer) session.asyncValues().get(\"c\")) - ((Integer) session.asyncValues().get(\"d\"));\n"
+                + "}\n"
+                + "CompletableFuture<Integer> allAsyncDone = session.registry().allValuesAsync(new String[]{\"c\", \"d\"}, session, executor)\n" +
+                "                .thenApply(new Function<Map<String, Object>, Integer>() {\n" +
+                "                    public Integer apply(Map<String, Object> asyncValues) {\n" +
+                "                        return ExpressionWOW.exec(new AsyncEvalSession(session, asyncValues));\n" +
+                "                    }\n" +
+                "                });"
+                + "return allAsyncDone;"
+        );
+        assertEquals(21, ((CompletableFuture)se.evaluate(new Object[]{session, executor})).get());
     }
 
 

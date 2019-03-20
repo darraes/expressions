@@ -194,7 +194,7 @@ public abstract class Argument {
             } else {
                 throw new EvaluationException(
                         "Argument %s (type: %s) is not assignable to"
-                                + " expected type %s",
+                                + " expected (type: %s)",
                         this.getName(),
                         result.getClass(),
                         this.getReturnType());

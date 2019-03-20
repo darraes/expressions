@@ -6,8 +6,10 @@ import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import org.codehaus.commons.compiler.CompileException;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 /**
  * Single access point to get the value of any argument.
@@ -96,5 +98,38 @@ public class ArgumentRegistry {
         }
 
         return this.arguments.get(name);
+    }
+
+    /**
+     *
+     * @param arguments
+     * @param session
+     * @param executor
+     * @return
+     */
+    public CompletableFuture<Map<String, Object>> allValuesAsync(
+            String[] arguments, EvalSession session, Executor executor) {
+        Map<String, CompletableFuture<Object>> futures
+                = new HashMap<>(arguments.length);
+
+        for (String argument : arguments) {
+            futures.put(
+                    argument,
+                    this.valueAsync(argument, session, executor));
+        }
+
+        CompletableFuture<Void> allDoneFuture =
+                CompletableFuture.allOf(
+                        futures.values().toArray(new CompletableFuture[0]));
+
+        return allDoneFuture.thenApply(
+                (v) -> futures
+                        .entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                x -> x.getKey(),
+                                x -> x.getValue().join()))
+
+        );
     }
 }
