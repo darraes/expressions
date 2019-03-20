@@ -22,7 +22,7 @@ public class HashMapInputProvider implements IInputProvider {
      * @param name  The name
      * @param value The value
      */
-    public void put(String name, Object value) throws CompilationException {
+    public void put(String name, Object value) {
         // We work with a single namespace and arguments must be uniquely identified
         // by its name
         if (this.arguments.containsKey(name)) {
@@ -41,7 +41,7 @@ public class HashMapInputProvider implements IInputProvider {
      * @throws EvaluationException If a value under @name is not available
      */
     @Override
-    public Object get(String name) throws EvaluationException {
+    public Object get(String name) {
         if (!this.exists(name)) {
             throw new EvaluationException("Argument %s not found", name);
         }

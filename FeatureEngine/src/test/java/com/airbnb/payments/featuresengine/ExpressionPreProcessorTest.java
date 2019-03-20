@@ -71,7 +71,7 @@ public class ExpressionPreProcessorTest {
     }
 
     @Test
-    public void convertDoubleMatch() throws EvaluationException, CompilationException {
+    public void convertDoubleMatch() {
         EvalSession session = createTestSession();
 
         String expressionText = ExpressionPreProcessor.process(
@@ -89,7 +89,7 @@ public class ExpressionPreProcessorTest {
     }
 
     @Test
-    public void convertMultiMatch() throws EvaluationException, CompilationException {
+    public void convertMultiMatch() {
         EvalSession session = createTestSession();
 
         String expressionText = ExpressionPreProcessor.process(
@@ -100,5 +100,18 @@ public class ExpressionPreProcessorTest {
                 int.class);
 
         assertEquals(-1, expression.eval(session));
+    }
+
+    @Test
+    public void argumentNotFound() {
+        EvalSession session = createTestSession();
+
+        try{
+            ExpressionPreProcessor.process(
+                    session.registry(), "$a + $d");
+            fail();
+        } catch (Exception e) {
+
+        }
     }
 }

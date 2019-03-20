@@ -2,7 +2,6 @@ package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
-import com.airbnb.payments.featuresengine.errors.CompilationException;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -22,7 +21,7 @@ public class ExpressionPreProcessor {
     }
 
     public static String process(
-            ArgumentRegistry registry, String expression) throws CompilationException {
+            ArgumentRegistry registry, String expression) {
         Matcher matcher = regex.matcher(expression);
 
         // Captures all argument reading

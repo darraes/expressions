@@ -27,7 +27,7 @@ public class ArgumentRegistry {
      * @throws CompilationException If an argument with the same name is already
      *                              registered
      */
-    public void register(Argument argument) throws CompilationException {
+    public void register(Argument argument) {
         // We work with a single namespace and arguments must be uniquely identified
         // by its name
         if (this.exists(argument.getName())) {
@@ -57,8 +57,7 @@ public class ArgumentRegistry {
      * @throws EvaluationException If the given argument is not registered or if the
      *                             argument's fetching/computing fails
      */
-    public Object value(String name,
-                        EvalSession session) throws EvaluationException {
+    public Object value(String name, EvalSession session) {
         if (!this.exists(name)) {
             throw new EvaluationException("Argument %s not registered", name);
         }
@@ -66,7 +65,7 @@ public class ArgumentRegistry {
         return this.arguments.get(name).value(session);
     }
 
-    public Argument get(String name) throws CompilationException {
+    public Argument get(String name) {
         if (!this.exists(name)) {
             throw new CompilationException("Argument %s not registered", name);
         }

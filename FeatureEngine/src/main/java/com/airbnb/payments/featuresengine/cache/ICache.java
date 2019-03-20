@@ -26,5 +26,5 @@ public interface ICache {
      * @return The value stored under the key
      * @throws EvaluationException If @key is not present
      */
-    Object get(String key) throws EvaluationException;
+    Object get(String key);
 }

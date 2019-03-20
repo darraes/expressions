@@ -44,7 +44,7 @@ public class HashMapCache implements ICache {
      * @throws EvaluationException if key is not present
      */
     @Override
-    public Object get(String key) throws EvaluationException {
+    public Object get(String key) {
         if (!this.cache.containsKey(key)) {
             throw new EvaluationException("Key %s not present in cache", key);
         }

@@ -2,11 +2,9 @@ package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.core.EvalSession;
-import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.arguments.Argument;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 
 /**
@@ -38,8 +36,7 @@ public class NamedExpression extends Argument {
                            Class<?> returnType,
                            String expression,
                            boolean cacheable,
-                           boolean isAsync)
-            throws CompilationException {
+                           boolean isAsync) {
         super(name, returnType, cacheable, isAsync);
         this.expressionText = expression;
         this.expression = new Expression(expression, returnType);
@@ -57,7 +54,7 @@ public class NamedExpression extends Argument {
      * expression
      */
     @Override
-    protected Object fetch(EvalSession session) throws EvaluationException {
+    protected Object fetch(EvalSession session) {
         return this.expression.eval(session);
     }
 
@@ -66,7 +63,7 @@ public class NamedExpression extends Argument {
      * expression
      */
     protected CompletableFuture<Object> fetchAsync(
-            EvalSession session, Executor executor) throws EvaluationException {
+            EvalSession session, Executor executor) {
         return this.expression.evalAsync(session, executor);
     }
 }

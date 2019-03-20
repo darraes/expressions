@@ -20,7 +20,7 @@ public class ArgumentFactory {
      * @throws CompilationException When the argument is duplicated
      */
     public static Argument create(ArgumentRegistry registry,
-                                  ArgumentConfig config) throws CompilationException {
+                                  ArgumentConfig config) {
         if (registry == null) {
             throw new RuntimeException(
                     "ArgumentFactory cannot be used before init() call");

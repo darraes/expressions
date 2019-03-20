@@ -17,7 +17,7 @@ public class ExpressionStack {
         this.evalFrames = new Stack<>();
     }
 
-    public void push(String key) throws EvaluationException {
+    public void push(String key) {
         if (this.inProgressEvals.contains(key)){
             throw new EvaluationException("Expression %s already in the stack", key);
         }

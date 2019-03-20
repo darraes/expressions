@@ -5,6 +5,8 @@ import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 public abstract class Argument {
     // Name (or key) of the argument
@@ -63,6 +65,12 @@ public abstract class Argument {
         this.returnType = returnType;
         this.cacheable = cacheable;
         this.isAsync = isAsync;
+
+        /*if (isAsync && !returnType.equals(CompletableFuture.class)
+                || !isAsync && returnType.equals(CompletableFuture.class)) {
+            throw new CompilationException("Async type mismatch on argument %s",
+                    this.getName());
+        }*/
     }
 
     /**
@@ -122,7 +130,7 @@ public abstract class Argument {
         try {
             result = this.fetch(session);
         } finally {
-            String name = session.stack().pop();
+            session.stack().pop();
         }
 
         if (result != null) {
@@ -158,5 +166,17 @@ public abstract class Argument {
      * @throws EvaluationException If anything goes wrong with the evaluation of the
      *                             value
      */
-    protected abstract Object fetch(EvalSession session) throws EvaluationException;
+    protected abstract Object fetch(EvalSession session);
+
+    /**
+     * Does the actual fetching of the argument.
+     *
+     * @param session  The current evaluation session
+     * @param executor Executor to run the fetching on
+     * @return The actual argument value
+     * @throws EvaluationException If anything goes wrong with the evaluation of the
+     *                             value
+     */
+    protected abstract CompletableFuture<Object> fetchAsync(
+            EvalSession session, Executor executor);
 }

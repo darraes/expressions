@@ -19,13 +19,11 @@ public class Expression {
     // Actual expression evaluator
     private ExpressionEvaluator eval;
 
-    public Expression(String expression, Class<?> type)
-            throws CompilationException {
+    public Expression(String expression, Class<?> type) {
         this(expression, type, new String[0]);
     }
 
-    public Expression(String expression, Class<?> type, String[] imports)
-            throws CompilationException {
+    public Expression(String expression, Class<?> type, String[] imports) {
         this.expressionText = expression;
         this.expressionType = type;
         this.eval = new ExpressionEvaluator();
@@ -76,7 +74,7 @@ public class Expression {
      * @param session Session of the individual request
      * @return Result of the expression computation
      */
-    public final Object eval(EvalSession session) throws EvaluationException {
+    public final Object eval(EvalSession session) {
         try {
             return this.eval.evaluate(new Object[]{session});
         } catch (InvocationTargetException e) {

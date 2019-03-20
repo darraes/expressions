@@ -16,7 +16,7 @@ public interface IInputProvider {
      * @return The object if any
      * @throws EvaluationException If argument doesn't exist
      */
-    Object get(String name) throws EvaluationException;
+    Object get(String name);
 
     /**
      * Checks if the given input exists
