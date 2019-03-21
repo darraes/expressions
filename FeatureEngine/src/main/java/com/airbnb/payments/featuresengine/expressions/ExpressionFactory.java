@@ -2,7 +2,6 @@ package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
-import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 
 import java.util.ArrayList;
@@ -23,6 +22,21 @@ public class ExpressionFactory {
     static {
         regex = Pattern.compile("(\\$[A-Za-z_][A-Za-z_]*)");
 
+        /**
+         * The first substitution is the actual expression adjusted to work with the
+         * AsyncEvalSession. Eg.:
+         *     ((Integer)session.registry().value("arg1", session.inner()))
+         *         + ((Integer) session.asyncValues().get("arg2"))
+         *
+         * The second substitution is a comma separated list of all async arguments.
+         * Eg.: "asyncArg1", "asyncArg2"
+         *
+         * The third substitution is the name of the class being compiled to serve
+         * the expression.
+         *
+         * The choice for a anonymous class instead of a lambda is due to the fact that
+         * Janino API doesn't support lambdas yet.
+         */
         ASYNC_SCRIPT_TEMPLATE = ""
                 + "static Integer execute(AsyncEvalSession session) {\n"
                 + "    return %s;\n"
@@ -46,7 +60,10 @@ public class ExpressionFactory {
         List<Argument> arguments = parseArguments(registry, config.getExpression());
 
         if (!config.isAsync()) {
-            String finalExpression = processExpression(config.getExpression(), arguments);
+            String finalExpression = processExpression(
+                    config.getExpression(),
+                    arguments);
+            
             return new Expression(new ExpressionInfo(
                     finalExpression,
                     Class.forName(config.getReturnType()),
