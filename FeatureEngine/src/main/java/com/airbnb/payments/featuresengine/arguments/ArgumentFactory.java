@@ -2,6 +2,7 @@ package com.airbnb.payments.featuresengine.arguments;
 
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
+import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 
 /**
@@ -39,9 +40,9 @@ public class ArgumentFactory {
             } else {
                 argument = new NamedExpression(
                         config.getName(),
+                        ExpressionFactory.create(registry, config),
                         Class.forName(
                                 config.getReturnType()),
-                        config.getExpression(),
                         config.isCacheable(),
                         config.isAsync());
             }

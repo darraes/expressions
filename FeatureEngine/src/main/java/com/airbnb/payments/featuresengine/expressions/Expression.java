@@ -43,7 +43,7 @@ public class Expression {
         }
     }
 
-    public Expression(ExpressionInfo info) {
+    Expression(ExpressionInfo info) {
         this.expressionText = info.getExpression();
         this.expressionType = info.getReturnType();
         try {

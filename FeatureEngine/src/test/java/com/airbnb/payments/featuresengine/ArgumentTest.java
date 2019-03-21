@@ -8,7 +8,6 @@ import com.airbnb.payments.featuresengine.core.AsyncEvalSession;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
-import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 import com.airbnb.payments.featuresengine.expressions.NamedExpression;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ScriptEvaluator;
@@ -66,18 +65,32 @@ public class ArgumentTest {
     @Test
     public void accessProperties() throws CompilationException {
         {
-            Argument arg1 = new InputArgument(
-                    "a", Integer.class, true, true);
+            ArgumentRegistry registry = new ArgumentRegistry();
+            Argument arg1 = ArgumentFactory.create(
+                    registry,
+                    new ArgumentConfig(
+                            "a",
+                            Integer.class.getName(),
+                            true,
+                            false
+                    ));
 
             assertTrue(arg1.isCacheable());
-            assertTrue(arg1.isAsync());
+            assertFalse(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
         }
 
         {
-            Argument arg1 = new InputArgument(
-                    "a", Integer.class, false, false);
+            ArgumentRegistry registry = new ArgumentRegistry();
+            Argument arg1 = ArgumentFactory.create(
+                    registry,
+                    new ArgumentConfig(
+                            "a",
+                            Integer.class.getName(),
+                            false,
+                            false
+                    ));
 
             assertFalse(arg1.isCacheable());
             assertFalse(arg1.isAsync());
@@ -86,33 +99,41 @@ public class ArgumentTest {
         }
 
         {
-            Argument arg1 = new NamedExpression(
-                    "a",
-                    Integer.class,
-                    "3 + 7",
-                    true,
-                    true);
+            ArgumentRegistry registry = new ArgumentRegistry();
+            Argument arg1 = ArgumentFactory.create(registry,
+                    new ArgumentConfig(
+                            "a",
+                            Integer.class.getName(),
+                            "3 + 7",
+                            true,
+                            false
+                            ));
 
             assertTrue(arg1.isCacheable());
-            assertTrue(arg1.isAsync());
+            assertFalse(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
-            assertEquals("3 + 7", ((NamedExpression) arg1).getExpressionText());
+            assertEquals("3 + 7",
+                    ((NamedExpression) arg1).getExpression().getExpressionText());
         }
 
         {
-            Argument arg1 = new NamedExpression(
-                    "a",
-                    Integer.class,
-                    "3 + 7",
-                    false,
-                    false);
+            ArgumentRegistry registry = new ArgumentRegistry();
+            Argument arg1 = ArgumentFactory.create(registry,
+                    new ArgumentConfig(
+                            "a",
+                            Integer.class.getName(),
+                            "3 + 7",
+                            false,
+                            false
+                    ));
 
             assertFalse(arg1.isCacheable());
             assertFalse(arg1.isAsync());
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
-            assertEquals("3 + 7", ((NamedExpression) arg1).getExpressionText());
+            assertEquals("3 + 7",
+                    ((NamedExpression) arg1).getExpression().getExpressionText());
         }
     }
 
@@ -139,13 +160,12 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        "((Integer)session.registry().value(\"a\", session))"
-                                + " + ((Integer)session.registry().value(\"b\", session))"));
+                        "$a + $b"));
         ArgumentFactory.create(registry,
                 new ArgumentConfig(
                         "d",
                         Integer.class.getName(),
-                        "10 * ((Integer)session.registry().value(\"c\", session))"));
+                        "10 * $c"));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -184,8 +204,7 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        "((Integer)session.registry().value(\"a\", session))"
-                                + " + ((Integer)session.registry().value(\"b\", session))"));
+                        "$a + $b"));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -207,27 +226,20 @@ public class ArgumentTest {
 
     @Test
     public void argumentNotRegistered() throws CompilationException {
-        ICache cache = new HashMapCache();
-
-        HashMapInputProvider provider = new HashMapInputProvider();
         ArgumentRegistry registry = new ArgumentRegistry();
 
-        ArgumentFactory.create(registry,
-                new ArgumentConfig(
-                        "c",
-                        Integer.class.getName(),
-                        "((Integer)session.registry().value(\"a\", session))"
-                                + " + ((Integer)session.registry().value(\"b\", session))",
-                        true, false));
-
-        EvalSession session = new EvalSession(provider, registry, cache);
-
         try {
-            registry.value("c", session);
+            ArgumentFactory.create(registry,
+                    new ArgumentConfig(
+                            "c",
+                            Integer.class.getName(),
+                            "$a + $b",
+                            true, false));
             fail();
-        } catch (EvaluationException e) {
+        } catch (CompilationException e) {
             assertTrue(e.getMessage().contains("not registered"));
         }
+
     }
 
     @Test
@@ -243,7 +255,8 @@ public class ArgumentTest {
                         "a",
                         Integer.class.getName(),
                         "1 + ((Integer)session.registry().value(\"b\", session))",
-                        true, false));
+                        true,
+                        false));
 
         ArgumentFactory.create(
                 registry,
@@ -251,7 +264,8 @@ public class ArgumentTest {
                         "b",
                         Integer.class.getName(),
                         "1 + ((Integer)session.registry().value(\"a\", session))",
-                        true, false));
+                        true,
+                        false));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -263,7 +277,7 @@ public class ArgumentTest {
         }
     }
 
-    /*
+
     @Test
     public void evaluateSimpleAsyncExpression()
             throws CompilationException, ExecutionException, InterruptedException {
@@ -291,11 +305,10 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        ExpressionFactory.create(
-                                registry,
-                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)"),
+                        "ArgumentTest.someAsyncMethod($a + $b)",
                         true,
-                        true));
+                        false,
+                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
 
         EvalSession session = new EvalSession(provider, registry, cache);
         Executor executor = Executors.newFixedThreadPool(2);
@@ -341,22 +354,20 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        ExpressionFactory.create(
-                                registry,
-                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($a + $b)"),
+                        "ArgumentTest.someAsyncMethod($a + $b)",
                         true,
-                        true));
+                        false,
+                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
 
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "d",
                         Integer.class.getName(),
-                        ExpressionFactory.create(
-                                registry,
-                                "com.airbnb.payments.featuresengine.ArgumentTest.someAsyncMethod($b - $a)"),
+                        "ArgumentTest.someAsyncMethod($b - $a)",
                         true,
-                        true));
+                        false,
+                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
 
         EvalSession session = new EvalSession(provider, registry, cache);
         Executor executor = Executors.newFixedThreadPool(2);
@@ -401,7 +412,7 @@ public class ArgumentTest {
         assertEquals(21,
                 ((CompletableFuture)se.evaluate(
                         new Object[]{session, executor})).get());
-    }*/
+    }
 
 
     public static CompletableFuture<Integer> someAsyncMethod(int x) {

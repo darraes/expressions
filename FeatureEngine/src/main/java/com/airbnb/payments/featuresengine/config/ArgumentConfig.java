@@ -15,6 +15,18 @@ public class ArgumentConfig extends ExpressionConfig {
 
     public ArgumentConfig(String name,
                           String returnType,
+                          boolean cacheable,
+                          boolean isAsync) {
+        this(name,
+                returnType,
+                null,
+                cacheable,
+                isAsync,
+                new String[0]);
+    }
+
+    public ArgumentConfig(String name,
+                          String returnType,
                           String expression) {
         this(name,
                 returnType,

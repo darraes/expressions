@@ -19,34 +19,28 @@ public class NamedExpression extends Argument {
 
     // The expression that evaluates to this argument
     private Expression expression;
-    // Text of the expression
-    private String expressionText;
 
     /**
      * Constructor
      *
      * @param name       The name of the expression
-     * @param returnType The type of the expression
      * @param expression The computing expression that evaluates to the desired value
+     * @param returnType The type of the expression
      * @param cacheable  If the expression, once computed, should be cached on further
      *                   fetches for this particular session
      * @throws CompilationException Thrown if the expression can't be compiled
      */
     public NamedExpression(String name,
+                           Expression expression,
                            Class<?> returnType,
-                           String expression,
                            boolean cacheable,
                            boolean isAsync) {
         super(name, returnType, cacheable, isAsync);
-        this.expressionText = expression;
-        this.expression = new Expression(expression, returnType);
+        this.expression = expression;
     }
 
-    /**
-     * Gets the original expression text
-     */
-    public String getExpressionText() {
-        return this.expressionText;
+    public Expression getExpression() {
+        return expression;
     }
 
     /**

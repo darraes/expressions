@@ -30,47 +30,23 @@ public class ExpressionInfo {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getExpression() {
         return expression;
-    }
-
-    public void setExpression(String expression) {
-        this.expression = expression;
     }
 
     public Class<?> getReturnType() {
         return returnType;
     }
 
-    public void setReturnType(Class<?> returnType) {
-        this.returnType = returnType;
-    }
-
     public List<Argument> getAccessedArguments() {
         return accessedArguments;
-    }
-
-    public void setAccessedArguments(List<Argument> accessedArguments) {
-        this.accessedArguments = accessedArguments;
     }
 
     public boolean isFromScript() {
         return isFromScript;
     }
 
-    public void setFromScript(boolean fromScript) {
-        isFromScript = fromScript;
-    }
-
     public String[] getDependencies() {
         return dependencies;
-    }
-
-    public void setDependencies(String[] dependencies) {
-        this.dependencies = dependencies;
     }
 }
