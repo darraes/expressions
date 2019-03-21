@@ -48,7 +48,6 @@ public class ExpressionFactory {
         if (!config.isAsync()) {
             String finalExpression = processExpression(config.getExpression(), arguments);
             return new Expression(new ExpressionInfo(
-                    config.getName(),
                     finalExpression,
                     Class.forName(config.getReturnType()),
                     arguments,

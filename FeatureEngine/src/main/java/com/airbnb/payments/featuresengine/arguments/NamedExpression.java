@@ -1,8 +1,9 @@
-package com.airbnb.payments.featuresengine.expressions;
+package com.airbnb.payments.featuresengine.arguments;
 
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.arguments.Argument;
+import com.airbnb.payments.featuresengine.expressions.Expression;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -30,11 +31,11 @@ public class NamedExpression extends Argument {
      *                   fetches for this particular session
      * @throws CompilationException Thrown if the expression can't be compiled
      */
-    public NamedExpression(String name,
-                           Expression expression,
-                           Class<?> returnType,
-                           boolean cacheable,
-                           boolean isAsync) {
+    NamedExpression(String name,
+                    Expression expression,
+                    Class<?> returnType,
+                    boolean cacheable,
+                    boolean isAsync) {
         super(name, returnType, cacheable, isAsync);
         this.expression = expression;
     }

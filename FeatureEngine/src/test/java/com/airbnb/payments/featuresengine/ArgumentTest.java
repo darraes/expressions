@@ -8,7 +8,7 @@ import com.airbnb.payments.featuresengine.core.AsyncEvalSession;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
-import com.airbnb.payments.featuresengine.expressions.NamedExpression;
+import com.airbnb.payments.featuresengine.arguments.NamedExpression;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ScriptEvaluator;
 import org.junit.Test;
