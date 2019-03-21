@@ -6,35 +6,20 @@ public class ArgumentConfig extends ExpressionConfig {
 
     public ArgumentConfig(String name,
                           String returnType) {
-        this(name,
-                returnType,
-                null,
-                true,
-                false,
-                new String[0]);
+        this(name, returnType, true, false);
     }
 
     public ArgumentConfig(String name,
                           String returnType,
                           boolean cacheable,
                           boolean isAsync) {
-        this(name,
-                returnType,
-                null,
-                cacheable,
-                isAsync,
-                new String[0]);
+        this(name, returnType, null, cacheable, isAsync, new String[0]);
     }
 
     public ArgumentConfig(String name,
                           String returnType,
                           String expression) {
-        this(name,
-                returnType,
-                expression,
-                true,
-                false,
-                new String[0]);
+        this(name, returnType, expression, true, false);
     }
 
     public ArgumentConfig(String name,
@@ -42,12 +27,7 @@ public class ArgumentConfig extends ExpressionConfig {
                           String expression,
                           boolean cacheable,
                           boolean isAsync) {
-        this(name,
-                returnType,
-                expression,
-                cacheable,
-                isAsync,
-                new String[0]);
+        this(name, returnType, expression, cacheable, isAsync, new String[0]);
     }
 
     public ArgumentConfig(String name,

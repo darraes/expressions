@@ -9,29 +9,20 @@ public class ExpressionConfig {
     public ExpressionConfig(String expression,
                             String returnType
     ) {
-        this(expression,
-                returnType,
-                false,
-                new String[0]);
+        this(expression, returnType, false, new String[0]);
     }
 
     public ExpressionConfig(String name,
                             String expression,
                             String returnType,
                             boolean isAsync) {
-        this(expression,
-                returnType,
-                isAsync,
-                new String[0]);
+        this(expression, returnType, isAsync, new String[0]);
     }
 
     public ExpressionConfig(String expression,
                             String returnType,
                             String[] dependencies) {
-        this(expression,
-                returnType,
-                false,
-                dependencies);
+        this(expression, returnType, false, dependencies);
     }
 
     public ExpressionConfig(String expression,
