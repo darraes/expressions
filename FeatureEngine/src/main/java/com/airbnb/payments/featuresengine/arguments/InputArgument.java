@@ -45,6 +45,10 @@ public class InputArgument extends Argument {
                     "Argument %s not found on argument provider", this.getName());
         }
 
+        // We don't support user provided async arguments, Those must always be an
+        // expression.
+        // We wrap the sync fetch inside a suppleAsync call to make this method work
+        // on all scenarios
         return CompletableFuture.supplyAsync(
                 () -> {
                     try {

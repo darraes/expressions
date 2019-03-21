@@ -29,6 +29,8 @@ public class Expression {
             "com.airbnb.payments.featuresengine.core.AsyncEvalSession",
     };
 
+    // TODO Remove the old ctors
+
     public Expression(String expression, Class<?> type) {
         this(expression, type, new String[0]);
     }
@@ -143,42 +145,32 @@ public class Expression {
     }
 
     /**
-     * @param expression
-     * @param type
-     * @param imports
-     * @return
-     * @throws CompileException
+     * Builds a Janino ExpressionEvaluator to serve the given @expression evaluations
      */
     private static IScriptEvaluator buildExpressionEvaluator(
-            String expression, Class<?> type, String[] imports) throws CompileException {
-        return buildEvaluator(new ExpressionEvaluator(), expression, type, imports);
+            String expression, Class<?> type, String[] imports)
+            throws CompileException {
+        return prepareEvaluator(new ExpressionEvaluator(), expression, type, imports);
     }
 
     /**
-     * @param expression
-     * @param type
-     * @param imports
-     * @return
-     * @throws CompileException
+     * Builds a Janino ScriptEvaluator to serve the given @expression evaluations
      */
     private static IScriptEvaluator buildScripEvaluator(
-            String expression, Class<?> type, String[] imports) throws CompileException {
+            String expression, String expressionID, Class<?> type, String[] imports)
+            throws CompileException {
         ScriptEvaluator eval = new ScriptEvaluator();
         eval.setReturnType(CompletableFuture.class);
-        eval.setClassName("ExpressionWOW");
+        eval.setClassName(expressionID);
 
-        return buildEvaluator(eval, expression, type, imports);
+        return prepareEvaluator(eval, expression, type, imports);
     }
 
     /**
-     * @param eval
-     * @param expression
-     * @param type
-     * @param imports
-     * @return
-     * @throws CompileException
+     * Adds parameters, imports and any other configuration necessary to run the
+     * Janino evaluator
      */
-    private static IScriptEvaluator buildEvaluator(
+    private static IScriptEvaluator prepareEvaluator(
             IScriptEvaluator eval,
             String expression,
             Class<?> type,

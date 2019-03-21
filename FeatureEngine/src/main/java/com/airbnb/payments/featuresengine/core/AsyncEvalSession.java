@@ -20,9 +20,20 @@ public class AsyncEvalSession {
         this.asyncValues = asyncValues;
     }
 
-    public AsyncEvalSession(EvalSession session, Object asyncValues) {
+    /**
+     * This ctor, with an Object as the values map instead of a Map<>, exists because
+     * Janino library loses the type information when anonymous classes are used as
+     * function parameters.
+     *
+     * IMPORTANT: Don't call this ctor directly
+     *
+     * @param session Caller's evaluation session
+     * @param asyncValuesMap A Map<String, Object> with the arguments
+     */
+    @SuppressWarnings(value = "unchecked")
+    public AsyncEvalSession(EvalSession session, Object asyncValuesMap) {
         this.session = session;
-        this.asyncValues = (Map<String, Object>) asyncValues;
+        this.asyncValues = (Map<String, Object>) asyncValuesMap;
     }
 
     /**

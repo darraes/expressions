@@ -12,8 +12,7 @@ public class ExpressionConfig {
         this(expression, returnType, false, new String[0]);
     }
 
-    public ExpressionConfig(String name,
-                            String expression,
+    public ExpressionConfig(String expression,
                             String returnType,
                             boolean isAsync) {
         this(expression, returnType, isAsync, new String[0]);
@@ -40,31 +39,15 @@ public class ExpressionConfig {
         return returnType;
     }
 
-    public void setReturnType(String returnType) {
-        this.returnType = returnType;
-    }
-
     public String getExpression() {
         return expression;
-    }
-
-    public void setExpression(String expression) {
-        this.expression = expression;
     }
 
     public boolean isAsync() {
         return isAsync;
     }
 
-    public void setAsync(boolean async) {
-        isAsync = async;
-    }
-
     public String[] getDependencies() {
         return dependencies;
-    }
-
-    public void setDependencies(String[] dependencies) {
-        this.dependencies = dependencies;
     }
 }

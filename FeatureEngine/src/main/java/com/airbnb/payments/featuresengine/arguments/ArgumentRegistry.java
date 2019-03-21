@@ -8,6 +8,7 @@ import org.codehaus.commons.compiler.CompileException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class ArgumentRegistry {
      * @throws CompilationException If an argument with the same name is already
      *                              registered
      */
-    public void register(Argument argument) {
+    void register(Argument argument) {
         // We work with a single namespace and arguments must be uniquely identified
         // by its name
         if (this.exists(argument.getName())) {
@@ -72,8 +73,8 @@ public class ArgumentRegistry {
     /**
      * Fetches (or possibly computes) the value for the argument with the given @name
      *
-     * @param name    Name of the argument
-     * @param session Current evaluation session
+     * @param name     Name of the argument
+     * @param session  Current evaluation session
      * @param executor Executor to run the fetching on
      * @return The argument value
      * @throws EvaluationException If the given argument is not registered or if the
@@ -90,6 +91,7 @@ public class ArgumentRegistry {
 
     /**
      * Gets the Argument object, not its value
+     *
      * @param name The name of the argument
      */
     public Argument get(String name) {
@@ -101,17 +103,23 @@ public class ArgumentRegistry {
     }
 
     /**
+     * Asynchronously fetches all arguments passed in on @arguments. The resulting
+     * completable future will only be ready when all arguments are fetched.
      *
-     * @param arguments
-     * @param session
-     * @param executor
-     * @return
+     * @param arguments Arguments to be fetched
+     * @param session   Caller's evaluation session
+     * @param executor  Executor to fetch the arguments on
+     * @return Future to be fulfilled when all arguments are ready
      */
     public CompletableFuture<Map<String, Object>> allValuesAsync(
             String[] arguments, EvalSession session, Executor executor) {
+        if (arguments == null || arguments.length == 0) {
+            return CompletableFuture.supplyAsync(
+                    () -> new HashMap<>(), executor);
+        }
+
         Map<String, CompletableFuture<Object>> futures
                 = new HashMap<>(arguments.length);
-
         for (String argument : arguments) {
             futures.put(
                     argument,

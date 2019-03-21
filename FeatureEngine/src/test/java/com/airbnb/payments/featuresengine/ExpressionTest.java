@@ -136,6 +136,16 @@ public class ExpressionTest {
         }
     }
 
+    @Test
+    public void evaluateArgumentMethodCallExpression() {
+        // TODO implement
+    }
+
+    @Test
+    public void evaluateMultipleArgumentTypeExpression() {
+        // TODO implement
+    }
+
     private static EvalSession createTestSession() throws CompilationException {
         ICache cache = new HashMapCache();
 

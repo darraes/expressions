@@ -57,10 +57,10 @@ public abstract class Argument {
      *                   fetches
      * @param isAsync    If the given argument needs async fetching
      */
-    public Argument(String name,
-                    Class<?> returnType,
-                    boolean cacheable,
-                    boolean isAsync) {
+    Argument(String name,
+             Class<?> returnType,
+             boolean cacheable,
+             boolean isAsync) {
         this.name = name;
         this.returnType = returnType;
         this.cacheable = cacheable;
@@ -104,7 +104,6 @@ public abstract class Argument {
      *
      * @param session Session of the individual request
      * @return Result of the argument fetching
-     * @throws EvaluationException
      */
     final Object value(EvalSession session) {
         if (session.stack().contains(this.getName())) {
@@ -130,7 +129,7 @@ public abstract class Argument {
             session.stack().pop();
         }
 
-        return this.handleResult(session, result);
+        return this.processResult(session, result);
     }
 
     /**
@@ -141,7 +140,6 @@ public abstract class Argument {
      * @param session  Session of the individual request
      * @param executor Executor to run the fetching on
      * @return Result of the argument fetching
-     * @throws EvaluationException
      */
     final CompletableFuture<Object> valueAsync(EvalSession session, Executor executor) {
         CompletableFuture<Object> result = new CompletableFuture<>();
@@ -166,7 +164,7 @@ public abstract class Argument {
                     this.fetchAsync(session, executor)
                             .thenAccept((res) -> {
                                 try {
-                                    res = handleResult(session, res);
+                                    res = processResult(session, res);
                                     // Complete the fetching successfully
                                     result.complete(res);
                                 } catch (Exception e) {
@@ -180,8 +178,16 @@ public abstract class Argument {
         return result;
     }
 
-    private Object handleResult(EvalSession session, Object result) {
+    /**
+     * Does the final type checking to make sure the argument's computed type matches
+     * the expected argument type.
+     * @param session Caller evaluation session
+     * @param result Raw evaluation result
+     * @return The final, processed, result
+     */
+    private Object processResult(EvalSession session, Object result) {
         if (result != null) {
+            // TODO handle CompletableFuture
             if (this.returnType.isInstance(result)
                     || this.returnType.isAssignableFrom(result.getClass())
                     || (primitives.containsKey(this.returnType)

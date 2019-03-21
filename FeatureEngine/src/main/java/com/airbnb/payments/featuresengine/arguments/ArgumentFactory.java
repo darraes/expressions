@@ -32,16 +32,14 @@ public class ArgumentFactory {
             if (config.getExpression() == null) {
                 argument = new InputArgument(
                         config.getName(),
-                        Class.forName(
-                                config.getReturnType()),
+                        Class.forName(config.getReturnType()),
                         config.isCacheable(),
                         config.isAsync());
             } else {
                 argument = new NamedExpression(
                         config.getName(),
                         ExpressionFactory.create(registry, config),
-                        Class.forName(
-                                config.getReturnType()),
+                        Class.forName(config.getReturnType()),
                         config.isCacheable(),
                         config.isAsync());
             }

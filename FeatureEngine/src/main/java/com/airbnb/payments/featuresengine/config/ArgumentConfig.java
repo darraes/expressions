@@ -45,15 +45,7 @@ public class ArgumentConfig extends ExpressionConfig {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public boolean isCacheable() {
         return cacheable;
-    }
-
-    public void setCacheable(boolean cacheable) {
-        this.cacheable = cacheable;
     }
 }

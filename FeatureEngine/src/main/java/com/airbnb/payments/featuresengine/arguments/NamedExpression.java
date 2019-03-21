@@ -2,7 +2,6 @@ package com.airbnb.payments.featuresengine.arguments;
 
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.core.EvalSession;
-import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 
 import java.util.concurrent.CompletableFuture;
