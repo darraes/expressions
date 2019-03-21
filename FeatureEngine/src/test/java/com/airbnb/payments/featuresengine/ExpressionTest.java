@@ -24,17 +24,23 @@ import static org.junit.Assert.*;
 public class ExpressionTest {
     @Test
     public void accessProperties() throws CompilationException {
-        Expression expression = new Expression("1 + 3", int.class);
+        ArgumentRegistry registry = new ArgumentRegistry();
+        Expression expression = ExpressionFactory.create(
+                registry,
+                new ExpressionConfig("1 + 3", Integer.class.getName()));
         assertEquals("1 + 3", expression.getExpressionText());
-        assertEquals(int.class, expression.getExpressionType());
+        assertEquals(Integer.class, expression.getExpressionType());
     }
 
     @Test
     public void evaluateStaticMethod()
             throws CompilationException, EvaluationException {
-        Expression expression = new Expression(
-                "Math.max(3, 10)",
-                int.class);
+        ArgumentRegistry registry = new ArgumentRegistry();
+        Expression expression = ExpressionFactory.create(
+                registry,
+                new ExpressionConfig(
+                        "Math.max(3, 10)",
+                        Integer.class.getName()));
 
         assertEquals(10, expression.eval(null));
     }
@@ -42,9 +48,11 @@ public class ExpressionTest {
     @Test
     public void evaluateInstanceMethod()
             throws CompilationException, EvaluationException {
-        Expression expression = new Expression(
-                "\" trim_me \".trim()",
-                String.class);
+        ArgumentRegistry registry = new ArgumentRegistry();
+        Expression expression = ExpressionFactory.create(
+                registry,
+                new ExpressionConfig(
+                        "\" trim_me \".trim()", String.class.getName()));
 
         assertEquals("trim_me", expression.eval(null));
     }
@@ -52,9 +60,12 @@ public class ExpressionTest {
     @Test
     public void evaluateConstructor()
             throws CompilationException, EvaluationException {
-        Expression expression = new Expression(
-                "(new String(\" trim_me \")).trim()",
-                String.class);
+        ArgumentRegistry registry = new ArgumentRegistry();
+        Expression expression = ExpressionFactory.create(
+                registry,
+                new ExpressionConfig(
+                        "(new String(\" trim_me \")).trim()",
+                        String.class.getName()));
 
         assertEquals("trim_me", expression.eval(null));
     }
@@ -64,10 +75,11 @@ public class ExpressionTest {
             throws CompilationException, EvaluationException {
         EvalSession session = createTestSession();
 
-        Expression expression = new Expression(
-                "((Integer)session.registry().value(\"a\", session))"
-                        + " + ((Integer)session.registry().value(\"b\", session))",
-                int.class);
+        Expression expression = ExpressionFactory.create(
+                session.registry(),
+                new ExpressionConfig(
+                        "$a + $b",
+                        Integer.class.getName()));
 
         assertEquals(9, expression.eval(session));
     }
@@ -77,9 +89,11 @@ public class ExpressionTest {
             throws CompilationException, EvaluationException {
         EvalSession session = createTestSession();
 
-        Expression expression = new Expression(
-                "Math.sqrt(((Integer)session.registry().value(\"c\", session)))",
-                int.class);
+        Expression expression = ExpressionFactory.create(
+                session.registry(),
+                new ExpressionConfig(
+                        "Math.sqrt($c)",
+                        Integer.class.getName()));
 
         assertEquals(3.0, expression.eval(session));
     }
@@ -87,22 +101,21 @@ public class ExpressionTest {
     @Test
     public void handleExceptions() throws CompilationException {
         EvalSession session = createTestSession();
-
-        Expression expression = new Expression(
-                "session.registry().value(\"d\", session)",
-                int.class);
-
         try {
-            expression.eval(session);
+            ExpressionFactory.create(
+                    session.registry(),
+                    new ExpressionConfig(
+                            "$d",
+                            Integer.class.getName()));
             fail();
-        } catch (EvaluationException e) {
+        } catch (CompilationException e) {
 
         }
     }
 
     @Test
     public void evaluateSimpleAsyncExpression()
-            throws CompilationException, ExecutionException, InterruptedException, ClassNotFoundException {
+            throws CompilationException, ExecutionException, InterruptedException {
         EvalSession session = createTestSession();
 
         Executor executor = Executors.newFixedThreadPool(2);

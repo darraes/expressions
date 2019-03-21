@@ -29,28 +29,22 @@ public class Expression {
             "com.airbnb.payments.featuresengine.core.AsyncEvalSession",
     };
 
-    // TODO Remove the old ctors
-
-    public Expression(String expression, Class<?> type) {
-        this(expression, type, new String[0]);
-    }
-
-    public Expression(String expression, Class<?> type, String[] imports) {
-        this.expressionText = expression;
-        this.expressionType = type;
-        try {
-            this.eval = buildExpressionEvaluator(expression, type, imports);
-        } catch (CompileException e) {
-            throw new CompilationException(e, "Failed compiling %s", expression);
-        }
-    }
-
     Expression(ExpressionInfo info) {
         this.expressionText = info.getExpression();
         this.expressionType = info.getReturnType();
         try {
-            this.eval = buildExpressionEvaluator(
-                    this.expressionText, this.expressionType, info.getDependencies());
+            if (info.isFromScript()) {
+                this.eval = buildScripEvaluator(
+                        this.expressionText,
+                        info.getID(),
+                        this.expressionType,
+                        info.getDependencies());
+            } else {
+                this.eval = buildExpressionEvaluator(
+                        this.expressionText,
+                        this.expressionType,
+                        info.getDependencies());
+            }
         } catch (CompileException e) {
             throw new CompilationException(e, "Failed compiling %s", this.expressionText);
         }

@@ -3,9 +3,11 @@ package com.airbnb.payments.featuresengine.expressions;
 import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.config.ExpressionConfig;
+import com.airbnb.payments.featuresengine.errors.CompilationException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,26 +57,69 @@ public class ExpressionFactory {
                 + "     });";
     }
 
-    public static Expression create(ArgumentRegistry registry, ExpressionConfig config)
-            throws ClassNotFoundException {
-        List<Argument> arguments = parseArguments(registry, config.getExpression());
+    public static Expression create(
+            ArgumentRegistry registry, ExpressionConfig config) {
+        try {
+            List<Argument> arguments = parseArguments(registry, config.getExpression());
 
-        if (!config.isAsync()) {
-            String finalExpression = processExpression(
-                    config.getExpression(),
-                    arguments);
-            
-            return new Expression(new ExpressionInfo(
-                    finalExpression,
-                    Class.forName(config.getReturnType()),
-                    arguments,
-                    false,
-                    config.getDependencies()));
+            if (!config.isAsync()) {
+                if (arguments.stream().anyMatch(Argument::isAsync)) {
+                    throw new CompilationException(
+                            "Expression %s is not marked as async but it has at least one"
+                                    + " async argument dependency",
+                            config.getExpression());
+                }
+
+                String finalExpression = processSyncExpression(
+                        config.getExpression(),
+                        arguments);
+
+                return new Expression(new ExpressionInfo(
+                        generateID(),
+                        finalExpression,
+                        Class.forName(config.getReturnType()),
+                        arguments,
+                        false,
+                        config.getDependencies()));
+            } else {
+                String finalExpression = processAsyncExpression(
+                        config.getExpression(),
+                        arguments);
+
+                String asyncArgs = String.join(
+                        ",",
+                        arguments
+                                .stream()
+                                .filter(Argument::isAsync)
+                                .map(a -> "\"" + a.getName() + "\"")
+                                .toArray(String[]::new));
+
+                String expressionID = generateID();
+
+                String finalScript = String.format(
+                        ASYNC_SCRIPT_TEMPLATE,
+                        finalExpression,
+                        asyncArgs,
+                        expressionID);
+
+                return new Expression(new ExpressionInfo(
+                        generateID(),
+                        finalScript,
+                        Class.forName(config.getReturnType()),
+                        arguments,
+                        true,
+                        config.getDependencies()));
+
+            }
+        } catch (ClassNotFoundException e) {
+            throw new CompilationException(e,
+                    "Class not found when compiling expression %s",
+                    config.getExpression());
         }
-        return null;
     }
 
-    public static String processExpression(String expression, List<Argument> arguments) {
+    private static String processSyncExpression(
+            String expression, List<Argument> arguments) {
         // Replaces the compressed syntax by the argument access logic
         String result;
         result = expression;
@@ -85,6 +130,32 @@ public class ExpressionFactory {
                             "((%s)session.registry().value(\"%s\", session))",
                             argument.getReturnType().getName(),
                             argument.getName()));
+        }
+
+        return result;
+    }
+
+    private static String processAsyncExpression(
+            String expression, List<Argument> arguments) {
+        // Replaces the compressed syntax by the argument access logic
+        String result;
+        result = expression;
+        for (Argument argument : arguments) {
+            if (argument.isAsync()) {
+                result = result.replace(
+                        String.format("$%s", argument.getName()),
+                        String.format(
+                                "((%s)session.registry().value(\"%s\", session.inner()))",
+                                argument.getReturnType().getName(),
+                                argument.getName()));
+            } else {
+                result = result.replace(
+                        String.format("$%s", argument.getName()),
+                        String.format(
+                                "((%s)session.asyncValues().get(\"%s\"))",
+                                argument.getReturnType().getName(),
+                                argument.getName()));
+            }
         }
 
         return result;
@@ -111,5 +182,12 @@ public class ExpressionFactory {
         // Eg.: $b + $big. If we create $b first, we would wrongly target ($b)ig
         arguments.sort((a1, a2) -> a2.getName().length() - a1.getName().length());
         return arguments;
+    }
+
+    private static String generateID() {
+        return UUID.randomUUID()
+                .toString()
+                .toUpperCase()
+                .replace("-", "");
     }
 }
