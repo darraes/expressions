@@ -1,6 +1,7 @@
 package com.airbnb.payments.featuresengine.config;
 
 public class ArgumentConfig extends ExpressionConfig {
+    private String name;
     private boolean cacheable;
 
     public ArgumentConfig(String name,
@@ -55,10 +56,18 @@ public class ArgumentConfig extends ExpressionConfig {
                           boolean cacheable,
                           boolean isAsync,
                           String[] dependencies) {
-        super(name, expression, returnType, isAsync, dependencies);
+        super(expression, returnType, isAsync, dependencies);
+        this.name = name;
         this.cacheable = cacheable;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public boolean isCacheable() {
         return cacheable;

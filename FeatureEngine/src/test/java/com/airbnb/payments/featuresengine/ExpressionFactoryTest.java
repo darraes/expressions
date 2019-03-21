@@ -66,7 +66,7 @@ public class ExpressionFactoryTest {
 
         Expression expression = ExpressionFactory.create(
                 session.registry(), new ExpressionConfig(
-                        "foo", "$a + $b", Integer.class.getName()));
+                        "$a + $b", Integer.class.getName()));
         assertEquals(
                 "((java.lang.Integer)session.registry().value(\"a\", session))"
                         + " + ((java.lang.Integer)session.registry().value(\"b\", session))",
@@ -83,7 +83,6 @@ public class ExpressionFactoryTest {
         Expression expression = ExpressionFactory.create(
                 session.registry(),
                 new ExpressionConfig(
-                        "foo",
                         "$a + $b - $C + $_d - $big",
                         Integer.class.getName()));
 
@@ -98,7 +97,7 @@ public class ExpressionFactoryTest {
         try {
             ExpressionFactory.create(
                     session.registry(), new ExpressionConfig(
-                            "foo","$a + $d", Integer.class.getName()));
+                            "$a + $d", Integer.class.getName()));
             fail();
         } catch (Exception e) {
 

@@ -1,18 +1,15 @@
 package com.airbnb.payments.featuresengine.config;
 
 public class ExpressionConfig {
-    private String name;
     private String returnType;
     private String expression;
     private boolean isAsync;
     private String[] dependencies;
 
-    public ExpressionConfig(String name,
-                            String expression,
+    public ExpressionConfig(String expression,
                             String returnType
-                            ) {
-        this(name,
-                expression,
+    ) {
+        this(expression,
                 returnType,
                 false,
                 new String[0]);
@@ -22,43 +19,31 @@ public class ExpressionConfig {
                             String expression,
                             String returnType,
                             boolean isAsync) {
-        this(name,
-                expression,
+        this(expression,
                 returnType,
                 isAsync,
                 new String[0]);
     }
 
-    public ExpressionConfig(String name,
-                            String expression,
+    public ExpressionConfig(String expression,
                             String returnType,
                             String[] dependencies) {
-        this(name,
-                expression,
+        this(expression,
                 returnType,
                 false,
                 dependencies);
     }
 
-    public ExpressionConfig(String name,
-                            String expression,
+    public ExpressionConfig(String expression,
                             String returnType,
                             boolean isAsync,
                             String[] dependencies) {
-        this.name = name;
         this.returnType = returnType;
         this.expression = expression;
         this.isAsync = isAsync;
         this.dependencies = dependencies;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getReturnType() {
         return returnType;

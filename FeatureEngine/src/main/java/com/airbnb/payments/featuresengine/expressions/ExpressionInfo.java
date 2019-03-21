@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine.expressions;
 import com.airbnb.payments.featuresengine.arguments.Argument;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ExpressionInfo {
     private String id;
@@ -12,12 +13,15 @@ public class ExpressionInfo {
     private boolean isFromScript;
     private String[] dependencies;
 
-    public ExpressionInfo(String expression,
+    ExpressionInfo(String expression,
                           Class<?> returnType,
                           List<Argument> accessedArguments,
                           boolean isFromScript,
                           String[] dependencies) {
-        this.id = "";
+        this.id = UUID.randomUUID()
+                .toString()
+                .toUpperCase()
+                .replace("-", "");
         this.expression = expression;
         this.returnType = returnType;
         this.accessedArguments = accessedArguments;

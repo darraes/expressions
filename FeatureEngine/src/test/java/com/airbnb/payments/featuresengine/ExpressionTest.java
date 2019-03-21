@@ -113,7 +113,6 @@ public class ExpressionTest {
                     ExpressionFactory.create(
                             session.registry(),
                             new ExpressionConfig(
-                                    "foo",
                                     "ExpressionTest.someAsyncMethod($c)",
                                     Integer.class.getName(),
                                     new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"}));
@@ -128,7 +127,6 @@ public class ExpressionTest {
                     ExpressionFactory.create(
                             session.registry(),
                             new ExpressionConfig(
-                                    "foo",
                                     "ExpressionTest.someAsyncMethod2($c)",
                                     Integer.class.getName(),
                                     new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"}));
