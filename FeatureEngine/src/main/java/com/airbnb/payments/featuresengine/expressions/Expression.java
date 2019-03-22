@@ -175,18 +175,12 @@ public class Expression {
             ExpressionInfo info)
             throws CompileException {
         IExpressionEvaluator eval = new ExpressionEvaluator();
-        
+
         // All expressions will only feed of the arguments therefore all we need are
         // the argument registry, the argument provider and the evaluation session
         eval.setParameters(
                 new String[]{"session"},
                 new Class[]{EvalSession.class});
-
-        if (info.isAsync()) {
-            //eval.setExpressionType(CompletableFuture.class);
-        } else {
-            //eval.setExpressionType(info.getReturnType());
-        }
 
         //Merge all imports (default and user) and set them
         String[] allImports =
@@ -202,8 +196,21 @@ public class Expression {
         eval.setDefaultImports(allImports);
 
         // TODO Check when the expression gets destructed the compilation doesn't leak
-        // Leave the expression already compiled for faster performance on evaluation
-        eval.cook(info.getExpression());
+
+        try {
+            eval.setExpressionType(info.getReturnType());
+            eval.cook(info.getExpression());
+        } catch (CompileException e) {
+            if (info.isAsync()) {
+                // Async expression can return CompletableFuture, when they are root
+                // async expression, or they can return the actual final type, when
+                // only their arguments are async and therefore will be asynchronously
+                // fetched before evaluating the expression
+                eval.setExpressionType(CompletableFuture.class);
+                eval.cook(info.getExpression());
+            }
+        }
+
         return eval;
     }
 }
