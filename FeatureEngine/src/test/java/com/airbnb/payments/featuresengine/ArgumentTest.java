@@ -328,93 +328,6 @@ public class ArgumentTest {
     }
 
     @Test
-    public void evaluateAllValuesAsyncOld()
-            throws CompileException, CompilationException, ExecutionException, InterruptedException, InvocationTargetException {
-        HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("a", 1);
-        provider.put("b", 8);
-
-
-        TestCache cache = new TestCache();
-
-        ArgumentRegistry registry = new ArgumentRegistry();
-        // Using class 'int' to test the boxed type checking
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "a",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "b",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "c",
-                        Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($a + $b)",
-                        true,
-                        false,
-                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "d",
-                        Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($b - $a)",
-                        true,
-                        false,
-                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
-
-        EvalSession session = new EvalSession(provider, registry, cache);
-        Executor executor = Executors.newFixedThreadPool(2);
-
-        CompletableFuture<AsyncEvalSession> allAsyncDone = registry.allValuesAsync(new String[]{"c", "d"}, session, executor)
-                .thenApply(new Function<Map<String, Object>, AsyncEvalSession>() {
-                    public AsyncEvalSession apply(Map<String, Object> asyncValues) {
-                        return new AsyncEvalSession(session, asyncValues);
-                    }
-                });
-        int result = allAsyncDone.thenApply(
-                new Function<AsyncEvalSession, Integer>() {
-                    public Integer apply(AsyncEvalSession aSession) {
-                        return ((Integer) aSession.asyncValues().get("c"))
-                                - ((Integer) aSession.asyncValues().get("d"));
-                    }
-                })
-                .get();
-        assertEquals(20, result);
-
-        ScriptEvaluator se = new ScriptEvaluator();
-        se.setReturnType(CompletableFuture.class);
-        se.setParameters(
-                new String[]{"session", "executor"},
-                new Class[]{EvalSession.class, Executor.class});
-        se.setClassName("ExpressionWOW");
-        se.setDefaultImports(
-                "com.airbnb.payments.featuresengine.core.AsyncEvalSession",
-                "java.util.concurrent.CompletableFuture",
-                "java.util.function.Function");
-
-        se.cook("static Integer exec(AsyncEvalSession session) {\n"
-                + "    return ((Integer)session.registry().value(\"a\", session.inner())) + ((Integer) session.asyncValues().get(\"c\")) - ((Integer) session.asyncValues().get(\"d\"));\n"
-                + "}\n"
-                + "return session.registry().allValuesAsync(new String[]{\"c\", \"d\"}, session, executor)\n" +
-                "                .thenApply(new Function<Map, Integer>() {\n" +
-                "                    public Integer apply(Map asyncValues) {\n" +
-                "                        return ExpressionWOW.exec(new AsyncEvalSession(session, asyncValues));\n" +
-                "                    }\n" +
-                "                });"
-        );
-        assertEquals(21,
-                ((CompletableFuture)se.evaluate(
-                        new Object[]{session, executor})).get());
-    }
-
-    @Test
     public void evaluateAllValuesAsync()
             throws CompileException, CompilationException, ExecutionException, InterruptedException, InvocationTargetException {
         HashMapInputProvider provider = new HashMapInputProvider();
@@ -453,7 +366,7 @@ public class ArgumentTest {
                         Integer.class.getName(),
                         "ArgumentTest.someAsyncMethod($b - $a)",
                         true,
-                        false,
+                        true,
                         new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
 
         ArgumentFactory.create(
@@ -461,17 +374,15 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "e",
                         Integer.class.getName(),
-                        "$c",
+                        "$c - $a",
                         true,
                         true));
 
         EvalSession session = new EvalSession(provider, registry, cache);
-        Executor executor = Executors.newFixedThreadPool(2);
+        Executor executor = Executors.newFixedThreadPool(8);
 
         int result = (int) registry.valueAsync("e", session, executor).get();
-        assertEquals(21, result);
-
-
+        assertEquals(89, result);
     }
 
 

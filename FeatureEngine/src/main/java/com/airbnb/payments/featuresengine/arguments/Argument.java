@@ -112,7 +112,6 @@ public abstract class Argument {
                     this.getName());
         }
 
-
         if (this.isCacheable() && session.cache().contains(this.getName())) {
             return session.cache().get(this.getName());
         }
@@ -165,13 +164,14 @@ public abstract class Argument {
                             .thenAccept((res) -> {
                                 try {
                                     res = processResult(session, res);
+                                    //The stack pop must happen before any complete()
+                                    session.stack().pop();
                                     // Complete the fetching successfully
                                     result.complete(res);
                                 } catch (Exception e) {
-                                    result.completeExceptionally(e);
-                                } finally {
-                                    // Guarantee to pop the argument from the stack
+                                    //The stack pop must happen before any complete()
                                     session.stack().pop();
+                                    result.completeExceptionally(e);
                                 }
                             });
                 }, executor);

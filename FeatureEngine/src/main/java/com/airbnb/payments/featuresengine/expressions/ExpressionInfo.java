@@ -9,7 +9,7 @@ public class ExpressionInfo {
     private String expression;
     private Class<?> returnType;
     private List<Argument> accessedArguments;
-    private boolean isFromScript;
+    private boolean isAsync;
     private String[] dependencies;
 
     ExpressionInfo(String id,
@@ -22,7 +22,7 @@ public class ExpressionInfo {
         this.expression = expression;
         this.returnType = returnType;
         this.accessedArguments = accessedArguments;
-        this.isFromScript = isFromScript;
+        this.isAsync = isFromScript;
         this.dependencies = dependencies;
     }
 
@@ -42,8 +42,8 @@ public class ExpressionInfo {
         return accessedArguments;
     }
 
-    public boolean isFromScript() {
-        return isFromScript;
+    public boolean isAsync() {
+        return isAsync;
     }
 
     public String[] getDependencies() {

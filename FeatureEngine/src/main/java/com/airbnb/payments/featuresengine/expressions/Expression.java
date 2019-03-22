@@ -1,5 +1,6 @@
 package com.airbnb.payments.featuresengine.expressions;
 
+import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
@@ -10,6 +11,10 @@ import org.codehaus.janino.ExpressionEvaluator;
 import org.codehaus.janino.ScriptEvaluator;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -20,6 +25,10 @@ public class Expression {
     private Class<?> expressionType;
     // Actual expression evaluator
     private IScriptEvaluator eval;
+    // Argument dependencies
+    private List<Argument> arguments;
+    // If this expression can only be computed using async methods
+    private boolean isAsync;
 
     private static String[] defaultImports = {
             "com.airbnb.payments.featuresengine.core.AsyncEvalSession",
@@ -30,19 +39,14 @@ public class Expression {
     Expression(ExpressionInfo info) {
         this.expressionText = info.getExpression();
         this.expressionType = info.getReturnType();
+        this.arguments = info.getAccessedArguments();
+        this.isAsync = info.isAsync();
+
         try {
-            if (info.isFromScript()) {
-                this.eval = buildScripEvaluator(
-                        this.expressionText,
-                        info.getID(),
-                        this.expressionType,
-                        info.getDependencies());
-            } else {
-                this.eval = buildExpressionEvaluator(
-                        this.expressionText,
-                        this.expressionType,
-                        info.getDependencies());
-            }
+            this.eval = buildExpressionEvaluator(
+                    this.expressionText,
+                    this.expressionType,
+                    info.getDependencies());
         } catch (CompileException e) {
             throw new CompilationException(e, "Failed compiling %s", this.expressionText);
         }
@@ -109,8 +113,14 @@ public class Expression {
     public final CompletableFuture<Object> evalAsync(
             EvalSession session, Executor executor) {
         CompletableFuture<Object> result = new CompletableFuture<>();
-        CompletableFuture.runAsync(
-                () -> {
+
+        String[] asyncArgs = arguments.stream()
+                .filter(Argument::isAsync)
+                .map(Argument::getName)
+                .toArray(String[]::new);
+
+        this.cacheAsyncArguments(asyncArgs, session, executor).thenAccept(
+                (v) -> {
                     try {
                         Object res = this.eval.evaluate(
                                 new Object[]{session, executor});
@@ -132,7 +142,7 @@ public class Expression {
                                             this.getExpressionText()));
                         }
                     }
-                }, executor);
+                });
         return result;
     }
 
@@ -143,19 +153,6 @@ public class Expression {
             String expression, Class<?> type, String[] imports)
             throws CompileException {
         return prepareEvaluator(new ExpressionEvaluator(), expression, type, imports);
-    }
-
-    /**
-     * Builds a Janino ScriptEvaluator to serve the given @expression evaluations
-     */
-    private static IScriptEvaluator buildScripEvaluator(
-            String expression, String expressionID, Class<?> type, String[] imports)
-            throws CompileException {
-        ScriptEvaluator eval = new ScriptEvaluator();
-        eval.setReturnType(CompletableFuture.class);
-        eval.setClassName(expressionID);
-
-        return prepareEvaluator(eval, expression, type, imports);
     }
 
     /**
@@ -185,6 +182,39 @@ public class Expression {
         // Leave the expression already compiled for faster performance on evaluation
         eval.cook(expression);
         return eval;
+    }
+
+
+    /**
+     * Asynchronously caches all arguments passed in on @arguments. The resulting
+     * completable future will only be ready when all arguments are in teh cache.
+     *
+     * @param arguments Arguments to be fetched
+     * @param session   Caller's evaluation session
+     * @param executor  Executor to fetch the arguments on
+     * @return Future to be fulfilled when all arguments are ready
+     */
+    private CompletableFuture<Void> cacheAsyncArguments(
+            String[] arguments, EvalSession session, Executor executor) {
+        CompletableFuture<Void> res = new CompletableFuture<>();
+        if (arguments == null || arguments.length == 0) {
+            res.complete(null);
+            return res;
+        }
+
+        CompletableFuture.runAsync(
+                () -> {
+                    CompletableFuture[] futures = Arrays.stream(arguments)
+                            .map((argument) -> session.registry().valueAsync(
+                                    argument,
+                                    session,
+                                    executor))
+                            .toArray(CompletableFuture[]::new);
+
+                    CompletableFuture.allOf(futures).thenAccept(res::complete);
+                }, executor);
+
+        return res;
     }
 
 }

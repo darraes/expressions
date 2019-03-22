@@ -3,14 +3,10 @@ package com.airbnb.payments.featuresengine.arguments;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
-import org.codehaus.commons.compiler.CompileException;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
-import java.util.stream.Collectors;
 
 /**
  * Single access point to get the value of any argument.
@@ -100,44 +96,5 @@ public class ArgumentRegistry {
         }
 
         return this.arguments.get(name);
-    }
-
-    /**
-     * Asynchronously fetches all arguments passed in on @arguments. The resulting
-     * completable future will only be ready when all arguments are fetched.
-     *
-     * @param arguments Arguments to be fetched
-     * @param session   Caller's evaluation session
-     * @param executor  Executor to fetch the arguments on
-     * @return Future to be fulfilled when all arguments are ready
-     */
-    public CompletableFuture<Map<String, Object>> allValuesAsync(
-            String[] arguments, EvalSession session, Executor executor) {
-        if (arguments == null || arguments.length == 0) {
-            return CompletableFuture.supplyAsync(
-                    () -> new HashMap<>(), executor);
-        }
-
-        Map<String, CompletableFuture<Object>> futures
-                = new HashMap<>(arguments.length);
-        for (String argument : arguments) {
-            futures.put(
-                    argument,
-                    this.valueAsync(argument, session, executor));
-        }
-
-        CompletableFuture<Void> allDoneFuture =
-                CompletableFuture.allOf(
-                        futures.values().toArray(new CompletableFuture[0]));
-
-        return allDoneFuture.thenApply(
-                (v) -> futures
-                        .entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(
-                                x -> x.getKey(),
-                                x -> x.getValue().join()))
-
-        );
     }
 }
