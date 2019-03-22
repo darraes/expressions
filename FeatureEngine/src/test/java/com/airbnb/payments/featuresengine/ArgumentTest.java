@@ -4,13 +4,11 @@ import com.airbnb.payments.featuresengine.arguments.*;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
-import com.airbnb.payments.featuresengine.core.AsyncEvalSession;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.arguments.NamedExpression;
 import org.codehaus.commons.compiler.CompileException;
-import org.codehaus.janino.ScriptEvaluator;
 import org.junit.Test;
 
 
@@ -23,7 +21,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 
 import static org.junit.Assert.*;
 
@@ -114,7 +111,7 @@ public class ArgumentTest {
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
             assertEquals("3 + 7",
-                    ((NamedExpression) arg1).getExpression().getExpressionText());
+                    ((NamedExpression) arg1).getExpression().getExpression());
         }
 
         {
@@ -133,7 +130,7 @@ public class ArgumentTest {
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
             assertEquals("3 + 7",
-                    ((NamedExpression) arg1).getExpression().getExpressionText());
+                    ((NamedExpression) arg1).getExpression().getExpression());
         }
     }
 
@@ -374,15 +371,15 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "e",
                         Integer.class.getName(),
-                        "$c - $a",
+                        "$c - $a - $d",
                         true,
                         true));
 
         EvalSession session = new EvalSession(provider, registry, cache);
-        Executor executor = Executors.newFixedThreadPool(8);
+        Executor executor = Executors.newFixedThreadPool(2);
 
         int result = (int) registry.valueAsync("e", session, executor).get();
-        assertEquals(89, result);
+        assertEquals(19, result);
     }
 
 

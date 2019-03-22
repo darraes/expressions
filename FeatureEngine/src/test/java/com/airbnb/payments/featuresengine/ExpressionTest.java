@@ -28,8 +28,8 @@ public class ExpressionTest {
         Expression expression = ExpressionFactory.create(
                 registry,
                 new ExpressionConfig("1 + 3", Integer.class.getName()));
-        assertEquals("1 + 3", expression.getExpressionText());
-        assertEquals(Integer.class, expression.getExpressionType());
+        assertEquals("1 + 3", expression.getExpression());
+        assertEquals(Integer.class, expression.getReturnType());
     }
 
     @Test

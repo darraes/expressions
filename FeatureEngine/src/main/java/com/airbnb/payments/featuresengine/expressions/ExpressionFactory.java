@@ -40,13 +40,15 @@ public class ExpressionFactory {
                     config.getExpression(),
                     arguments);
 
-            return new Expression(new ExpressionInfo(
-                    generateID(),
-                    finalExpression,
-                    Class.forName(config.getReturnType()),
-                    arguments,
-                    config.isAsync(),
-                    config.getDependencies()));
+            return new Expression(
+                    new ExpressionInfo(
+                            generateID(),
+                            config.getExpression(),
+                            finalExpression,
+                            Class.forName(config.getReturnType()),
+                            arguments,
+                            config.isAsync(),
+                            config.getDependencies()));
         } catch (ClassNotFoundException e) {
             throw new CompilationException(e,
                     "Class not found when compiling expression %s",
@@ -66,32 +68,6 @@ public class ExpressionFactory {
                             "((%s)session.registry().value(\"%s\", session))",
                             argument.getReturnType().getName(),
                             argument.getName()));
-        }
-
-        return result;
-    }
-
-    private static String processAsyncExpression(
-            String expression, List<Argument> arguments) {
-        // Replaces the compressed syntax by the argument access logic
-        String result;
-        result = expression;
-        for (Argument argument : arguments) {
-            if (!argument.isAsync()) {
-                result = result.replace(
-                        String.format("$%s", argument.getName()),
-                        String.format(
-                                "((%s)session.registry().value(\"%s\", session.inner()))",
-                                argument.getReturnType().getName(),
-                                argument.getName()));
-            } else {
-                result = result.replace(
-                        String.format("$%s", argument.getName()),
-                        String.format(
-                                "((%s)session.asyncValues().get(\"%s\"))",
-                                argument.getReturnType().getName(),
-                                argument.getName()));
-            }
         }
 
         return result;

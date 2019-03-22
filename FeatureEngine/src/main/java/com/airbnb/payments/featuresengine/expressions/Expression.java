@@ -8,47 +8,34 @@ import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.commons.compiler.IScriptEvaluator;
 import org.codehaus.janino.ExpressionEvaluator;
-import org.codehaus.janino.ScriptEvaluator;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class Expression {
-    // Original expression text
-    private String expressionText;
-    // The class type this expression evaluates to
-    private Class<?> expressionType;
+    // All metadata about the expression
+    private ExpressionInfo info;
     // Actual expression evaluator
     private IScriptEvaluator eval;
-    // Argument dependencies
-    private List<Argument> arguments;
-    // If this expression can only be computed using async methods
-    private boolean isAsync;
 
     private static String[] defaultImports = {
-            "com.airbnb.payments.featuresengine.core.AsyncEvalSession",
             "java.util.concurrent.CompletableFuture",
-            "java.util.function.Function"
     };
 
     Expression(ExpressionInfo info) {
-        this.expressionText = info.getExpression();
-        this.expressionType = info.getReturnType();
-        this.arguments = info.getAccessedArguments();
-        this.isAsync = info.isAsync();
+        this.info = info;
 
         try {
             this.eval = buildExpressionEvaluator(
-                    this.expressionText,
-                    this.expressionType,
+                    this.info.getExpression(),
+                    this.info.getReturnType(),
                     info.getDependencies());
         } catch (CompileException e) {
-            throw new CompilationException(e, "Failed compiling %s", this.expressionText);
+            throw new CompilationException(
+                    e, "Failed compiling %s", this.info.getSourceExpression());
         }
     }
 
@@ -57,15 +44,15 @@ public class Expression {
      *
      * @return The original expression text before compiling it
      */
-    public final String getExpressionText() {
-        return expressionText;
+    public final String getExpression() {
+        return this.info.getExpression();
     }
 
     /**
      * @return The class type this expression evaluates to
      */
-    public Class<?> getExpressionType() {
-        return expressionType;
+    public Class<?> getReturnType() {
+        return this.info.getReturnType();
     }
 
     /**
@@ -82,15 +69,24 @@ public class Expression {
      * @return Result of the expression computation
      */
     public final Object eval(EvalSession session) {
+        if (this.info.isAsync()) {
+            throw new EvaluationException(
+                    "Async expressions must be computed using evalAsync()."
+                            + " Expression %s",
+                    this.info.getSourceExpression());
+        }
+
         try {
             return this.eval.evaluate(new Object[]{session, null});
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             if (e.getCause() instanceof EvaluationException) {
                 throw (EvaluationException) e.getCause();
             }
 
             throw new EvaluationException(
-                    e, "Error evaluation expression %s", this.getExpressionText());
+                    e,
+                    "Error evaluation expression %s",
+                    this.info.getSourceExpression());
         }
 
     }
@@ -114,7 +110,7 @@ public class Expression {
             EvalSession session, Executor executor) {
         CompletableFuture<Object> result = new CompletableFuture<>();
 
-        String[] asyncArgs = arguments.stream()
+        String[] asyncArgs = this.info.getAccessedArguments().stream()
                 .filter(Argument::isAsync)
                 .map(Argument::getName)
                 .toArray(String[]::new);
@@ -139,7 +135,7 @@ public class Expression {
                                     new EvaluationException(
                                             e,
                                             "Error evaluation expression %s",
-                                            this.getExpressionText()));
+                                            this.info.getSourceExpression()));
                         }
                     }
                 });
