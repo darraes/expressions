@@ -174,16 +174,8 @@ public class Expression {
     private static IExpressionEvaluator buildExpressionEvaluator(
             ExpressionInfo info)
             throws CompileException {
-        return prepareEvaluator(new ExpressionEvaluator(), info);
-    }
-
-    /**
-     * Adds parameters, imports and any other configuration necessary to run the
-     * Janino evaluator
-     */
-    private static IExpressionEvaluator prepareEvaluator(
-            IExpressionEvaluator eval,
-            ExpressionInfo info) throws CompileException {
+        IExpressionEvaluator eval = new ExpressionEvaluator();
+        
         // All expressions will only feed of the arguments therefore all we need are
         // the argument registry, the argument provider and the evaluation session
         eval.setParameters(
