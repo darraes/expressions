@@ -326,7 +326,7 @@ public class ArgumentTest {
 
     @Test
     public void evaluateAllValuesAsync()
-            throws CompileException, CompilationException, ExecutionException, InterruptedException, InvocationTargetException {
+            throws CompilationException, ExecutionException, InterruptedException {
         HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("a", 1);
         provider.put("b", 8);
@@ -375,11 +375,20 @@ public class ArgumentTest {
                         true,
                         true));
 
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "f",
+                        Integer.class.getName(),
+                        "2*$e",
+                        true,
+                        true));
+
         EvalSession session = new EvalSession(provider, registry, cache);
         Executor executor = Executors.newFixedThreadPool(2);
 
-        int result = (int) registry.valueAsync("e", session, executor).get();
-        assertEquals(19, result);
+        int result = (int) registry.valueAsync("f", session, executor).get();
+        assertEquals(38, result);
     }
 
 

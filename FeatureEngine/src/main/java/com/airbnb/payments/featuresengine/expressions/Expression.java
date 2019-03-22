@@ -110,16 +110,24 @@ public class Expression {
                 .filter(Argument::isAsync)
                 .toArray(Argument[]::new);
 
+        // All async arguments will be asynchronously fetched and cached in the session
+        // before this expression runs.
+        // Expression that have async arguments will rely on those arguments to be
+        // already in the session.cache() and therefore they will load those arguments
+        // normally.
         this.cacheAsyncArguments(asyncArgs, session, executor).thenAccept(
                 (v) -> {
                     try {
                         Object res = this.eval.evaluate(
                                 new Object[]{session});
                         if (res instanceof CompletableFuture) {
+                            // Handles when the expression itself is async
                             ((CompletableFuture<Object>)
                                     res)
                                     .thenApply(result::complete);
                         } else {
+                            // Handles when the expression itself is not async, but
+                            // it has at least one async argument
                             result.complete(res);
                         }
                     } catch (InvocationTargetException e) {
@@ -205,7 +213,10 @@ public class Expression {
                 // Async expression can return CompletableFuture, when they are root
                 // async expression, or they can return the actual final type, when
                 // only their arguments are async and therefore will be asynchronously
-                // fetched before evaluating the expression
+                // fetched before evaluating the expression.
+                // Eg.:
+                // $exp1 = 'MyClass.doFooAsync($a)' -> return type = CompletableFuture
+                // $exp2 = '$exp1 + 10' -> return type = Integer
                 eval.setExpressionType(CompletableFuture.class);
                 eval.cook(info.getExpression());
             }
