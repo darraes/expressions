@@ -140,7 +140,8 @@ public abstract class Argument {
      * @param executor Executor to run the fetching on
      * @return Result of the argument fetching
      */
-    final CompletableFuture<Object> valueAsync(EvalSession session, Executor executor) {
+    public final CompletableFuture<Object> valueAsync(
+            EvalSession session, Executor executor) {
         CompletableFuture<Object> result = new CompletableFuture<>();
         CompletableFuture.runAsync(
                 () -> {
@@ -187,7 +188,6 @@ public abstract class Argument {
      */
     private Object processResult(EvalSession session, Object result) {
         if (result != null) {
-            // TODO handle CompletableFuture
             if (this.returnType.isInstance(result)
                     || this.returnType.isAssignableFrom(result.getClass())
                     || (primitives.containsKey(this.returnType)

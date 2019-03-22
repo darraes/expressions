@@ -6,12 +6,11 @@ import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
 import org.codehaus.commons.compiler.CompileException;
-import org.codehaus.commons.compiler.IScriptEvaluator;
+import org.codehaus.commons.compiler.IExpressionEvaluator;
 import org.codehaus.janino.ExpressionEvaluator;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -19,7 +18,7 @@ public class Expression {
     // All metadata about the expression
     private ExpressionInfo info;
     // Actual expression evaluator
-    private IScriptEvaluator eval;
+    private IExpressionEvaluator eval;
 
     private static String[] defaultImports = {
             "java.util.concurrent.CompletableFuture",
@@ -29,10 +28,7 @@ public class Expression {
         this.info = info;
 
         try {
-            this.eval = buildExpressionEvaluator(
-                    this.info.getExpression(),
-                    this.info.getReturnType(),
-                    info.getDependencies());
+            this.eval = buildExpressionEvaluator(this.info);
         } catch (CompileException e) {
             throw new CompilationException(
                     e, "Failed compiling %s", this.info.getSourceExpression());
@@ -110,10 +106,9 @@ public class Expression {
             EvalSession session, Executor executor) {
         CompletableFuture<Object> result = new CompletableFuture<>();
 
-        String[] asyncArgs = this.info.getAccessedArguments().stream()
+        Argument[] asyncArgs = this.info.getAccessedArguments().stream()
                 .filter(Argument::isAsync)
-                .map(Argument::getName)
-                .toArray(String[]::new);
+                .toArray(Argument[]::new);
 
         this.cacheAsyncArguments(asyncArgs, session, executor).thenAccept(
                 (v) -> {
@@ -141,46 +136,7 @@ public class Expression {
                 });
         return result;
     }
-
-    /**
-     * Builds a Janino ExpressionEvaluator to serve the given @expression evaluations
-     */
-    private static IScriptEvaluator buildExpressionEvaluator(
-            String expression, Class<?> type, String[] imports)
-            throws CompileException {
-        return prepareEvaluator(new ExpressionEvaluator(), expression, type, imports);
-    }
-
-    /**
-     * Adds parameters, imports and any other configuration necessary to run the
-     * Janino evaluator
-     */
-    private static IScriptEvaluator prepareEvaluator(
-            IScriptEvaluator eval,
-            String expression,
-            Class<?> type,
-            String[] imports) throws CompileException {
-        // All expressions will only feed of the arguments therefore all we need are
-        // the argument registry, the argument provider and the evaluation session
-        eval.setParameters(
-                new String[]{"session", "executor"},
-                new Class[]{EvalSession.class, Executor.class});
-
-        //Merge all imports (default and user) and set them
-        String[] allImports = new String[defaultImports.length + imports.length];
-        System.arraycopy(
-                defaultImports, 0, allImports, 0, defaultImports.length);
-        System.arraycopy(
-                imports, 0, allImports, defaultImports.length, imports.length);
-        eval.setDefaultImports(allImports);
-
-        // TODO Check when the expression gets destructed the compilation doesn't leak
-        // Leave the expression already compiled for faster performance on evaluation
-        eval.cook(expression);
-        return eval;
-    }
-
-
+    
     /**
      * Asynchronously caches all arguments passed in on @arguments. The resulting
      * completable future will only be ready when all arguments are in teh cache.
@@ -191,7 +147,7 @@ public class Expression {
      * @return Future to be fulfilled when all arguments are ready
      */
     private CompletableFuture<Void> cacheAsyncArguments(
-            String[] arguments, EvalSession session, Executor executor) {
+            Argument[] arguments, EvalSession session, Executor executor) {
         CompletableFuture<Void> res = new CompletableFuture<>();
         if (arguments == null || arguments.length == 0) {
             res.complete(null);
@@ -201,8 +157,7 @@ public class Expression {
         CompletableFuture.runAsync(
                 () -> {
                     CompletableFuture[] futures = Arrays.stream(arguments)
-                            .map((argument) -> session.registry().valueAsync(
-                                    argument,
+                            .map((argument) -> argument.valueAsync(
                                     session,
                                     executor))
                             .toArray(CompletableFuture[]::new);
@@ -213,4 +168,44 @@ public class Expression {
         return res;
     }
 
+    /**
+     * Builds a Janino ExpressionEvaluator to serve the given @expression evaluations
+     */
+    private static IExpressionEvaluator buildExpressionEvaluator(
+            ExpressionInfo info)
+            throws CompileException {
+        return prepareEvaluator(new ExpressionEvaluator(), info);
+    }
+
+    /**
+     * Adds parameters, imports and any other configuration necessary to run the
+     * Janino evaluator
+     */
+    private static IExpressionEvaluator prepareEvaluator(
+            IExpressionEvaluator eval,
+            ExpressionInfo info) throws CompileException {
+        // All expressions will only feed of the arguments therefore all we need are
+        // the argument registry, the argument provider and the evaluation session
+        eval.setParameters(
+                new String[]{"session", "executor"},
+                new Class[]{EvalSession.class, Executor.class});
+
+        //Merge all imports (default and user) and set them
+        String[] allImports =
+                new String[defaultImports.length + info.getDependencies().length];
+        System.arraycopy(
+                defaultImports, 0, allImports, 0, defaultImports.length);
+        System.arraycopy(
+                info.getDependencies(),
+                0,
+                allImports,
+                defaultImports.length,
+                info.getDependencies().length);
+        eval.setDefaultImports(allImports);
+
+        // TODO Check when the expression gets destructed the compilation doesn't leak
+        // Leave the expression already compiled for faster performance on evaluation
+        eval.cook(info.getExpression());
+        return eval;
+    }
 }
