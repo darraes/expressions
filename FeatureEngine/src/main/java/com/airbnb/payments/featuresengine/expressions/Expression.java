@@ -20,7 +20,7 @@ public class Expression {
     // Actual expression evaluator
     private IExpressionEvaluator eval;
 
-    private static String[] defaultImports = {
+    public static String[] DEFAULT_IMPORTS = {
             "java.util.concurrent.CompletableFuture",
     };
 
@@ -157,13 +157,17 @@ public class Expression {
 
         CompletableFuture.runAsync(
                 () -> {
-                    CompletableFuture[] futures = Arrays.stream(arguments)
-                            .map((argument) -> argument.valueAsync(
-                                    session,
-                                    executor))
-                            .toArray(CompletableFuture[]::new);
+                    try {
+                        CompletableFuture[] futures = Arrays.stream(arguments)
+                                .map((argument) -> argument.valueAsync(
+                                        session,
+                                        executor))
+                                .toArray(CompletableFuture[]::new);
 
-                    CompletableFuture.allOf(futures).thenAccept(res::complete);
+                        CompletableFuture.allOf(futures).thenAccept(res::complete);
+                    } catch (Exception e) {
+                        res.completeExceptionally(e);
+                    }
                 }, executor);
 
         return res;
@@ -185,14 +189,14 @@ public class Expression {
 
         //Merge all imports (default and user) and set them
         String[] allImports =
-                new String[defaultImports.length + info.getDependencies().length];
+                new String[DEFAULT_IMPORTS.length + info.getDependencies().length];
         System.arraycopy(
-                defaultImports, 0, allImports, 0, defaultImports.length);
+                DEFAULT_IMPORTS, 0, allImports, 0, DEFAULT_IMPORTS.length);
         System.arraycopy(
                 info.getDependencies(),
                 0,
                 allImports,
-                defaultImports.length,
+                DEFAULT_IMPORTS.length,
                 info.getDependencies().length);
         eval.setDefaultImports(allImports);
 
@@ -212,6 +216,8 @@ public class Expression {
                 // $exp2 = '$exp1 + 10' -> return type = Integer
                 eval.setExpressionType(CompletableFuture.class);
                 eval.cook(info.getExpression());
+            } else {
+                throw e;
             }
         }
 

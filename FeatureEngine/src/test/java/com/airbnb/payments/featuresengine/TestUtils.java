@@ -8,6 +8,10 @@ import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 public class TestUtils {
     public static EvalSession testSession() {
         ICache cache = new HashMapCache();
@@ -37,5 +41,21 @@ public class TestUtils {
                         "$i_int_a + $i_int_b"));
 
         return new EvalSession(provider, registry, cache);
+    }
+
+    public static CompletableFuture<Integer> asyncPow(int x, int pow) {
+        CompletableFuture<Integer> result = new CompletableFuture<>();
+        CompletableFuture.runAsync(
+                () -> {
+                    result.complete((int) Math.pow(x, pow));
+                });
+        return result;
+    }
+
+    public CompletableFuture<Map> asyncSqrt(int x) {
+        Map<String, Integer> map = new HashMap<>();
+        map.put("key_1", (int) Math.sqrt(x));
+
+        return CompletableFuture.supplyAsync(() -> map);
     }
 }

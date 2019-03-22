@@ -22,39 +22,6 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
 
-class TestCache implements ICache {
-
-    private Map<String, Object> cache;
-    private Set<String> servedFromCache;
-
-    public TestCache() {
-        this.cache = new HashMap<>();
-        this.servedFromCache = new HashSet<>();
-    }
-
-    @Override
-    public boolean contains(String key) {
-        return this.cache.containsKey(key);
-    }
-
-    @Override
-    public void put(String key, Object value) {
-        this.cache.put(key, value);
-    }
-
-    @Override
-    public Object get(String key) {
-        this.servedFromCache.add(key);
-        return this.cache.get(key);
-    }
-
-    public boolean served(String key) {
-        if (!this.servedFromCache.contains(key)) {
-            return false;
-        }
-        return true;
-    }
-}
 
 public class ArgumentTest {
     @Test

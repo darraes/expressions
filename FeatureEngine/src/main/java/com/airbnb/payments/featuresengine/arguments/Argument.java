@@ -152,36 +152,43 @@ public abstract class Argument {
         CompletableFuture<Object> result = new CompletableFuture<>();
         CompletableFuture.runAsync(
                 () -> {
-                    if (session.stack().contains(this.getName())) {
-                        result.completeExceptionally(new EvaluationException(
-                                "Circular dependency found on argument %s",
-                                this.getName()));
+                    boolean localArgPush = false;
+                    try {
+                        if (session.stack().contains(this.getName())) {
+                            result.completeExceptionally(new EvaluationException(
+                                    "Circular dependency found on argument %s",
+                                    this.getName()));
+                            return;
+                        }
+
+                        if (this.isCacheable()
+                                && session.cache().contains(this.getName())) {
+                            result.complete(session.cache().get(this.getName()));
+                            return;
+                        }
+
+                        // Push current argument into the nested stack to track circular
+                        // dependency
+                        session.stack().push(this.getName());
+                        localArgPush = true;
+
+                        this.fetchAsync(session, executor)
+                                .thenAccept((res) -> {
+                                    try {
+                                        res = processResult(session, res);
+                                        session.stack().pop();
+                                        result.complete(res);
+                                    } catch (Exception e) {
+                                        session.stack().pop();
+                                        result.completeExceptionally(e);
+                                    }
+                                });
+                    } catch (Exception e) {
+                        if (localArgPush) {
+                            session.stack().pop();
+                        }
+                        result.completeExceptionally(e);
                     }
-
-                    if (this.isCacheable()
-                            && session.cache().contains(this.getName())) {
-                        result.complete(session.cache().get(this.getName()));
-                        return;
-                    }
-
-                    // Push current argument into the nested stack to track circular
-                    // dependency
-                    session.stack().push(this.getName());
-
-                    this.fetchAsync(session, executor)
-                            .thenAccept((res) -> {
-                                try {
-                                    res = processResult(session, res);
-                                    //The stack pop must happen before any complete()
-                                    session.stack().pop();
-                                    // Complete the fetching successfully
-                                    result.complete(res);
-                                } catch (Exception e) {
-                                    //The stack pop must happen before any complete()
-                                    session.stack().pop();
-                                    result.completeExceptionally(e);
-                                }
-                            });
                 }, executor);
         return result;
     }
@@ -189,8 +196,9 @@ public abstract class Argument {
     /**
      * Does the final type checking to make sure the argument's computed type matches
      * the expected argument type.
+     *
      * @param session Caller evaluation session
-     * @param result Raw evaluation result
+     * @param result  Raw evaluation result
      * @return The final, processed, result
      */
     private Object processResult(EvalSession session, Object result) {

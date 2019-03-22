@@ -9,6 +9,7 @@ import com.airbnb.payments.featuresengine.expressions.Expression;
 import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -18,26 +19,80 @@ import static org.junit.Assert.*;
 
 public class ExpressionTest {
     @Test
-    public void accessProperties() throws CompilationException {
-        ArgumentRegistry registry = new ArgumentRegistry();
+    public void expressionInfo() throws CompilationException {
+        String expressionText = "1 + 3";
         Expression expression = ExpressionFactory.create(
-                registry,
-                new ExpressionConfig("1 + 3", Integer.class.getName()));
-        assertEquals("1 + 3", expression.info().getExpression());
+                new ArgumentRegistry(),
+                new ExpressionConfig(expressionText, Integer.class.getName()));
+
+        assertEquals(expressionText, expression.info().getExpression());
+        assertEquals(expressionText, expression.info().getSourceExpression());
+        assertFalse(expression.info().isAsync());
         assertEquals(Integer.class, expression.info().getReturnType());
+        assertEquals(0, expression.info().getAccessedArguments().size());
+        assertNotNull(expression.info().getID());
+        assertArrayEquals(new String[0], expression.info().getDependencies());
     }
+
+    @Test
+    public void evaluateAllTypes() {
+
+    }
+
 
     @Test
     public void evaluateStaticMethod()
             throws CompilationException, EvaluationException {
-        ArgumentRegistry registry = new ArgumentRegistry();
-        Expression expression = ExpressionFactory.create(
-                registry,
-                new ExpressionConfig(
-                        "Math.max(3, 10)",
-                        Integer.class.getName()));
+        {
+            Expression expression = ExpressionFactory.create(
+                    new ArgumentRegistry(),
+                    new ExpressionConfig(
+                            "Math.max(3, 10) - Math.min(3, 10)",
+                            Integer.class.getName()));
 
-        assertEquals(10, expression.eval(null));
+            assertEquals(7, expression.eval(null));
+        }
+
+        {
+            Expression expression = ExpressionFactory.create(
+                    new ArgumentRegistry(),
+                    new ExpressionConfig(
+                            "Math.max(3L, 10L) - Math.min(3L, 10L)",
+                            Long.class.getName()));
+
+            assertEquals(7L, expression.eval(null));
+        }
+
+        {
+            Expression expression = ExpressionFactory.create(
+                    new ArgumentRegistry(),
+                    new ExpressionConfig(
+                            "Math.max(3.0, 10.0) - Math.min(3.0, 10.0)",
+                            Double.class.getName()));
+
+            assertEquals(7.0, expression.eval(null));
+        }
+
+        {
+            Expression expression = ExpressionFactory.create(
+                    new ArgumentRegistry(),
+                    new ExpressionConfig(
+                            "Math.max(3.0f, 10.0f) - Math.min(3.0f, 10.0f)",
+                            Float.class.getName()));
+
+            assertEquals(7.0f, expression.eval(null));
+        }
+
+        {
+            Expression expression = ExpressionFactory.create(
+                    new ArgumentRegistry(),
+                    new ExpressionConfig(
+                            "String.format(new String(\"test %s\"), \'A\')",
+                            String.class.getName()));
+
+            assertEquals("test A", expression.eval(null));
+        }
+
     }
 
     @Test
@@ -103,46 +158,51 @@ public class ExpressionTest {
                             "$dont_exists",
                             Integer.class.getName()));
             fail();
-        } catch (CompilationException e) {
-
-        }
+        } catch (CompilationException e) { }
     }
 
     @Test
     public void evaluateSimpleAsyncExpression()
             throws CompilationException, ExecutionException, InterruptedException {
         EvalSession session = TestUtils.testSession();
-
         Executor executor = Executors.newFixedThreadPool(2);
 
         {
+            String expressionText = "TestUtils.asyncPow(10, 2)";
             Expression expression =
                     ExpressionFactory.create(
                             session.registry(),
                             new ExpressionConfig(
-                                    "ExpressionTest.someAsyncMethod($e_int_c)",
+                                    expressionText,
                                     Integer.class.getName(),
                                     true,
-                                    new String[]{this.getClass().getName()}));
+                                    new String[]{TestUtils.class.getName()}));
 
             expression.evalAsync(session, executor)
-                    .thenAccept(res -> assertEquals(19, res)).get();
+                    .thenAccept(res -> assertEquals(100, res)).get();
         }
 
         {
-
+            String expressionText = "(new TestUtils()).asyncSqrt(100)";
             Expression expression =
                     ExpressionFactory.create(
                             session.registry(),
                             new ExpressionConfig(
-                                    "ExpressionTest.someAsyncMethod2($e_int_c)",
-                                    Integer.class.getName(),
+                                    expressionText,
+                                    Map.class.getName(),
                                     true,
-                                    new String[]{this.getClass().getName()}));
+                                    new String[]{TestUtils.class.getName()}));
 
             expression.evalAsync(session, executor)
-                    .thenAccept(res -> assertEquals(90, res)).get();
+                    .thenAccept((res) -> {
+                        assertEquals(10, ((Map)res).get("key_1"));
+                    }).get();
         }
+    }
+
+    @Test
+    public void evaluateExceptionOnSyncEvalForAsyncExpression() {
+        // TODO implement
     }
 
     @Test
@@ -153,18 +213,5 @@ public class ExpressionTest {
     @Test
     public void evaluateMultipleArgumentTypeExpression() {
         // TODO implement
-    }
-
-    public static CompletableFuture<Integer> someAsyncMethod(int x) {
-        CompletableFuture<Integer> result = new CompletableFuture<>();
-        CompletableFuture.runAsync(
-                () -> {
-                    result.complete(10 + x);
-                });
-        return result;
-    }
-
-    public static CompletableFuture<Integer> someAsyncMethod2(int x) {
-        return CompletableFuture.supplyAsync(() -> 10 * x);
     }
 }
