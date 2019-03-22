@@ -36,7 +36,7 @@ public class ExpressionTest {
 
     @Test
     public void evaluateAllTypes() {
-
+        // TODO Implement
     }
 
 
@@ -150,15 +150,47 @@ public class ExpressionTest {
 
     @Test
     public void handleExceptions() throws CompilationException {
-        EvalSession session = TestUtils.testSession();
-        try {
-            ExpressionFactory.create(
-                    session.registry(),
-                    new ExpressionConfig(
-                            "$dont_exists",
-                            Integer.class.getName()));
-            fail();
-        } catch (CompilationException e) { }
+        {
+            // Argument doesn't exist
+            try {
+                ExpressionFactory.create(
+                        new ArgumentRegistry(),
+                        new ExpressionConfig(
+                                "$dont_exists",
+                                Integer.class.getName()));
+                fail();
+            } catch (CompilationException e) {
+            } catch (Exception e) {
+                fail();
+            }
+        }
+
+        {
+            // Type mismatch
+            try {
+                ExpressionFactory.create(
+                        new ArgumentRegistry(),
+                        new ExpressionConfig(
+                                "new String(\"test\")",
+                                Integer.class.getName()));
+                fail();
+            } catch (CompilationException e) {
+            } catch (Exception e) {
+                fail();
+            }
+
+            try {
+                ExpressionFactory.create(
+                        new ArgumentRegistry(),
+                        new ExpressionConfig(
+                                "1L",
+                                String.class.getName()));
+                fail();
+            } catch (CompilationException e) {
+            } catch (Exception e) {
+                fail();
+            }
+        }
     }
 
     @Test
@@ -195,7 +227,24 @@ public class ExpressionTest {
 
             expression.evalAsync(session, executor)
                     .thenAccept((res) -> {
-                        assertEquals(10, ((Map)res).get("key_1"));
+                        assertEquals(10, ((Map) res).get("key_1"));
+                    }).get();
+        }
+
+        {
+            String expressionText = "(new TestUtils()).asyncSqrt(100)";
+            Expression expression =
+                    ExpressionFactory.create(
+                            session.registry(),
+                            new ExpressionConfig(
+                                    expressionText,
+                                    CompletableFuture.class.getName(),
+                                    false,
+                                    new String[]{TestUtils.class.getName()}));
+
+            expression.evalAsync(session, executor)
+                    .thenAccept((res) -> {
+                        assertEquals(10, ((Map) res).get("key_1"));
                     }).get();
         }
     }

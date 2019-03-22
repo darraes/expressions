@@ -10,11 +10,6 @@ import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.arguments.NamedExpression;
 import org.junit.Test;
 
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -354,6 +349,16 @@ public class ArgumentTest {
 
         int result = (int) registry.valueAsync("f", session, executor).get();
         assertEquals(38, result);
+    }
+
+    @Test
+    public void callMethodOnAsyncInstanceArgument() {
+        // TODO implement
+    }
+
+    @Test
+    public void argumentTypeMismatch() {
+        // TODO implement
     }
 
 
