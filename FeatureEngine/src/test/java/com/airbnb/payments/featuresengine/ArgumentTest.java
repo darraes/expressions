@@ -328,7 +328,7 @@ public class ArgumentTest {
     }
 
     @Test
-    public void evaluateAllValuesAsync()
+    public void evaluateAllValuesAsyncOld()
             throws CompileException, CompilationException, ExecutionException, InterruptedException, InvocationTargetException {
         HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("a", 1);
@@ -412,6 +412,66 @@ public class ArgumentTest {
         assertEquals(21,
                 ((CompletableFuture)se.evaluate(
                         new Object[]{session, executor})).get());
+    }
+
+    @Test
+    public void evaluateAllValuesAsync()
+            throws CompileException, CompilationException, ExecutionException, InterruptedException, InvocationTargetException {
+        HashMapInputProvider provider = new HashMapInputProvider();
+        provider.put("a", 1);
+        provider.put("b", 8);
+
+
+        TestCache cache = new TestCache();
+
+        ArgumentRegistry registry = new ArgumentRegistry();
+        // Using class 'int' to test the boxed type checking
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "a",
+                        Integer.class.getName()));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "b",
+                        Integer.class.getName()));
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "c",
+                        Integer.class.getName(),
+                        "ArgumentTest.someAsyncMethod($a + $b)",
+                        true,
+                        true,
+                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "d",
+                        Integer.class.getName(),
+                        "ArgumentTest.someAsyncMethod($b - $a)",
+                        true,
+                        false,
+                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "e",
+                        Integer.class.getName(),
+                        "$c",
+                        true,
+                        true));
+
+        EvalSession session = new EvalSession(provider, registry, cache);
+        Executor executor = Executors.newFixedThreadPool(2);
+
+        int result = (int) registry.valueAsync("e", session, executor).get();
+        assertEquals(21, result);
+
+
     }
 
 

@@ -40,15 +40,15 @@ public class ExpressionFactory {
          * Janino API doesn't support lambdas yet.
          */
         ASYNC_SCRIPT_TEMPLATE = ""
-                + "static Integer execute(AsyncEvalSession session) {\n"
+                + "static Object execute(AsyncEvalSession session) {\n"
                 + "    return %s;\n"
                 + "}\n"
-                + "return session.registry().allValuesAsync("
+                + "return session.registry().allValuesAsync(\n"
                 + "                                   new String[]{%s},\n"
                 + "                                   session,\n"
                 + "                                   executor)\n"
-                + "    .thenApply(new Function<Map, Integer>() {\n"
-                + "                  public Integer apply(Map asyncValues) {\n"
+                + "    .thenCompose(new Function<Map, Integer>() {\n"
+                + "                 public Object apply(Map asyncValues) {\n"
                 + "                      return %s.execute(\n"
                 + "                              new AsyncEvalSession(\n"
                 + "                                      session,\n"
@@ -102,8 +102,24 @@ public class ExpressionFactory {
                         asyncArgs,
                         expressionID);
 
+                /*
+                System.out.println(finalScript);
+
+                finalScript = String.format("static Integer exec(AsyncEvalSession session) {\n"
+                        + "    return ((Integer)session.registry().value(\"a\", session.inner())) + ((Integer) session.asyncValues().get(\"c\")) - ((Integer) session.asyncValues().get(\"d\"));\n"
+                        + "}\n"
+                        + "return session.registry().allValuesAsync(new String[]{\"c\", \"d\"}, session, executor)\n" +
+                        "                .thenApply(new Function<Map, Integer>() {\n" +
+                        "                    public Integer apply(Map asyncValues) {\n" +
+                        "                        return %s.exec(new AsyncEvalSession(session, asyncValues));\n" +
+                        "                    }\n" +
+                        "                });", expressionID);
+
+                System.out.println(finalScript);
+                */
+
                 return new Expression(new ExpressionInfo(
-                        generateID(),
+                        expressionID,
                         finalScript,
                         Class.forName(config.getReturnType()),
                         arguments,
@@ -141,7 +157,7 @@ public class ExpressionFactory {
         String result;
         result = expression;
         for (Argument argument : arguments) {
-            if (argument.isAsync()) {
+            if (!argument.isAsync()) {
                 result = result.replace(
                         String.format("$%s", argument.getName()),
                         String.format(
@@ -185,7 +201,8 @@ public class ExpressionFactory {
     }
 
     private static String generateID() {
-        return UUID.randomUUID()
+        return "E_"
+                + UUID.randomUUID()
                 .toString()
                 .toUpperCase()
                 .replace("-", "");

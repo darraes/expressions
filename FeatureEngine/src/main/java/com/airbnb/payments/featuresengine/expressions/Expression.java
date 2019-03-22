@@ -22,11 +22,9 @@ public class Expression {
     private IScriptEvaluator eval;
 
     private static String[] defaultImports = {
-            "java.util.Map",
-            "java.util.concurrent.CompletableFuture",
-            "java.util.function.Function",
-            "com.airbnb.payments.featuresengine.core.EvalSession",
             "com.airbnb.payments.featuresengine.core.AsyncEvalSession",
+            "java.util.concurrent.CompletableFuture",
+            "java.util.function.Function"
     };
 
     Expression(ExpressionInfo info) {
