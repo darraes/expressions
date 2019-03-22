@@ -304,7 +304,7 @@ public class ArgumentTest {
                         Integer.class.getName(),
                         "ArgumentTest.someAsyncMethod($a + $b)",
                         true,
-                        false,
+                        true,
                         new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
 
         EvalSession session = new EvalSession(provider, registry, cache);

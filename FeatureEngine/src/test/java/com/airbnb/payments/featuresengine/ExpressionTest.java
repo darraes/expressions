@@ -93,7 +93,7 @@ public class ExpressionTest {
                 session.registry(),
                 new ExpressionConfig(
                         "Math.sqrt($c)",
-                        Integer.class.getName()));
+                        Double.class.getName()));
 
         assertEquals(3.0, expression.eval(session));
     }
@@ -128,6 +128,7 @@ public class ExpressionTest {
                             new ExpressionConfig(
                                     "ExpressionTest.someAsyncMethod($c)",
                                     Integer.class.getName(),
+                                    true,
                                     new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"}));
 
             expression.evalAsync(session, executor)
@@ -142,6 +143,7 @@ public class ExpressionTest {
                             new ExpressionConfig(
                                     "ExpressionTest.someAsyncMethod2($c)",
                                     Integer.class.getName(),
+                                    true,
                                     new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"}));
 
             expression.evalAsync(session, executor)

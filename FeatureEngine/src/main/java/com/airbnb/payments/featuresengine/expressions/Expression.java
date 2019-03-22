@@ -73,7 +73,7 @@ public class Expression {
         }
 
         try {
-            return this.eval.evaluate(new Object[]{session, null});
+            return this.eval.evaluate(new Object[]{session});
         } catch (Exception e) {
             if (e.getCause() instanceof EvaluationException) {
                 throw (EvaluationException) e.getCause();
@@ -114,7 +114,7 @@ public class Expression {
                 (v) -> {
                     try {
                         Object res = this.eval.evaluate(
-                                new Object[]{session, executor});
+                                new Object[]{session});
                         if (res instanceof CompletableFuture) {
                             ((CompletableFuture<Object>)
                                     res)
@@ -187,8 +187,14 @@ public class Expression {
         // All expressions will only feed of the arguments therefore all we need are
         // the argument registry, the argument provider and the evaluation session
         eval.setParameters(
-                new String[]{"session", "executor"},
-                new Class[]{EvalSession.class, Executor.class});
+                new String[]{"session"},
+                new Class[]{EvalSession.class});
+
+        if (info.isAsync()) {
+            //eval.setExpressionType(CompletableFuture.class);
+        } else {
+            //eval.setExpressionType(info.getReturnType());
+        }
 
         //Merge all imports (default and user) and set them
         String[] allImports =

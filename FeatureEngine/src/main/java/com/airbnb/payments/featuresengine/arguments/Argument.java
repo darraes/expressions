@@ -1,6 +1,7 @@
 package com.airbnb.payments.featuresengine.arguments;
 
 import com.airbnb.payments.featuresengine.core.EvalSession;
+import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
 import java.util.HashMap;
@@ -65,6 +66,12 @@ public abstract class Argument {
         this.returnType = returnType;
         this.cacheable = cacheable;
         this.isAsync = isAsync;
+
+        if (this.isAsync && !this.cacheable) {
+            throw new CompilationException(
+                    "Async arguments must be cacheable. Argument %s is not",
+                    this.getName());
+        }
     }
 
     /**
