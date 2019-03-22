@@ -8,11 +8,9 @@ import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.arguments.NamedExpression;
-import org.codehaus.commons.compiler.CompileException;
 import org.junit.Test;
 
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -111,7 +109,7 @@ public class ArgumentTest {
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
             assertEquals("3 + 7",
-                    ((NamedExpression) arg1).getExpression().getExpression());
+                    ((NamedExpression) arg1).getExpression().info().getExpression());
         }
 
         {
@@ -130,7 +128,7 @@ public class ArgumentTest {
             assertEquals(Integer.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
             assertEquals("3 + 7",
-                    ((NamedExpression) arg1).getExpression().getExpression());
+                    ((NamedExpression) arg1).getExpression().info().getExpression());
         }
     }
 

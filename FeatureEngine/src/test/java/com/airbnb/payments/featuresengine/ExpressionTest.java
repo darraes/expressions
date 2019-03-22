@@ -1,11 +1,6 @@
 package com.airbnb.payments.featuresengine;
 
-import com.airbnb.payments.featuresengine.arguments.ArgumentFactory;
-import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
-import com.airbnb.payments.featuresengine.cache.HashMapCache;
-import com.airbnb.payments.featuresengine.cache.ICache;
-import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
@@ -28,8 +23,8 @@ public class ExpressionTest {
         Expression expression = ExpressionFactory.create(
                 registry,
                 new ExpressionConfig("1 + 3", Integer.class.getName()));
-        assertEquals("1 + 3", expression.getExpression());
-        assertEquals(Integer.class, expression.getReturnType());
+        assertEquals("1 + 3", expression.info().getExpression());
+        assertEquals(Integer.class, expression.info().getReturnType());
     }
 
     @Test
@@ -73,12 +68,12 @@ public class ExpressionTest {
     @Test
     public void evaluateInputArgument()
             throws CompilationException, EvaluationException {
-        EvalSession session = createTestSession();
+        EvalSession session = TestUtils.testSession();
 
         Expression expression = ExpressionFactory.create(
                 session.registry(),
                 new ExpressionConfig(
-                        "$a + $b",
+                        "$i_int_a + $i_int_b",
                         Integer.class.getName()));
 
         assertEquals(9, expression.eval(session));
@@ -87,12 +82,12 @@ public class ExpressionTest {
     @Test
     public void evaluateRecursiveArguments()
             throws CompilationException, EvaluationException {
-        EvalSession session = createTestSession();
+        EvalSession session = TestUtils.testSession();
 
         Expression expression = ExpressionFactory.create(
                 session.registry(),
                 new ExpressionConfig(
-                        "Math.sqrt($c)",
+                        "Math.sqrt($e_int_c)",
                         Double.class.getName()));
 
         assertEquals(3.0, expression.eval(session));
@@ -100,12 +95,12 @@ public class ExpressionTest {
 
     @Test
     public void handleExceptions() throws CompilationException {
-        EvalSession session = createTestSession();
+        EvalSession session = TestUtils.testSession();
         try {
             ExpressionFactory.create(
                     session.registry(),
                     new ExpressionConfig(
-                            "$d",
+                            "$dont_exists",
                             Integer.class.getName()));
             fail();
         } catch (CompilationException e) {
@@ -116,20 +111,19 @@ public class ExpressionTest {
     @Test
     public void evaluateSimpleAsyncExpression()
             throws CompilationException, ExecutionException, InterruptedException {
-        EvalSession session = createTestSession();
+        EvalSession session = TestUtils.testSession();
 
         Executor executor = Executors.newFixedThreadPool(2);
 
         {
-
             Expression expression =
                     ExpressionFactory.create(
                             session.registry(),
                             new ExpressionConfig(
-                                    "ExpressionTest.someAsyncMethod($c)",
+                                    "ExpressionTest.someAsyncMethod($e_int_c)",
                                     Integer.class.getName(),
                                     true,
-                                    new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"}));
+                                    new String[]{this.getClass().getName()}));
 
             expression.evalAsync(session, executor)
                     .thenAccept(res -> assertEquals(19, res)).get();
@@ -141,10 +135,10 @@ public class ExpressionTest {
                     ExpressionFactory.create(
                             session.registry(),
                             new ExpressionConfig(
-                                    "ExpressionTest.someAsyncMethod2($c)",
+                                    "ExpressionTest.someAsyncMethod2($e_int_c)",
                                     Integer.class.getName(),
                                     true,
-                                    new String[]{"com.airbnb.payments.featuresengine.ExpressionTest"}));
+                                    new String[]{this.getClass().getName()}));
 
             expression.evalAsync(session, executor)
                     .thenAccept(res -> assertEquals(90, res)).get();
@@ -159,37 +153,6 @@ public class ExpressionTest {
     @Test
     public void evaluateMultipleArgumentTypeExpression() {
         // TODO implement
-    }
-
-    private static EvalSession createTestSession() throws CompilationException {
-        ICache cache = new HashMapCache();
-
-        HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("a", 1);
-        provider.put("b", 8);
-
-        ArgumentRegistry registry = new ArgumentRegistry();
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "a",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "b",
-                        Integer.class.getName()));
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "c",
-                        Integer.class.getName(),
-                        "((Integer)session.registry().value(\"a\", session))"
-                                + " + ((Integer)session.registry().value(\"b\", session))"));
-
-        return new EvalSession(provider, registry, cache);
     }
 
     public static CompletableFuture<Integer> someAsyncMethod(int x) {

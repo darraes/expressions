@@ -4,7 +4,7 @@ import com.airbnb.payments.featuresengine.arguments.Argument;
 
 import java.util.List;
 
-class ExpressionInfo {
+public class ExpressionInfo {
     private String id;
     private String expression;
     private String sourceExpression;
@@ -29,31 +29,31 @@ class ExpressionInfo {
         this.dependencies = dependencies;
     }
 
-    String getID() {
+    public String getID() {
         return id;
     }
 
-    String getExpression() {
+    public String getExpression() {
         return expression;
     }
 
-    String getSourceExpression() {
+    public String getSourceExpression() {
         return sourceExpression;
     }
 
-    Class<?> getReturnType() {
+    public Class<?> getReturnType() {
         return returnType;
     }
 
-    List<Argument> getAccessedArguments() {
+    public List<Argument> getAccessedArguments() {
         return accessedArguments;
     }
 
-    boolean isAsync() {
+    public boolean isAsync() {
         return isAsync;
     }
 
-    String[] getDependencies() {
+    public String[] getDependencies() {
         return dependencies;
     }
 }

@@ -38,17 +38,10 @@ public class Expression {
     /**
      * Getter.
      *
-     * @return The original expression text before compiling it
+     * @return The original expression metadata
      */
-    public final String getExpression() {
-        return this.info.getExpression();
-    }
-
-    /**
-     * @return The class type this expression evaluates to
-     */
-    public Class<?> getReturnType() {
-        return this.info.getReturnType();
+    public final ExpressionInfo info() {
+        return this.info;
     }
 
     /**
@@ -73,7 +66,7 @@ public class Expression {
         }
 
         try {
-            return this.eval.evaluate(new Object[]{session});
+            return this.eval.evaluate(new Object[]{session, null});
         } catch (Exception e) {
             if (e.getCause() instanceof EvaluationException) {
                 throw (EvaluationException) e.getCause();
@@ -119,7 +112,7 @@ public class Expression {
                 (v) -> {
                     try {
                         Object res = this.eval.evaluate(
-                                new Object[]{session});
+                                new Object[]{session, executor});
                         if (res instanceof CompletableFuture) {
                             // Handles when the expression itself is async
                             ((CompletableFuture<Object>)
@@ -187,8 +180,8 @@ public class Expression {
         // All expressions will only feed of the arguments therefore all we need are
         // the argument registry, the argument provider and the evaluation session
         eval.setParameters(
-                new String[]{"session"},
-                new Class[]{EvalSession.class});
+                new String[]{"session", "executor"},
+                new Class[]{EvalSession.class, Executor.class});
 
         //Merge all imports (default and user) and set them
         String[] allImports =

@@ -70,7 +70,7 @@ public class ExpressionFactoryTest {
         assertEquals(
                 "((java.lang.Integer)session.registry().value(\"a\", session))"
                         + " + ((java.lang.Integer)session.registry().value(\"b\", session))",
-                expression.getExpression());
+                expression.info().getExpression());
 
 
         assertEquals(3, expression.eval(session));
