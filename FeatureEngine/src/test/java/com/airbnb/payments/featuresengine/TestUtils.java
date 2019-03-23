@@ -120,6 +120,10 @@ public class TestUtils {
         return new EvalSession(provider, registry, cache);
     }
 
+    public static Object add(int x, int y) {
+        return x + y;
+    }
+
     public static CompletableFuture<Integer> asyncPow(int x, int pow) {
         return asyncLambda(x, pow, (a, p) -> (int) Math.pow(a, p));
     }

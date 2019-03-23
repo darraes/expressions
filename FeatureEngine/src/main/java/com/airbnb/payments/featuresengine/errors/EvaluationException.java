@@ -12,4 +12,8 @@ public class EvaluationException extends RuntimeException {
     public EvaluationException(Exception cause, String msgFmt, Object... args) {
         super(String.format(msgFmt, args), cause);
     }
+
+    public EvaluationException(Throwable cause, String msgFmt, Object... args) {
+        super(String.format(msgFmt, args), cause);
+    }
 }

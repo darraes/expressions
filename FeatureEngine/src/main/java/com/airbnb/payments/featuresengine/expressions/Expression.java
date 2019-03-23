@@ -9,8 +9,11 @@ import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.commons.compiler.IExpressionEvaluator;
 import org.codehaus.janino.ExpressionEvaluator;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class Expression {
@@ -60,21 +63,14 @@ public class Expression {
         if (this.info.isAsync()) {
             throw new EvaluationException(
                     "Async expressions must be computed using evalAsync()."
-                            + " Expression %s",
+                            + " Expression (%s) was not",
                     this.info.getSourceExpression());
         }
 
         try {
             return this.eval.evaluate(new Object[]{session, null});
         } catch (Exception e) {
-            if (e.getCause() instanceof EvaluationException) {
-                throw (EvaluationException) e.getCause();
-            }
-
-            throw new EvaluationException(
-                    e,
-                    "Error evaluation expression %s",
-                    this.info.getSourceExpression());
+            throw findTrueException(e, this.info().getSourceExpression());
         }
 
     }
@@ -118,7 +114,10 @@ public class Expression {
                                     res)
                                     .thenApply(result::complete)
                                     .exceptionally((e) -> {
-                                        result.completeExceptionally(e.getCause());
+                                        result.completeExceptionally(
+                                                findTrueException(
+                                                        e,
+                                                        this.info().getSourceExpression()));
                                         return null;
                                     });
                             ;
@@ -128,19 +127,16 @@ public class Expression {
                             result.complete(res);
                         }
                     } catch (Exception e) {
-                        if (e.getCause() instanceof EvaluationException) {
-                            result.completeExceptionally(e.getCause());
-                        } else {
-                            result.completeExceptionally(
-                                    new EvaluationException(
-                                            e,
-                                            "Error evaluation expression %s",
-                                            this.info.getSourceExpression()));
-                        }
+                        result.completeExceptionally(
+                                findTrueException(
+                                        e, this.info().getSourceExpression()));
                     }
                 })
                 .exceptionally((e) -> {
-                    result.completeExceptionally(e.getCause());
+                    result.completeExceptionally(
+                            findTrueException(
+                                    e,
+                                    this.info().getSourceExpression()));
                     return null;
                 });
         return result;
@@ -175,11 +171,17 @@ public class Expression {
                         CompletableFuture.allOf(futures)
                                 .thenAccept(result::complete)
                                 .exceptionally((e) -> {
-                                    result.completeExceptionally(e.getCause());
+                                    result.completeExceptionally(
+                                            findTrueException(
+                                                    e,
+                                                    this.info().getSourceExpression()));
                                     return null;
                                 });
                     } catch (Exception e) {
-                        result.completeExceptionally(e);
+                        result.completeExceptionally(
+                                findTrueException(
+                                        e,
+                                        this.info().getSourceExpression()));
                     }
                 }, executor);
 
@@ -239,5 +241,37 @@ public class Expression {
         }
 
         return eval;
+    }
+
+    /**
+     * The async nature together with the dynamic compilation makes that the actual
+     * exception are wrapper inside layers of other exceptions.
+     * This method will unwrap that and return the actual root error.
+     *
+     * @param e Exception to be searched
+     * @return Root error
+     */
+    private static EvaluationException findTrueException(Throwable e, String context) {
+        if (e instanceof EvaluationException) {
+            return ((EvaluationException) e);
+        }
+
+        if (e.getCause() instanceof EvaluationException) {
+            return (EvaluationException) e.getCause();
+        } else if (e.getCause() instanceof InvocationTargetException ||
+                e.getCause() instanceof CompletionException ||
+                e.getCause() instanceof ExecutionException) {
+            return new EvaluationException(
+                    e.getCause(),
+                    "Error evaluation (%s): %s",
+                    context,
+                    e.getCause().getMessage());
+        }
+
+        return new EvaluationException(
+                e,
+                "Error evaluation (%s): %s",
+                context,
+                e.getMessage());
     }
 }

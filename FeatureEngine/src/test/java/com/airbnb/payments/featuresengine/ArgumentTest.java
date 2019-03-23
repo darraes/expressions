@@ -63,7 +63,7 @@ public class ArgumentTest {
                             "3 + 7",
                             true,
                             false
-                            ));
+                    ));
 
             assertTrue(arg1.isCacheable());
             assertFalse(arg1.isAsync());
@@ -139,7 +139,72 @@ public class ArgumentTest {
         } catch (CompilationException e) {
             assertTrue(e.getMessage().contains("not registered"));
         }
+    }
 
+    @Test
+    public void argumentTypeMismatch() {
+        {
+            // For sync expressions, we do type checking during compilation
+            try {
+                EvalSession session = TestUtils.testSession();
+                ArgumentFactory.create(
+                        session.registry(),
+                        new ArgumentConfig(
+                                "a",
+                                Integer.class.getName(),
+                                "new String(\"there\")"));
+                fail();
+            } catch (CompilationException e) {
+                assertTrue(
+                        e.getCause().getMessage().contains("conversion not possible"));
+            }
+        }
+
+        {
+            // Type casting errors show during evaluation
+            try {
+                EvalSession session = TestUtils.testSession();
+                ArgumentFactory.create(
+                        session.registry(),
+                        new ArgumentConfig(
+                                "a",
+                                String.class.getName(),
+                                "(String) TestUtils.add(1, 1)",
+                                true,
+                                false,
+                                new String[]{TestUtils.class.getName()}));
+                session.registry().value("a", session);
+                fail();
+            } catch (EvaluationException e) {
+                assertTrue(e.getCause().getCause() instanceof ClassCastException);
+            } catch (Exception e) {
+                fail();
+            }
+        }
+
+        {
+            // For async expression returning CompletableFuture, we can only catch
+            // type mismatches during evaluations
+            try {
+                Executor executor = Executors.newFixedThreadPool(2);
+                EvalSession session = TestUtils.testSession();
+                ArgumentFactory.create(
+                        session.registry(),
+                        new ArgumentConfig(
+                                "a",
+                                String.class.getName(),
+                                "TestUtils.asyncSub($i_int_b, $i_int_a)",
+                                true,
+                                true,
+                                new String[]{TestUtils.class.getName()}));
+                session.registry().valueAsync("a", session, executor).get();
+                fail();
+            } catch (ExecutionException e) {
+                assertTrue(e.getCause().getMessage().contains("not assignable"));
+            } catch (Exception e) {
+                fail();
+            }
+        }
     }
 
     @Test
@@ -259,10 +324,5 @@ public class ArgumentTest {
 
         session.registry().valueAsync("async_int_from_map", session, executor)
                 .thenAccept(res -> assertEquals(100, res)).get();
-    }
-
-    @Test
-    public void argumentTypeMismatch() {
-        // TODO implement
     }
 }
