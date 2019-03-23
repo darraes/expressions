@@ -180,7 +180,7 @@ public abstract class Argument {
                                 })
                                 .exceptionally((e) -> {
                                     session.stack().pop();
-                                    result.completeExceptionally(e);
+                                    result.completeExceptionally(e.getCause());
                                     return null;
                                 });
                     } catch (Exception e) {

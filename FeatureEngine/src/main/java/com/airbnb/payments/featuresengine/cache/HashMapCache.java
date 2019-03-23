@@ -2,8 +2,8 @@ package com.airbnb.payments.featuresengine.cache;
 
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Cache implementation using a HashMap therefore no evicting policy is is place.
@@ -13,7 +13,7 @@ public class HashMapCache implements ICache {
     private Map<String, Object> cache;
 
     public HashMapCache() {
-        this.cache = new HashMap<>();
+        this.cache = new ConcurrentHashMap<>();
     }
 
     /**

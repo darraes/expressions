@@ -119,7 +119,7 @@ public class Expression {
                                     res)
                                     .thenApply(result::complete)
                                     .exceptionally((e) -> {
-                                        result.completeExceptionally(e);
+                                        result.completeExceptionally(e.getCause());
                                         return null;
                                     });
                             ;
@@ -172,7 +172,7 @@ public class Expression {
                         CompletableFuture.allOf(futures)
                                 .thenAccept(result::complete)
                                 .exceptionally((e) -> {
-                                    result.completeExceptionally(e);
+                                    result.completeExceptionally(e.getCause());
                                     return null;
                                 });
                     } catch (Exception e) {
