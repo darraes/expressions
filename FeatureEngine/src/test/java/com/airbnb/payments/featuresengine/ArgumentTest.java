@@ -288,7 +288,7 @@ public class ArgumentTest {
     public void evaluateAllValuesAsync()
             throws CompilationException, ExecutionException, InterruptedException {
         HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("a", 1);
+        provider.put("i_int_a", 1);
         provider.put("b", 8);
 
 
@@ -299,7 +299,7 @@ public class ArgumentTest {
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
-                        "a",
+                        "i_int_a",
                         Integer.class.getName()));
         ArgumentFactory.create(
                 registry,
@@ -311,7 +311,7 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($a + $b)",
+                        "ArgumentTest.someAsyncMethod($i_int_a + $b)",
                         true,
                         true,
                         new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
@@ -321,7 +321,7 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "d",
                         Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($b - $a)",
+                        "ArgumentTest.someAsyncMethod($b - $i_int_a)",
                         true,
                         true,
                         new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
@@ -331,7 +331,7 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "e",
                         Integer.class.getName(),
-                        "$c - $a - $d",
+                        "$c - $i_int_a - $d",
                         true,
                         true));
 

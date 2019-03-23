@@ -117,13 +117,18 @@ public class Expression {
                             // Handles when the expression itself is async
                             ((CompletableFuture<Object>)
                                     res)
-                                    .thenApply(result::complete);
+                                    .thenApply(result::complete)
+                                    .exceptionally((e) -> {
+                                        result.completeExceptionally(e);
+                                        return null;
+                                    });
+                            ;
                         } else {
                             // Handles when the expression itself is not async, but
                             // it has at least one async argument
                             result.complete(res);
                         }
-                    } catch (InvocationTargetException e) {
+                    } catch (Exception e) {
                         if (e.getCause() instanceof EvaluationException) {
                             result.completeExceptionally(e.getCause());
                         } else {
@@ -137,7 +142,7 @@ public class Expression {
                 });
         return result;
     }
-    
+
     /**
      * Asynchronously caches all arguments passed in on @arguments. The resulting
      * completable future will only be ready when all arguments are in teh cache.
@@ -149,10 +154,10 @@ public class Expression {
      */
     private CompletableFuture<Void> cacheAsyncArguments(
             Argument[] arguments, EvalSession session, Executor executor) {
-        CompletableFuture<Void> res = new CompletableFuture<>();
+        CompletableFuture<Void> result = new CompletableFuture<>();
         if (arguments == null || arguments.length == 0) {
-            res.complete(null);
-            return res;
+            result.complete(null);
+            return result;
         }
 
         CompletableFuture.runAsync(
@@ -164,13 +169,18 @@ public class Expression {
                                         executor))
                                 .toArray(CompletableFuture[]::new);
 
-                        CompletableFuture.allOf(futures).thenAccept(res::complete);
+                        CompletableFuture.allOf(futures)
+                                .thenAccept(result::complete)
+                                .exceptionally((e) -> {
+                                    result.completeExceptionally(e);
+                                    return null;
+                                });
                     } catch (Exception e) {
-                        res.completeExceptionally(e);
+                        result.completeExceptionally(e);
                     }
                 }, executor);
 
-        return res;
+        return result;
     }
 
     /**

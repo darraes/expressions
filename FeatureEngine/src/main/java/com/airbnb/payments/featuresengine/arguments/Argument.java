@@ -174,14 +174,14 @@ public abstract class Argument {
 
                         this.fetchAsync(session, executor)
                                 .thenAccept((res) -> {
-                                    try {
-                                        res = processResult(session, res);
-                                        session.stack().pop();
-                                        result.complete(res);
-                                    } catch (Exception e) {
-                                        session.stack().pop();
-                                        result.completeExceptionally(e);
-                                    }
+                                    res = processResult(session, res);
+                                    session.stack().pop();
+                                    result.complete(res);
+                                })
+                                .exceptionally((e) -> {
+                                    session.stack().pop();
+                                    result.completeExceptionally(e);
+                                    return null;
                                 });
                     } catch (Exception e) {
                         if (localArgPush) {
