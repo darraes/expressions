@@ -6,10 +6,7 @@ import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
-import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
-import com.airbnb.payments.featuresengine.expressions.Expression;
-import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +15,13 @@ import java.util.function.BiFunction;
 
 public class TestUtils {
     public static EvalSession testSession() {
-        ICache cache = new HashMapCache();
+        return testSession(null);
+    }
+
+    public static EvalSession testSession(ICache cache) {
+        if (cache == null) {
+            cache = new HashMapCache();
+        }
 
         HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("i_int_a", 1);
@@ -30,12 +33,16 @@ public class TestUtils {
                 registry,
                 new ArgumentConfig(
                         "i_int_a",
-                        Integer.class.getName()));
+                        Integer.class.getName(),
+                        true,
+                        false));
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "i_int_b",
-                        Integer.class.getName()));
+                        Integer.class.getName(),
+                        false,
+                        false));
 
         ArgumentFactory.create(
                 registry,
@@ -43,6 +50,15 @@ public class TestUtils {
                         "e_int_c",
                         Integer.class.getName(),
                         "$i_int_a + $i_int_b"));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "e_int_d",
+                        Integer.class.getName(),
+                        "$i_int_b - $i_int_a",
+                        false,
+                        false));
 
         ArgumentFactory.create(
                 registry,

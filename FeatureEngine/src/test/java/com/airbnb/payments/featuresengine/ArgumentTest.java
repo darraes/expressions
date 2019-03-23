@@ -43,14 +43,14 @@ public class ArgumentTest {
                     registry,
                     new ArgumentConfig(
                             "a",
-                            Integer.class.getName(),
+                            Double.class.getName(),
                             false,
                             false
                     ));
 
             assertFalse(arg1.isCacheable());
             assertFalse(arg1.isAsync());
-            assertEquals(Integer.class, arg1.getReturnType());
+            assertEquals(Double.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
         }
 
@@ -78,106 +78,51 @@ public class ArgumentTest {
             Argument arg1 = ArgumentFactory.create(registry,
                     new ArgumentConfig(
                             "a",
-                            Integer.class.getName(),
-                            "3 + 7",
+                            Double.class.getName(),
+                            "3.0 + 7.0",
                             false,
                             false
                     ));
 
             assertFalse(arg1.isCacheable());
             assertFalse(arg1.isAsync());
-            assertEquals(Integer.class, arg1.getReturnType());
+            assertEquals(Double.class, arg1.getReturnType());
             assertEquals("a", arg1.getName());
-            assertEquals("3 + 7",
+            assertEquals("3.0 + 7.0",
                     ((NamedExpression) arg1).getExpression().info().getExpression());
         }
     }
 
     @Test
     public void expressionArgument() throws EvaluationException, CompilationException {
-        HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("a", 1);
-        provider.put("b", 8);
-
-        ICache cache = new HashMapCache();
-
-        ArgumentRegistry registry = new ArgumentRegistry();
-        // Using class 'int' to test the boxed type checking
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "a",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig("b",
-                        Integer.class.getName()));
-        ArgumentFactory.create(registry,
-                new ArgumentConfig(
-                        "c",
-                        Integer.class.getName(),
-                        "$a + $b"));
-        ArgumentFactory.create(registry,
-                new ArgumentConfig(
-                        "d",
-                        Integer.class.getName(),
-                        "10 * $c"));
-
-        EvalSession session = new EvalSession(provider, registry, cache);
-
-        assertTrue(registry.exists("a"));
-        assertTrue(registry.exists("b"));
-        assertTrue(registry.exists("c"));
-        assertTrue(registry.exists("d"));
-        assertFalse(registry.exists("e"));
-
-        assertEquals(90, registry.value("d", session));
+        EvalSession session = TestUtils.testSession();
+        assertEquals(9, session.registry().value("e_int_c", session));
     }
 
     @Test
     public void cachingEvaluations() throws EvaluationException, CompilationException {
-        HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("a", 1);
-        provider.put("b", 8);
-
-
         TestCache cache = new TestCache();
+        EvalSession session = TestUtils.testSession(cache);
 
-        ArgumentRegistry registry = new ArgumentRegistry();
-        // Using class 'int' to test the boxed type checking
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "a",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "b",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "c",
-                        Integer.class.getName(),
-                        "$a + $b"));
+        assertEquals(9, session.registry().value("e_int_c", session));
+        assertFalse(cache.served("i_int_a"));
+        assertFalse(cache.served("i_int_b"));
+        assertFalse(cache.served("e_int_c"));
 
-        EvalSession session = new EvalSession(provider, registry, cache);
+        assertEquals(9, session.registry().value("e_int_c", session));
 
-        assertEquals(9, registry.value("c", session));
-        assertFalse(cache.served("a"));
-        assertFalse(cache.served("b"));
-        assertFalse(cache.served("c"));
+        assertFalse(cache.served("i_int_a"));
+        assertFalse(cache.served("i_int_b"));
+        assertTrue(cache.served("e_int_c"));
 
-        assertEquals(9, registry.value("c", session));
+        assertTrue(cache.contains("i_int_a"));
+        assertTrue(cache.contains("e_int_c"));
+        assertFalse(cache.contains("i_int_b"));
 
-        assertFalse(cache.served("a"));
-        assertFalse(cache.served("b"));
-        assertTrue(cache.served("c"));
-
-        assertTrue(cache.contains("a"));
-        assertTrue(cache.contains("b"));
-        assertTrue(cache.contains("c"));
+        assertEquals(7, session.registry().value("e_int_d", session));
+        assertFalse(cache.served("e_int_d"));
+        assertEquals(7, session.registry().value("e_int_d", session));
+        assertFalse(cache.served("e_int_d"));
     }
 
     @Test
