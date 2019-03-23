@@ -6,7 +6,10 @@ import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
+import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
+import com.airbnb.payments.featuresengine.expressions.Expression;
+import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,13 +73,31 @@ public class TestUtils {
                         true,
                         true));
 
-        // $f = 2 * (a))
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "async_int_f",
                         Integer.class.getName(),
                         "2 * $async_int_e",
+                        true,
+                        true));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "async_map",
+                        Map.class.getName(),
+                        "(new TestUtils()).asyncMap(\"key_1\", 100)",
+                        true,
+                        true,
+                        new String[]{TestUtils.class.getName()}));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "async_int_from_map",
+                        Integer.class.getName(),
+                        "(Integer) $async_map.get(\"key_1\")",
                         true,
                         true));
 

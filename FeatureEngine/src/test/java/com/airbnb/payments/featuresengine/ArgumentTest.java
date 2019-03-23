@@ -10,7 +10,6 @@ import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.arguments.NamedExpression;
 import org.junit.Test;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -183,18 +182,41 @@ public class ArgumentTest {
 
     @Test
     public void argumentNotRegistered() throws CompilationException {
-        ArgumentRegistry registry = new ArgumentRegistry();
-
         try {
-            ArgumentFactory.create(registry,
+            EvalSession session = TestUtils.testSession();
+            ArgumentFactory.create(
+                    session.registry(),
                     new ArgumentConfig(
-                            "c",
+                            "not_there",
                             Integer.class.getName(),
-                            "$a + $b",
-                            true, false));
+                            "$a + $b"));
             fail();
         } catch (CompilationException e) {
             assertTrue(e.getMessage().contains("not registered"));
+        }
+
+    }
+
+    @Test
+    public void duplicatedArgument() throws CompilationException {
+        try {
+            EvalSession session = TestUtils.testSession();
+            ArgumentFactory.create(
+                    session.registry(),
+                    new ArgumentConfig(
+                            "a",
+                            Integer.class.getName(),
+                            "1 + 1"));
+
+            ArgumentFactory.create(
+                    session.registry(),
+                    new ArgumentConfig(
+                            "a",
+                            Integer.class.getName(),
+                            "1 + 1"));
+            fail();
+        } catch (CompilationException e) {
+            assertTrue(e.getMessage().contains("registered"));
         }
 
     }
@@ -211,18 +233,14 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "a",
                         Integer.class.getName(),
-                        "1 + ((Integer)session.registry().value(\"b\", session))",
-                        true,
-                        false));
+                        "((Integer)session.registry().value(\"b\", session))"));
 
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "b",
                         Integer.class.getName(),
-                        "1 + ((Integer)session.registry().value(\"a\", session))",
-                        true,
-                        false));
+                        "((Integer)session.registry().value(\"a\", session))"));
 
         EvalSession session = new EvalSession(provider, registry, cache);
 
@@ -238,137 +256,68 @@ public class ArgumentTest {
     @Test
     public void evaluateSimpleAsyncExpression()
             throws CompilationException, ExecutionException, InterruptedException {
-        HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("a", 1);
-        provider.put("b", 8);
-
-
-        TestCache cache = new TestCache();
-
-        ArgumentRegistry registry = new ArgumentRegistry();
-        // Using class 'int' to test the boxed type checking
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "a",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "b",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "c",
-                        Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($a + $b)",
-                        true,
-                        true,
-                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
-
-        EvalSession session = new EvalSession(provider, registry, cache);
+        EvalSession session = TestUtils.testSession();
         Executor executor = Executors.newFixedThreadPool(2);
 
-        registry.valueAsync("a", session, executor)
+        session.registry().valueAsync("i_int_a", session, executor)
                 .thenAccept(res -> assertEquals(1, res)).get();
 
-        registry.valueAsync("c", session, executor)
-                .thenAccept(res -> assertEquals(90, res)).get();
+        session.registry().valueAsync("async_int_c", session, executor)
+                .thenAccept(res -> assertEquals(9, res)).get();
 
-        registry.valueAsync("b", session, executor)
+        session.registry().valueAsync("i_int_b", session, executor)
                 .thenAccept(res -> assertEquals(8, res)).get();
 
-        registry.valueAsync("c", session, executor)
-                .thenAccept(res -> assertEquals(90, res)).get();
+        session.registry().valueAsync("async_int_c", session, executor)
+                .thenAccept(res -> assertEquals(9, res)).get();
 
     }
 
     @Test
     public void evaluateAllValuesAsync()
             throws CompilationException, ExecutionException, InterruptedException {
-        HashMapInputProvider provider = new HashMapInputProvider();
-        provider.put("i_int_a", 1);
-        provider.put("i_int_b", 8);
-
-
-        TestCache cache = new TestCache();
-
-        ArgumentRegistry registry = new ArgumentRegistry();
-        // Using class 'int' to test the boxed type checking
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "i_int_a",
-                        Integer.class.getName()));
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "i_int_b",
-                        Integer.class.getName()));
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "c",
-                        Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($i_int_a + $i_int_b)",
-                        true,
-                        true,
-                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "d",
-                        Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($i_int_b - $i_int_a)",
-                        true,
-                        true,
-                        new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "e",
-                        Integer.class.getName(),
-                        "$c - $i_int_a - $d",
-                        true,
-                        true));
-
-        ArgumentFactory.create(
-                registry,
-                new ArgumentConfig(
-                        "f",
-                        Integer.class.getName(),
-                        "2*$e",
-                        true,
-                        true));
-
         Executor executor = Executors.newFixedThreadPool(2);
 
-        /*EvalSession session = new EvalSession(provider, registry, cache);
-        int result = (int) registry.valueAsync("f", session, executor).get();
-        assertEquals(38, result);*/
 
-        EvalSession session = TestUtils.testSession();
-        int result = (int) session.registry().valueAsync(
-                "async_int_f", session, executor).get();
-        assertEquals(38, result);
+        {
+            // Loading order of dependants first
+            EvalSession session = TestUtils.testSession();
+            assertEquals(38, session.registry().valueAsync(
+                    "async_int_f", session, executor).get());
+
+            assertEquals(19, session.registry().valueAsync(
+                    "async_int_e", session, executor).get());
+
+            assertEquals(9, session.registry().valueAsync(
+                    "async_int_c", session, executor).get());
+        }
+
+        {
+            // Loading order of dependencies first
+            EvalSession session = TestUtils.testSession();
+            assertEquals(9, session.registry().valueAsync(
+                    "async_int_c", session, executor).get());
+
+            assertEquals(19, session.registry().valueAsync(
+                    "async_int_e", session, executor).get());
+
+            assertEquals(38, session.registry().valueAsync(
+                    "async_int_f", session, executor).get());
+        }
     }
 
     @Test
-    public void callMethodOnAsyncInstanceArgument() {
-        // TODO implement
+    public void callMethodOnAsyncInstanceArgument()
+            throws CompilationException, ExecutionException, InterruptedException {
+        EvalSession session = TestUtils.testSession();
+        Executor executor = Executors.newFixedThreadPool(2);
+
+        session.registry().valueAsync("async_int_from_map", session, executor)
+                .thenAccept(res -> assertEquals(100, res)).get();
     }
 
     @Test
     public void argumentTypeMismatch() {
         // TODO implement
-    }
-
-
-    public static CompletableFuture<Integer> someAsyncMethod(int x) {
-        return CompletableFuture.supplyAsync(() -> 10 * x);
     }
 }

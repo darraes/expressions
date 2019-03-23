@@ -247,6 +247,36 @@ public class ExpressionTest {
                         assertEquals(100, ((Map) res).get("key_1"));
                     }).get();
         }
+
+        {
+            String expressionText = "Math.pow(10, 2)";
+            Expression expression =
+                    ExpressionFactory.create(
+                            session.registry(),
+                            new ExpressionConfig(
+                                    expressionText,
+                                    Double.class.getName(),
+                                    true,
+                                    new String[]{TestUtils.class.getName()}));
+
+            expression.evalAsync(session, executor)
+                    .thenAccept(res -> assertEquals(100.0, res)).get();
+        }
+
+        {
+            String expressionText = "new String(\"test\")";
+            Expression expression =
+                    ExpressionFactory.create(
+                            session.registry(),
+                            new ExpressionConfig(
+                                    expressionText,
+                                    String.class.getName(),
+                                    true,
+                                    new String[]{TestUtils.class.getName()}));
+
+            expression.evalAsync(session, executor)
+                    .thenAccept(res -> assertEquals("test", res)).get();
+        }
     }
 
     @Test

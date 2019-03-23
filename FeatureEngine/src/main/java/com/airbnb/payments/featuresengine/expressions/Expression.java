@@ -139,6 +139,10 @@ public class Expression {
                                             this.info.getSourceExpression()));
                         }
                     }
+                })
+                .exceptionally((e) -> {
+                    result.completeExceptionally(e.getCause());
+                    return null;
                 });
         return result;
     }
@@ -217,15 +221,19 @@ public class Expression {
             eval.cook(info.getExpression());
         } catch (CompileException e) {
             if (info.isAsync()) {
-                // Async expression can return CompletableFuture, when they are root
-                // async expression, or they can return the actual final type, when
-                // only their arguments are async and therefore will be asynchronously
-                // fetched before evaluating the expression.
-                // Eg.:
-                // $exp1 = 'MyClass.doFooAsync($a)' -> return type = CompletableFuture
-                // $exp2 = '$exp1 + 10' -> return type = Integer
-                eval.setExpressionType(CompletableFuture.class);
-                eval.cook(info.getExpression());
+                try {
+                    // Async expression can return CompletableFuture, when they are root
+                    // async expression, or they can return the actual final type, when
+                    // only their arguments are async and therefore will be asynchronously
+                    // fetched before evaluating the expression.
+                    // Eg.:
+                    // $exp1 = 'MyClass.doFooAsync($a)' -> return type = CompletableFuture
+                    // $exp2 = '$exp1 + 10' -> return type = Integer
+                    eval.setExpressionType(CompletableFuture.class);
+                    eval.cook(info.getExpression());
+                } catch (CompileException e1) {
+                    throw e;
+                }
             } else {
                 throw e;
             }
