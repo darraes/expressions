@@ -11,6 +11,7 @@ import com.airbnb.payments.featuresengine.core.EvalSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 public class TestUtils {
     public static EvalSession testSession() {
@@ -50,23 +51,60 @@ public class TestUtils {
                         true,
                         new String[]{TestUtils.class.getName()}));
 
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "async_int_d",
+                        Integer.class.getName(),
+                        "TestUtils.asyncSub($i_int_b, $i_int_a)",
+                        true,
+                        true,
+                        new String[]{TestUtils.class.getName()}));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "async_int_e",
+                        Integer.class.getName(),
+                        "10 * $async_int_c - $i_int_a - 10* $async_int_d",
+                        true,
+                        true));
+
+        // $f = 2 * (a))
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "async_int_f",
+                        Integer.class.getName(),
+                        "2 * $async_int_e",
+                        true,
+                        true));
+
         return new EvalSession(provider, registry, cache);
     }
 
     public static CompletableFuture<Integer> asyncPow(int x, int pow) {
-        CompletableFuture<Integer> result = new CompletableFuture<>();
-        CompletableFuture.runAsync(
-                () -> {
-                    result.complete((int) Math.pow(x, pow));
-                });
-        return result;
+        return asyncLambda(x, pow, (a, p) -> (int) Math.pow(a, p));
     }
 
     public static CompletableFuture<Integer> asyncAdd(int x, int y) {
+        return asyncLambda(x, y, (a, b) -> a + b);
+    }
+
+    public static CompletableFuture<Integer> asyncSub(int x, int y) {
+        return asyncLambda(x, y, (a, b) -> a - b);
+    }
+
+    public static CompletableFuture<Integer> asyncMul(int x, int y) {
+        return asyncLambda(x, y, (a, b) -> x * b);
+    }
+
+    private static CompletableFuture<Integer> asyncLambda(
+            int x, int y, BiFunction<Integer, Integer, Integer> op) {
         CompletableFuture<Integer> result = new CompletableFuture<>();
         CompletableFuture.runAsync(
                 () -> {
-                    result.complete(x + y);
+                    result.complete(op.apply(x, y));
                 });
         return result;
     }

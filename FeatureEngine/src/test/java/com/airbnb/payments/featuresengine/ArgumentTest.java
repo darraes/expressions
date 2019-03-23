@@ -345,10 +345,15 @@ public class ArgumentTest {
                         true,
                         true));
 
-        EvalSession session = new EvalSession(provider, registry, cache);
         Executor executor = Executors.newFixedThreadPool(2);
 
+        /*EvalSession session = new EvalSession(provider, registry, cache);
         int result = (int) registry.valueAsync("f", session, executor).get();
+        assertEquals(38, result);*/
+
+        EvalSession session = TestUtils.testSession();
+        int result = (int) session.registry().valueAsync(
+                "async_int_f", session, executor).get();
         assertEquals(38, result);
     }
 
