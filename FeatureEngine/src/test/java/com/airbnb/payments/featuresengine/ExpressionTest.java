@@ -215,7 +215,7 @@ public class ExpressionTest {
         }
 
         {
-            String expressionText = "(new TestUtils()).asyncSqrt(100)";
+            String expressionText = "(new TestUtils()).asyncMap(\"key_1\", 100)";
             Expression expression =
                     ExpressionFactory.create(
                             session.registry(),
@@ -227,12 +227,12 @@ public class ExpressionTest {
 
             expression.evalAsync(session, executor)
                     .thenAccept((res) -> {
-                        assertEquals(10, ((Map) res).get("key_1"));
+                        assertEquals(100, ((Map) res).get("key_1"));
                     }).get();
         }
 
         {
-            String expressionText = "(new TestUtils()).asyncSqrt(100)";
+            String expressionText = "(new TestUtils()).asyncMap(\"key_1\", 100)";
             Expression expression =
                     ExpressionFactory.create(
                             session.registry(),
@@ -244,7 +244,7 @@ public class ExpressionTest {
 
             expression.evalAsync(session, executor)
                     .thenAccept((res) -> {
-                        assertEquals(10, ((Map) res).get("key_1"));
+                        assertEquals(100, ((Map) res).get("key_1"));
                     }).get();
         }
     }

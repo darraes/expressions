@@ -40,6 +40,16 @@ public class TestUtils {
                         Integer.class.getName(),
                         "$i_int_a + $i_int_b"));
 
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "async_int_c",
+                        Integer.class.getName(),
+                        "TestUtils.asyncAdd($i_int_a, $i_int_b)",
+                        true,
+                        true,
+                        new String[]{TestUtils.class.getName()}));
+
         return new EvalSession(provider, registry, cache);
     }
 
@@ -52,10 +62,18 @@ public class TestUtils {
         return result;
     }
 
-    public CompletableFuture<Map> asyncSqrt(int x) {
-        Map<String, Integer> map = new HashMap<>();
-        map.put("key_1", (int) Math.sqrt(x));
+    public static CompletableFuture<Integer> asyncAdd(int x, int y) {
+        CompletableFuture<Integer> result = new CompletableFuture<>();
+        CompletableFuture.runAsync(
+                () -> {
+                    result.complete(x + y);
+                });
+        return result;
+    }
 
+    public CompletableFuture<Map> asyncMap(String key, Object value) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(key, value);
         return CompletableFuture.supplyAsync(() -> map);
     }
 }

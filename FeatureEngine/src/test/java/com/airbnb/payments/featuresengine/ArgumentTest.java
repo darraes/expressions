@@ -289,7 +289,7 @@ public class ArgumentTest {
             throws CompilationException, ExecutionException, InterruptedException {
         HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("i_int_a", 1);
-        provider.put("b", 8);
+        provider.put("i_int_b", 8);
 
 
         TestCache cache = new TestCache();
@@ -304,14 +304,15 @@ public class ArgumentTest {
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
-                        "b",
+                        "i_int_b",
                         Integer.class.getName()));
+
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
                         "c",
                         Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($i_int_a + $b)",
+                        "ArgumentTest.someAsyncMethod($i_int_a + $i_int_b)",
                         true,
                         true,
                         new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
@@ -321,7 +322,7 @@ public class ArgumentTest {
                 new ArgumentConfig(
                         "d",
                         Integer.class.getName(),
-                        "ArgumentTest.someAsyncMethod($b - $i_int_a)",
+                        "ArgumentTest.someAsyncMethod($i_int_b - $i_int_a)",
                         true,
                         true,
                         new String[]{"com.airbnb.payments.featuresengine.ArgumentTest"}));
