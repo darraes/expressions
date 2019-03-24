@@ -89,7 +89,7 @@ public class ExpressionTest {
         Expression expression = ExpressionFactory.create(
                 registry,
                 new ExpressionConfig(
-                        "\" trim_me \".trim()", String.class.getName()));
+                        "\"  trim_me  \".trim()", String.class.getName()));
 
         assertEquals("trim_me", expression.eval(null));
     }

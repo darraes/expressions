@@ -10,13 +10,13 @@ import org.codehaus.commons.compiler.IExpressionEvaluator;
 import org.codehaus.janino.ExpressionEvaluator;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class Expression {
+    private static Void VOID = null;
     // All metadata about the expression
     private ExpressionInfo info;
     // Actual expression evaluator
@@ -157,19 +157,38 @@ public class Expression {
         CompletableFuture.runAsync(
                 () -> {
                     try {
-                        // TODO Fetch the arguments serially against one another
-                        CompletableFuture[] futures = Arrays.stream(arguments)
-                                .map((argument) -> argument.valueAsync(
-                                        session,
-                                        executor))
-                                .toArray(CompletableFuture[]::new);
+                        // To avoid concurrent loading of possibly the same arguments
+                        // for the same session, we load the async arguments serially.
+                        // This should not be a problem as the engine is designed for
+                        // serving multiple requests in parallel and therefore the
+                        // the parallelism is achieve via the multi-request nature of
+                        // the engine, not through the arguments.
+                        //
+                        // As an example, one of the issues of loading the async args in
+                        // parallel is if different arguments depend on a common nested
+                        // argument. In this case, if both fetches start before the
+                        // other finishes, they will fetch the dependant argument
+                        // independently instead of leveraging the cached result of one
+                        // another and possibly can get different values causing
+                        // unattended consequences.
+                        CompletableFuture<Object> fetchAllTask = null;
+                        for (Argument arg : arguments) {
+                            if (fetchAllTask == null) {
+                                // First argument, start the chain
+                                fetchAllTask = arg.valueAsync(session, executor);
+                            } else {
+                                // Nesting all other arguments in the chain
+                                fetchAllTask = fetchAllTask.thenCompose(
+                                        (r) -> arg.valueAsync(session, executor));
+                            }
+                        }
 
-                        CompletableFuture.allOf(futures)
-                                .thenAccept(result::complete)
+                        fetchAllTask
+                                .thenAccept((r) -> result.complete(VOID))
                                 .exceptionally((e) -> {
                                     result.completeExceptionally(
                                             cause(e, this.info().getSrcExpression()));
-                                    return null;
+                                    return VOID;
                                 });
                     } catch (Exception e) {
                         result.completeExceptionally(
