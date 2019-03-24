@@ -289,7 +289,6 @@ public class ArgumentTest {
             throws CompilationException, ExecutionException, InterruptedException {
         Executor executor = Executors.newFixedThreadPool(2);
 
-
         {
             // Loading order of dependants first
             EvalSession session = TestUtils.testSession();

@@ -1,7 +1,9 @@
 package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.arguments.Argument;
+import com.google.common.collect.Sets;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ public class ExpressionInfo {
     private Class<?> returnType;
     private List<Argument> accessedArguments;
     private Set<Argument> dependentArguments;
+    private boolean commonDependency;
     private boolean isAsync;
     private String[] imports;
 
@@ -65,12 +68,23 @@ public class ExpressionInfo {
         return imports;
     }
 
-    public boolean hasIntersectingChains() {
-        // TODO Implement
-        return true;
+    public boolean hasCommonDependencies() {
+        return this.commonDependency;
     }
 
     private void loadDependencies() {
-        // TODO Implement
+        this.commonDependency = false;
+        this.dependentArguments = new HashSet<>();
+
+        for (Argument argument : this.accessedArguments) {
+            if (!Sets.intersection(
+                    this.dependentArguments,
+                    argument.dependencies()).isEmpty()) {
+                this.commonDependency = true;
+            }
+
+            this.dependentArguments.add(argument);
+            this.dependentArguments.addAll(argument.dependencies());
+        }
     }
 }

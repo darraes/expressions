@@ -267,6 +267,11 @@ public class ExpressionTest {
     }
 
     @Test
+    public void expressionArgumentDependencies() {
+        // TODO implement
+    }
+
+    @Test
     public void evaluateExceptionOnSyncEvalForAsyncExpression() {
         // TODO implement
     }
@@ -278,6 +283,11 @@ public class ExpressionTest {
 
     @Test
     public void evaluateMultipleArgumentTypeExpression() {
+        // TODO implement
+    }
+
+    @Test
+    public void evaluateSameArgumentMultipleTimes() {
         // TODO implement
     }
 }

@@ -160,7 +160,7 @@ public class Expression {
                     try {
                         // TODO Use DisjointSets to optimize this logic.
 
-                        if (this.info.hasIntersectingChains()) {
+                        if (this.info.hasCommonDependencies()) {
                             // Arguments have dependencies in common.
                             // To avoid racing when loading the same arguments in the
                             // same session, we load the async arguments serially when
@@ -262,7 +262,7 @@ public class Expression {
                     // $exp2 = '$exp1 + 10' -> return type = Integer
                     eval.setExpressionType(CompletableFuture.class);
                     eval.cook(info.getExpression());
-                } catch (CompileException e1) {
+                } catch (CompileException innerEx) {
                     throw e;
                 }
             } else {
