@@ -72,7 +72,7 @@ public class ExpressionFactoryTest {
         assertEquals(Integer.class, expression.info().getReturnType());
         assertEquals(0, expression.info().getAccessedArguments().size());
         assertNotNull(expression.info().getID());
-        assertArrayEquals(new String[0], expression.info().getDependencies());
+        assertArrayEquals(new String[0], expression.info().getImports());
     }
 
     @Test

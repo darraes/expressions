@@ -4,6 +4,7 @@ import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -56,8 +57,17 @@ public class NamedExpression extends Argument {
      * Fetches the value by actually computing the evaluation of the compiled
      * expression
      */
+    @Override
     protected CompletableFuture<Object> fetchAsync(
             EvalSession session, Executor executor) {
         return this.expression.evalAsync(session, executor);
+    }
+
+    /**
+     * Returns all arguments, recursively, that this argument depends on
+     */
+    @Override
+    public Set<Argument> dependencies() {
+        return this.expression.info().getDependentArguments();
     }
 }

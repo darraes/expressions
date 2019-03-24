@@ -10,6 +10,7 @@ import org.codehaus.commons.compiler.IExpressionEvaluator;
 import org.codehaus.janino.ExpressionEvaluator;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
@@ -157,39 +158,57 @@ public class Expression {
         CompletableFuture.runAsync(
                 () -> {
                     try {
-                        // To avoid concurrent loading of possibly the same arguments
-                        // for the same session, we load the async arguments serially.
-                        // This should not be a problem as the engine is designed for
-                        // serving multiple requests in parallel and therefore the
-                        // the parallelism is achieve via the multi-request nature of
-                        // the engine, not through the arguments.
-                        //
-                        // As an example, one of the issues of loading the async args in
-                        // parallel is if different arguments depend on a common nested
-                        // argument. In this case, if both fetches start before the
-                        // other finishes, they will fetch the dependant argument
-                        // independently instead of leveraging the cached result of one
-                        // another and possibly can get different values causing
-                        // unattended consequences.
-                        CompletableFuture<Object> fetchAllTask = null;
-                        for (Argument arg : arguments) {
-                            if (fetchAllTask == null) {
-                                // First argument, start the chain
-                                fetchAllTask = arg.valueAsync(session, executor);
-                            } else {
-                                // Nesting all other arguments in the chain
-                                fetchAllTask = fetchAllTask.thenCompose(
-                                        (r) -> arg.valueAsync(session, executor));
-                            }
-                        }
+                        // TODO Use DisjointSets to optimize this logic.
 
-                        fetchAllTask
-                                .thenAccept((r) -> result.complete(VOID))
-                                .exceptionally((e) -> {
-                                    result.completeExceptionally(
-                                            cause(e, this.info().getSrcExpression()));
-                                    return VOID;
-                                });
+                        if (this.info.hasIntersectingChains()) {
+                            // Arguments have dependencies in common.
+                            // To avoid racing when loading the same arguments in the
+                            // same session, we load the async arguments serially when
+                            // they share at least one dependency.
+                            //
+                            // As an example, one of the issues of loading the async
+                            // args in parallel is if different arguments depend on a
+                            // common nested argument. In this case, if both fetches
+                            // start before the other finishes, they will fetch the
+                            // dependant argument independently instead of leveraging
+                            // the cached result of one another and possibly can get
+                            // different values causing unattended consequences.
+                            CompletableFuture<Object> fetchAllTask = null;
+                            for (Argument arg : arguments) {
+                                if (fetchAllTask == null) {
+                                    // First argument, start the chain
+                                    fetchAllTask = arg.valueAsync(session, executor);
+                                } else {
+                                    // Nesting all other arguments in the chain
+                                    fetchAllTask = fetchAllTask.thenCompose(
+                                            (r) -> arg.valueAsync(session, executor));
+                                }
+                            }
+
+                            fetchAllTask
+                                    .thenAccept((r) -> result.complete(VOID))
+                                    .exceptionally((e) -> {
+                                        result.completeExceptionally(
+                                                cause(e, this.info.getSrcExpression()));
+                                        return VOID;
+                                    });
+                        } else {
+                            // Arguments have no dependencies in common and therefore
+                            // they can be load in parallel
+                            CompletableFuture[] futures = Arrays.stream(arguments)
+                                    .map((argument) -> argument.valueAsync(
+                                            session,
+                                            executor))
+                                    .toArray(CompletableFuture[]::new);
+
+                            CompletableFuture.allOf(futures)
+                                    .thenAccept(result::complete)
+                                    .exceptionally((e) -> {
+                                        result.completeExceptionally(
+                                                cause(e, this.info().getSrcExpression()));
+                                        return null;
+                                    });
+                        }
                     } catch (Exception e) {
                         result.completeExceptionally(
                                 cause(e, this.info().getSrcExpression()));
@@ -215,15 +234,15 @@ public class Expression {
 
         //Merge all imports (default and user) and set them
         String[] allImports =
-                new String[DEFAULT_IMPORTS.length + info.getDependencies().length];
+                new String[DEFAULT_IMPORTS.length + info.getImports().length];
         System.arraycopy(
                 DEFAULT_IMPORTS, 0, allImports, 0, DEFAULT_IMPORTS.length);
         System.arraycopy(
-                info.getDependencies(),
+                info.getImports(),
                 0,
                 allImports,
                 DEFAULT_IMPORTS.length,
-                info.getDependencies().length);
+                info.getImports().length);
         eval.setDefaultImports(allImports);
 
         // TODO Check when the expression gets destructed the compilation doesn't leak

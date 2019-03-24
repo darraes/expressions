@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine.expressions;
 import com.airbnb.payments.featuresengine.arguments.Argument;
 
 import java.util.List;
+import java.util.Set;
 
 public class ExpressionInfo {
     private String id;
@@ -10,8 +11,9 @@ public class ExpressionInfo {
     private String sourceExpression;
     private Class<?> returnType;
     private List<Argument> accessedArguments;
+    private Set<Argument> dependentArguments;
     private boolean isAsync;
-    private String[] dependencies;
+    private String[] imports;
 
     ExpressionInfo(String id,
                    String sourceExpression,
@@ -19,14 +21,16 @@ public class ExpressionInfo {
                    Class<?> returnType,
                    List<Argument> accessedArguments,
                    boolean isFromScript,
-                   String[] dependencies) {
+                   String[] imports) {
         this.id = id;
         this.sourceExpression = sourceExpression;
         this.expression = expression;
         this.returnType = returnType;
         this.accessedArguments = accessedArguments;
         this.isAsync = isFromScript;
-        this.dependencies = dependencies;
+        this.imports = imports;
+
+        this.loadDependencies();
     }
 
     public String getID() {
@@ -49,11 +53,24 @@ public class ExpressionInfo {
         return accessedArguments;
     }
 
+    public Set<Argument> getDependentArguments() {
+        return dependentArguments;
+    }
+
     public boolean isAsync() {
         return isAsync;
     }
 
-    public String[] getDependencies() {
-        return dependencies;
+    public String[] getImports() {
+        return imports;
+    }
+
+    public boolean hasIntersectingChains() {
+        // TODO Implement
+        return true;
+    }
+
+    private void loadDependencies() {
+        // TODO Implement
     }
 }

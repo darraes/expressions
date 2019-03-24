@@ -6,6 +6,7 @@ import com.airbnb.payments.featuresengine.errors.EvaluationException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -211,4 +212,9 @@ public abstract class Argument {
      */
     protected abstract CompletableFuture<Object> fetchAsync(
             EvalSession session, Executor executor);
+
+    /**
+     * Returns all arguments, recursively, that this argument depends on
+     */
+    public abstract Set<Argument> dependencies();
 }
