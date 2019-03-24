@@ -8,7 +8,6 @@ import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
 import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
-import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ExpressionFactoryTest {
-    private static EvalSession createTestSession() throws CompilationException {
+    private static EvalSession createTestSession() {
         ICache cache = new HashMapCache();
 
         HashMapInputProvider provider = new HashMapInputProvider();
@@ -61,7 +60,28 @@ public class ExpressionFactoryTest {
     }
 
     @Test
-    public void convertDoubleMatch() throws ClassNotFoundException {
+    public void expressionInfo() {
+        String expressionText = "1 + 3";
+        Expression expression = ExpressionFactory.create(
+                new ArgumentRegistry(),
+                new ExpressionConfig(expressionText, Integer.class.getName()));
+
+        assertEquals(expressionText, expression.info().getExpression());
+        assertEquals(expressionText, expression.info().getSrcExpression());
+        assertFalse(expression.info().isAsync());
+        assertEquals(Integer.class, expression.info().getReturnType());
+        assertEquals(0, expression.info().getAccessedArguments().size());
+        assertNotNull(expression.info().getID());
+        assertArrayEquals(new String[0], expression.info().getDependencies());
+    }
+
+    @Test
+    public void accessedArgumentsDetection() {
+        // TODO Implement
+    }
+
+    @Test
+    public void convertDoubleMatch() {
         EvalSession session = createTestSession();
 
         Expression expression = ExpressionFactory.create(

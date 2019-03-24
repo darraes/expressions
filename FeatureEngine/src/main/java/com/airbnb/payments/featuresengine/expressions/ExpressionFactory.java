@@ -5,9 +5,7 @@ import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,9 +82,16 @@ public class ExpressionFactory {
         }
 
         // Gets the argument definition from the registry
+        Set<String> seenArguments = new HashSet<>();
         ArrayList<Argument> arguments = new ArrayList<>();
         for (String s : matches) {
-            arguments.add(registry.get(s.substring(1)));
+            String name = s.substring(1);
+            if (seenArguments.contains(name)) {
+                continue;
+            }
+
+            seenArguments.add(name);
+            arguments.add(registry.get(name));
         }
 
         // We must handle the lengthier names first to prevent arguments with matching

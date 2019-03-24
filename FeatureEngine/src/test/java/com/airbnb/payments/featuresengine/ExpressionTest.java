@@ -18,23 +18,8 @@ import java.util.concurrent.Executors;
 import static org.junit.Assert.*;
 
 public class ExpressionTest {
-    @Test
-    public void expressionInfo() throws CompilationException {
-        String expressionText = "1 + 3";
-        Expression expression = ExpressionFactory.create(
-                new ArgumentRegistry(),
-                new ExpressionConfig(expressionText, Integer.class.getName()));
 
-        assertEquals(expressionText, expression.info().getExpression());
-        assertEquals(expressionText, expression.info().getSrcExpression());
-        assertFalse(expression.info().isAsync());
-        assertEquals(Integer.class, expression.info().getReturnType());
-        assertEquals(0, expression.info().getAccessedArguments().size());
-        assertNotNull(expression.info().getID());
-        assertArrayEquals(new String[0], expression.info().getDependencies());
-    }
-
-    @Test
+   @Test
     public void evaluateAllTypes() {
         // TODO Implement
     }

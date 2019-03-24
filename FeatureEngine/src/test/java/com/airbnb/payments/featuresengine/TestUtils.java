@@ -75,7 +75,7 @@ public class TestUtils {
                 new ArgumentConfig(
                         "async_int_d",
                         Integer.class.getName(),
-                        "TestUtils.asyncSub($i_int_b, $i_int_a)",
+                        "TestUtils.asyncSub(2*$i_int_b - $i_int_b, $i_int_a)",
                         true,
                         true,
                         new String[]{TestUtils.class.getName()}));
