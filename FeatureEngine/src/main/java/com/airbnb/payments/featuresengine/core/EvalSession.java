@@ -18,7 +18,6 @@ public class EvalSession {
     private ICache cache;
     private ArgumentRegistry registry;
     private IInputProvider arguments;
-    private ExpressionStack expressionStack;
 
 
     public EvalSession(IInputProvider provider,
@@ -27,7 +26,6 @@ public class EvalSession {
         this.cache = cache;
         this.registry = registry;
         this.arguments = provider;
-        this.expressionStack = new ExpressionStack();
     }
 
     /**
@@ -50,12 +48,5 @@ public class EvalSession {
      */
     public ICache cache() {
         return this.cache;
-    }
-
-    /**
-     * Stack to keep track of the nested expressions being current evaluated.
-     */
-    public ExpressionStack stack() {
-        return this.expressionStack;
     }
 }

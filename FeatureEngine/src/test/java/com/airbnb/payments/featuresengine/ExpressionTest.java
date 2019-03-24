@@ -26,7 +26,7 @@ public class ExpressionTest {
                 new ExpressionConfig(expressionText, Integer.class.getName()));
 
         assertEquals(expressionText, expression.info().getExpression());
-        assertEquals(expressionText, expression.info().getSourceExpression());
+        assertEquals(expressionText, expression.info().getSrcExpression());
         assertFalse(expression.info().isAsync());
         assertEquals(Integer.class, expression.info().getReturnType());
         assertEquals(0, expression.info().getAccessedArguments().size());

@@ -33,7 +33,7 @@ public class Expression {
             this.eval = buildExpressionEvaluator(this.info);
         } catch (CompileException e) {
             throw new CompilationException(
-                    e, "Failed compiling %s", this.info.getSourceExpression());
+                    e, "Failed compiling %s", this.info.getSrcExpression());
         }
     }
 
@@ -64,13 +64,13 @@ public class Expression {
             throw new EvaluationException(
                     "Async expressions must be computed using evalAsync()."
                             + " Expression (%s) was not",
-                    this.info.getSourceExpression());
+                    this.info.getSrcExpression());
         }
 
         try {
             return this.eval.evaluate(new Object[]{session, null});
         } catch (Exception e) {
-            throw findTrueException(e, this.info().getSourceExpression());
+            throw cause(e, this.info().getSrcExpression());
         }
 
     }
@@ -115,9 +115,7 @@ public class Expression {
                                     .thenApply(result::complete)
                                     .exceptionally((e) -> {
                                         result.completeExceptionally(
-                                                findTrueException(
-                                                        e,
-                                                        this.info().getSourceExpression()));
+                                                cause(e, this.info.getSrcExpression()));
                                         return null;
                                     });
                             ;
@@ -128,15 +126,12 @@ public class Expression {
                         }
                     } catch (Exception e) {
                         result.completeExceptionally(
-                                findTrueException(
-                                        e, this.info().getSourceExpression()));
+                                cause(e, this.info.getSrcExpression()));
                     }
                 })
                 .exceptionally((e) -> {
                     result.completeExceptionally(
-                            findTrueException(
-                                    e,
-                                    this.info().getSourceExpression()));
+                            cause(e, this.info.getSrcExpression()));
                     return null;
                 });
         return result;
@@ -172,16 +167,12 @@ public class Expression {
                                 .thenAccept(result::complete)
                                 .exceptionally((e) -> {
                                     result.completeExceptionally(
-                                            findTrueException(
-                                                    e,
-                                                    this.info().getSourceExpression()));
+                                            cause(e, this.info().getSrcExpression()));
                                     return null;
                                 });
                     } catch (Exception e) {
                         result.completeExceptionally(
-                                findTrueException(
-                                        e,
-                                        this.info().getSourceExpression()));
+                                cause(e, this.info().getSrcExpression()));
                     }
                 }, executor);
 
@@ -251,7 +242,7 @@ public class Expression {
      * @param e Exception to be searched
      * @return Root error
      */
-    private static EvaluationException findTrueException(Throwable e, String context) {
+    private static EvaluationException cause(Throwable e, String context) {
         if (e instanceof EvaluationException) {
             return ((EvaluationException) e);
         }

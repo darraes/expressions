@@ -113,28 +113,11 @@ public abstract class Argument {
      * @return Result of the argument fetching
      */
     final Object value(EvalSession session) {
-        if (session.stack().contains(this.getName())) {
-            throw new EvaluationException(
-                    "Circular dependency found on argument %s",
-                    this.getName());
-        }
-
         if (this.isCacheable() && session.cache().contains(this.getName())) {
             return session.cache().get(this.getName());
         }
 
-        Object result;
-        try {
-            // Push current argument into the nested stack to track circular
-            // dependency
-            session.stack().push(this.getName());
-
-            result = this.fetch(session);
-        } finally {
-            // Guarantee to pop the argument from the stack
-            session.stack().pop();
-        }
-
+        Object result = this.fetch(session);
         return this.processResult(session, result);
     }
 
@@ -152,41 +135,22 @@ public abstract class Argument {
         CompletableFuture<Object> result = new CompletableFuture<>();
         CompletableFuture.runAsync(
                 () -> {
-                    boolean localArgPush = false;
                     try {
-                        if (session.stack().contains(this.getName())) {
-                            result.completeExceptionally(new EvaluationException(
-                                    "Circular dependency found on argument %s",
-                                    this.getName()));
-                            return;
-                        }
-
                         if (this.isCacheable()
                                 && session.cache().contains(this.getName())) {
                             result.complete(session.cache().get(this.getName()));
                             return;
                         }
 
-                        // Push current argument into the nested stack to track circular
-                        // dependency
-                        session.stack().push(this.getName());
-                        localArgPush = true;
-
                         this.fetchAsync(session, executor)
                                 .thenAccept((res) -> {
-                                    res = processResult(session, res);
-                                    session.stack().pop();
-                                    result.complete(res);
+                                    result.complete(processResult(session, res));
                                 })
                                 .exceptionally((e) -> {
-                                    session.stack().pop();
                                     result.completeExceptionally(e.getCause());
                                     return null;
                                 });
                     } catch (Exception e) {
-                        if (localArgPush) {
-                            session.stack().pop();
-                        }
                         result.completeExceptionally(e);
                     }
                 }, executor);

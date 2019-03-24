@@ -37,7 +37,7 @@ public class ExpressionInfo {
         return expression;
     }
 
-    public String getSourceExpression() {
+    public String getSrcExpression() {
         return sourceExpression;
     }
 
