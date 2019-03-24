@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="eb29c907-3943-417d-8339-1c31e4f9ebcd" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/core/EvalSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/core/EvalSession.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/helpers/ExpressionStack.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestUtils.java" afterDir="false" />
     </list>
@@ -34,8 +31,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2916">
-              <caret line="169" column="53" selection-start-line="169" selection-start-column="53" selection-end-line="169" selection-end-column="53" />
+            <state relative-caret-position="387">
+              <caret line="156" column="35" lean-forward="true" selection-start-line="156" selection-start-column="35" selection-end-line="156" selection-end-column="35" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -46,20 +43,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/Argument.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-612">
-              <caret line="145" column="54" selection-start-line="145" selection-start-column="54" selection-end-line="145" selection-end-column="54" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="142">
-              <caret line="21" column="3" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
+            <state relative-caret-position="551">
+              <caret line="39" column="49" lean-forward="true" selection-start-line="39" selection-start-column="49" selection-end-line="39" selection-end-column="49" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -68,6 +53,18 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="432">
+              <caret line="62" column="33" selection-start-line="62" selection-start-column="33" selection-end-line="62" selection-end-column="33" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="162">
@@ -103,24 +100,11 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionFactory.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
-              <caret line="92" column="36" selection-start-line="92" selection-start-column="36" selection-end-line="92" selection-end-column="36" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="77" column="65" selection-start-line="77" selection-start-column="65" selection-end-line="77" selection-end-column="65" />
+            <state relative-caret-position="126">
+              <caret line="10" column="65" lean-forward="true" selection-start-line="10" selection-start-column="65" selection-end-line="10" selection-end-column="65" />
               <folding>
-                <element signature="imports" expanded="true" />
                 <element signature="e#717#718#0" expanded="true" />
                 <element signature="e#750#751#0" expanded="true" />
                 <element signature="e#4269#4270#0" expanded="true" />
@@ -210,14 +194,14 @@
         <option value="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/cache/HashMapCache.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestCache.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/errors/EvaluationException.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ArgumentTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/core/EvalSession.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/Argument.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionFactory.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestUtils.java" />
-        <option value="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestUtils.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" />
+        <option value="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java" />
       </list>
     </option>
   </component>
@@ -528,34 +512,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="All_Tests - 2019.03.23 at 11h 33m 39s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 26m 23s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 11h 34m 20s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 27m 04s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 11h 34m 28s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 30m 24s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 17h 43m 06s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 32m 01s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 17h 55m 21s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 33m 13s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 17h 55m 34s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 35m 09s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 17h 57m 51s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 35m 26s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 18h 00m 01s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 35m 44s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 18h 04m 28s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 37m 12s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="All_Tests - 2019.03.23 at 18h 05m 00s.xml">
+    <history-entry file="All_Tests - 2019.03.24 at 09h 38m 13s.xml">
       <configuration name="All Tests" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -576,7 +560,7 @@
       <window_info id="UI Designer" order="1" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info id="aws.explorer" order="3" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="4" visible="true" weight="0.2732475" />
+      <window_info content_ui="combo" id="Project" order="4" visible="true" weight="0.2446352" />
       <window_info id="Structure" order="5" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Messages" order="0" weight="0.24076433" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
@@ -584,7 +568,7 @@
       <window_info anchor="bottom" id="Version Control" order="3" weight="0.3299363" />
       <window_info anchor="bottom" id="Message" order="4" />
       <window_info anchor="bottom" id="Find" order="5" weight="0.3299363" />
-      <window_info anchor="bottom" id="Run" order="6" weight="0.19617835" />
+      <window_info active="true" anchor="bottom" id="Run" order="6" visible="true" weight="0.19617835" />
       <window_info anchor="bottom" id="Debug" order="7" weight="0.45859873" />
       <window_info anchor="bottom" id="Cvs" order="8" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="9" weight="0.4" />
@@ -931,42 +915,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2916">
-          <caret line="169" column="53" selection-start-line="169" selection-start-column="53" selection-end-line="169" selection-end-column="53" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/ArgumentRegistry.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="508">
           <caret line="92" column="20" selection-start-line="92" selection-start-column="20" selection-end-line="92" selection-end-column="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/core/EvalSession.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="26" column="34" selection-start-line="26" selection-start-column="34" selection-end-line="26" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1490#1491#0" expanded="true" />
-            <element signature="e#1526#1527#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/Argument.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-612">
-          <caret line="145" column="54" selection-start-line="145" selection-start-column="54" selection-end-line="145" selection-end-column="54" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -993,6 +945,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="59" selection-start-line="9" selection-start-column="59" selection-end-line="9" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="10" column="65" lean-forward="true" selection-start-line="10" selection-start-column="65" selection-end-line="10" selection-end-column="65" />
+          <folding>
+            <element signature="e#717#718#0" expanded="true" />
+            <element signature="e#750#751#0" expanded="true" />
+            <element signature="e#4269#4270#0" expanded="true" />
+            <element signature="e#4296#4297#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionFactory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="430">
@@ -1003,34 +975,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestUtils.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/core/EvalSession.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="77" column="65" selection-start-line="77" selection-start-column="65" selection-end-line="77" selection-end-column="65" />
+        <state relative-caret-position="340">
+          <caret line="26" column="34" selection-start-line="26" selection-start-column="34" selection-end-line="26" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#717#718#0" expanded="true" />
-            <element signature="e#750#751#0" expanded="true" />
-            <element signature="e#4269#4270#0" expanded="true" />
-            <element signature="e#4296#4297#0" expanded="true" />
+            <element signature="e#1490#1491#0" expanded="true" />
+            <element signature="e#1526#1527#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="387">
+          <caret line="156" column="35" lean-forward="true" selection-start-line="156" selection-start-column="35" selection-end-line="156" selection-end-column="35" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/Argument.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="551">
+          <caret line="39" column="49" lean-forward="true" selection-start-line="39" selection-start-column="49" selection-end-line="39" selection-end-column="49" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="142">
-          <caret line="21" column="3" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
+        <state relative-caret-position="432">
+          <caret line="62" column="33" selection-start-line="62" selection-start-column="33" selection-end-line="62" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="9" column="59" selection-start-line="9" selection-start-column="59" selection-end-line="9" selection-end-column="59" />
         </state>
       </provider>
     </entry>

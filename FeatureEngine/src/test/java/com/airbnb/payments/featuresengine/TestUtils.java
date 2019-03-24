@@ -6,7 +6,10 @@ import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
 import com.airbnb.payments.featuresengine.cache.HashMapCache;
 import com.airbnb.payments.featuresengine.cache.ICache;
 import com.airbnb.payments.featuresengine.config.ArgumentConfig;
+import com.airbnb.payments.featuresengine.config.ExpressionConfig;
 import com.airbnb.payments.featuresengine.core.EvalSession;
+import com.airbnb.payments.featuresengine.expressions.Expression;
+import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +17,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
 public class TestUtils {
+
+    public static Expression expression(String exp, Class<?> type) {
+        return ExpressionFactory.create(
+                new ArgumentRegistry(),
+                new ExpressionConfig(
+                        exp,
+                        type.getName()));
+    }
+
     public static EvalSession testSession() {
         return testSession(null);
     }

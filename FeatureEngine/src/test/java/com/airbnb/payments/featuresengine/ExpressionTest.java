@@ -19,9 +19,14 @@ import static org.junit.Assert.*;
 
 public class ExpressionTest {
 
-   @Test
+    @Test
     public void evaluateAllTypes() {
         // TODO Implement
+        {
+            Expression expression = TestUtils.expression(
+                    "(char) 65", Character.class);
+            assertEquals('A', expression.eval(null));
+        }
     }
 
 
@@ -29,55 +34,52 @@ public class ExpressionTest {
     public void evaluateStaticMethod()
             throws CompilationException, EvaluationException {
         {
-            Expression expression = ExpressionFactory.create(
-                    new ArgumentRegistry(),
-                    new ExpressionConfig(
-                            "Math.max(3, 10) - Math.min(3, 10)",
-                            Integer.class.getName()));
-
+            Expression expression = TestUtils.expression(
+                    "Math.max(3, 10) - Math.min(3, 10)", Integer.class);
             assertEquals(7, expression.eval(null));
         }
 
         {
-            Expression expression = ExpressionFactory.create(
-                    new ArgumentRegistry(),
-                    new ExpressionConfig(
-                            "Math.max(3L, 10L) - Math.min(3L, 10L)",
-                            Long.class.getName()));
-
+            Expression expression = TestUtils.expression(
+                    "Math.max(3L, 10L) - Math.min(3L, 10L)", Long.class);
             assertEquals(7L, expression.eval(null));
         }
 
         {
-            Expression expression = ExpressionFactory.create(
-                    new ArgumentRegistry(),
-                    new ExpressionConfig(
-                            "Math.max(3.0, 10.0) - Math.min(3.0, 10.0)",
-                            Double.class.getName()));
-
+            Expression expression = TestUtils.expression(
+                    "Math.max(3.0, 10.0) - Math.min(3.0, 10.0)", Double.class);
             assertEquals(7.0, expression.eval(null));
         }
 
         {
-            Expression expression = ExpressionFactory.create(
-                    new ArgumentRegistry(),
-                    new ExpressionConfig(
-                            "Math.max(3.0f, 10.0f) - Math.min(3.0f, 10.0f)",
-                            Float.class.getName()));
-
+            Expression expression = TestUtils.expression(
+                    "Math.max(3.0f, 10.0f) - Math.min(3.0f, 10.0f)", Float.class);
             assertEquals(7.0f, expression.eval(null));
         }
 
         {
-            Expression expression = ExpressionFactory.create(
-                    new ArgumentRegistry(),
-                    new ExpressionConfig(
-                            "String.format(new String(\"test %s\"), \'A\')",
-                            String.class.getName()));
+            Expression expression = TestUtils.expression(
+                    "Short.decode(\"7\")", Short.class);
+            assertEquals((short) 7, expression.eval(null));
+        }
 
+        {
+            Expression expression = TestUtils.expression(
+                    "String.format(new String(\"test %s\"), \'A\')", String.class);
             assertEquals("test A", expression.eval(null));
         }
 
+        {
+            Expression expression = TestUtils.expression(
+                    "Character.toLowerCase('A')", Character.class);
+            assertEquals('a', expression.eval(null));
+        }
+
+        {
+            Expression expression = TestUtils.expression(
+                    "Byte.parseByte(\"1\")", Byte.class);
+            assertEquals(((byte) 1), expression.eval(null));
+        }
     }
 
     @Test

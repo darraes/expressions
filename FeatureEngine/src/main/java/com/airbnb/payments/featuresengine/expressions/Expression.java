@@ -157,6 +157,7 @@ public class Expression {
         CompletableFuture.runAsync(
                 () -> {
                     try {
+                        // TODO Fetch the arguments serially against one another
                         CompletableFuture[] futures = Arrays.stream(arguments)
                                 .map((argument) -> argument.valueAsync(
                                         session,
