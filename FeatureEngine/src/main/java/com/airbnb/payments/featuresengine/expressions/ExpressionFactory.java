@@ -39,7 +39,7 @@ public class ExpressionFactory {
                     arguments);
 
             return new Expression(
-                    new ExpressionInfo(
+                    new ExpressionMetadata(
                             generateID(),
                             config.getExpression(),
                             finalExpression,

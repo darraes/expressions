@@ -19,7 +19,7 @@ import java.util.concurrent.Executor;
 public class Expression {
     private static Void VOID = null;
     // All metadata about the expression
-    private ExpressionInfo info;
+    private ExpressionMetadata info;
     // Actual expression evaluator
     private IExpressionEvaluator eval;
 
@@ -27,7 +27,7 @@ public class Expression {
             "java.util.concurrent.CompletableFuture",
     };
 
-    Expression(ExpressionInfo info) {
+    Expression(ExpressionMetadata info) {
         this.info = info;
 
         try {
@@ -43,7 +43,7 @@ public class Expression {
      *
      * @return The original expression metadata
      */
-    public final ExpressionInfo info() {
+    public final ExpressionMetadata info() {
         return this.info;
     }
 
@@ -222,7 +222,7 @@ public class Expression {
      * Builds a Janino ExpressionEvaluator to serve the given @expression evaluations
      */
     private static IExpressionEvaluator buildExpressionEvaluator(
-            ExpressionInfo info)
+            ExpressionMetadata info)
             throws CompileException {
         IExpressionEvaluator eval = new ExpressionEvaluator();
 

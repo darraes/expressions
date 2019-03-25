@@ -19,11 +19,30 @@ import java.util.function.BiFunction;
 public class TestUtils {
 
     public static Expression expression(String exp, Class<?> type) {
+        return expression(exp, type, null);
+    }
+
+    public static Expression expression(
+            String exp, Class<?> type, EvalSession session) {
+        return expression(exp, type, session, false);
+    }
+
+    public static Expression asyncExpression(
+            String exp, Class<?> type, EvalSession session) {
+        return expression(exp, type, session, true);
+    }
+
+    public static Expression expression(
+            String exp, Class<?> type, EvalSession session, boolean isAsync) {
+        ArgumentRegistry registry = (session != null)
+                ? session.registry() : new ArgumentRegistry();
         return ExpressionFactory.create(
-                new ArgumentRegistry(),
+                registry,
                 new ExpressionConfig(
                         exp,
-                        type.getName()));
+                        type.getName(),
+                        isAsync,
+                        new String[]{TestUtils.class.getName()}));
     }
 
     public static EvalSession testSession() {

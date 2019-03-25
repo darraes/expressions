@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ExpressionInfo {
+public class ExpressionMetadata {
     private String id;
     private String expression;
     private String sourceExpression;
@@ -18,13 +18,13 @@ public class ExpressionInfo {
     private boolean isAsync;
     private String[] imports;
 
-    ExpressionInfo(String id,
-                   String sourceExpression,
-                   String expression,
-                   Class<?> returnType,
-                   List<Argument> accessedArguments,
-                   boolean isFromScript,
-                   String[] imports) {
+    ExpressionMetadata(String id,
+                       String sourceExpression,
+                       String expression,
+                       Class<?> returnType,
+                       List<Argument> accessedArguments,
+                       boolean isFromScript,
+                       String[] imports) {
         this.id = id;
         this.sourceExpression = sourceExpression;
         this.expression = expression;
