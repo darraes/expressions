@@ -189,25 +189,31 @@ public class ExpressionTest {
     @Test
     public void expressionArgumentDependencies() {
         // TODO implement
+        // Check if the dependency chain is properly tracked
+        // Multiple tests
     }
 
     @Test
     public void evaluateExceptionOnSyncEvalForAsyncExpression() {
         // TODO implement
+        // Making sure only the async methods can serve async expression
     }
 
     @Test
     public void evaluateArgumentMethodCallExpression() {
         // TODO implement
+        // Calling a method on an argument
     }
 
     @Test
     public void evaluateMultipleArgumentTypeExpression() {
         // TODO implement
+        // Same expression playing around multiple types
     }
 
     @Test
     public void evaluateSameArgumentMultipleTimes() {
         // TODO implement
+        // Same argument appearing several times on the same expression
     }
 }

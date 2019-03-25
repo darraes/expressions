@@ -57,6 +57,7 @@ public class TestUtils {
         HashMapInputProvider provider = new HashMapInputProvider();
         provider.put("i_int_a", 1);
         provider.put("i_int_b", 8);
+        provider.put("i_int_c", 30);
 
         ArgumentRegistry registry = new ArgumentRegistry();
 
@@ -78,6 +79,14 @@ public class TestUtils {
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
+                        "i_int_c",
+                        Integer.class.getName(),
+                        false,
+                        false));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
                         "e_int_c",
                         Integer.class.getName(),
                         "$i_int_a + $i_int_b"));
@@ -88,6 +97,15 @@ public class TestUtils {
                         "e_int_d",
                         Integer.class.getName(),
                         "$i_int_b - $i_int_a",
+                        false,
+                        false));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "e_int_e",
+                        Integer.class.getName(),
+                        "(int)($i_int_c / 2)",
                         false,
                         false));
 
@@ -126,6 +144,24 @@ public class TestUtils {
                         "async_int_f",
                         Integer.class.getName(),
                         "2 * $async_int_e",
+                        true,
+                        true));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "async_int_g",
+                        Integer.class.getName(),
+                        "2 * $e_int_e",
+                        true,
+                        true));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "async_int_h",
+                        Integer.class.getName(),
+                        "$async_int_g + $async_int_c",
                         true,
                         true));
 

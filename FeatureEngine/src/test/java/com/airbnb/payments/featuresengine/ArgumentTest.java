@@ -314,6 +314,13 @@ public class ArgumentTest {
             assertEquals(38, session.registry().valueAsync(
                     "async_int_f", session, executor).get());
         }
+
+        {
+            // No common dependency on argument chain
+            EvalSession session = TestUtils.testSession();
+            assertEquals(39, session.registry().valueAsync(
+                    "async_int_h", session, executor).get());
+        }
     }
 
     @Test
