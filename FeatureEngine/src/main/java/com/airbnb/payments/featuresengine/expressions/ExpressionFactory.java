@@ -44,7 +44,7 @@ public class ExpressionFactory {
                             config.getExpression(),
                             finalExpression,
                             Class.forName(config.getReturnType()),
-                            arguments,
+                            new HashSet<>(arguments),
                             config.isAsync(),
                             config.getDependencies()));
         } catch (ClassNotFoundException e) {
@@ -54,6 +54,13 @@ public class ExpressionFactory {
         }
     }
 
+    /**
+     * TODO Explain
+     *
+     * @param expression
+     * @param arguments
+     * @return
+     */
     private static String processSyncExpression(
             String expression, List<Argument> arguments) {
         // Replaces the compressed syntax by the argument access logic
@@ -71,6 +78,13 @@ public class ExpressionFactory {
         return result;
     }
 
+    /**
+     * TODO Explain
+     *
+     * @param registry
+     * @param expression
+     * @return
+     */
     private static List<Argument> parseArguments(
             ArgumentRegistry registry, String expression) {
         Matcher matcher = regex.matcher(expression);

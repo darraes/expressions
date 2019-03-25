@@ -21,7 +21,7 @@ public class ExpressionMetadata {
     // The type the expression evaluates to
     private Class<?> returnType;
     // The arguments **directly** accessed by the expression
-    private List<Argument> accessedArguments;
+    private Set<Argument> accessedArguments;
     // All arguments in the nested dependencies used on this expression (recursively)
     private Set<Argument> dependentArguments;
     // All class imports used on this expression
@@ -45,7 +45,7 @@ public class ExpressionMetadata {
                        String sourceExpression,
                        String expression,
                        Class<?> returnType,
-                       List<Argument> accessedArguments,
+                       Set<Argument> accessedArguments,
                        boolean isAsync,
                        String[] imports) {
         this.id = id;
@@ -99,9 +99,9 @@ public class ExpressionMetadata {
     /**
      * The arguments <b>directly</b> accessed by the expression
      *
-     * @return List with all unique top top level arguments
+     * @return Set with all unique top top level arguments
      */
-    public List<Argument> getAccessedArguments() {
+    public Set<Argument> getAccessedArguments() {
         return accessedArguments;
     }
 
