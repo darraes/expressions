@@ -105,6 +105,25 @@ public abstract class Argument {
         return this.isAsync;
     }
 
+    @Override
+    public int hashCode() {
+        return this.name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (!(that instanceof Argument)) {
+            return false;
+        }
+
+        return this.name.equals(((Argument) that).getName());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s)", this.name, this.returnType.getName());
+    }
+
     /**
      * Gets the value of of the current argument. If the argument is cacheable, the
      * first call will cache the result and further calls will grab the result from

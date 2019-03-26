@@ -1,14 +1,17 @@
 package com.airbnb.payments.featuresengine;
 
-import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
-import com.airbnb.payments.featuresengine.config.ExpressionConfig;
+import com.airbnb.payments.featuresengine.arguments.Argument;
+import com.airbnb.payments.featuresengine.arguments.InputArgument;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
-import com.airbnb.payments.featuresengine.expressions.ExpressionFactory;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -188,9 +191,72 @@ public class ExpressionTest {
 
     @Test
     public void expressionArgumentDependencies() {
-        // TODO implement
-        // Check if the dependency chain is properly tracked
-        // Multiple tests
+        EvalSession session = TestUtils.testSession();
+
+        { // Checks if the argument dependency is exactly how it should be
+            Expression expression = TestUtils.asyncExpression(
+                    "$async_int_f > 1.0",
+                    Boolean.class,
+                    session);
+            Set<?> deps1 = expression.info().getDependentArguments();
+            Set<?> deps2 = new HashSet<>(
+                    Arrays.asList(
+                            TestUtils.argument(
+                                    "async_int_f",
+                                    Integer.class),
+                            TestUtils.argument(
+                                    "async_int_e",
+                                    Integer.class),
+                            TestUtils.argument(
+                                    "async_int_d",
+                                    Integer.class),
+                            TestUtils.argument(
+                                    "async_int_c",
+                                    Integer.class),
+                            TestUtils.argument(
+                                    "i_int_a",
+                                    Integer.class),
+                            TestUtils.argument(
+                                    "i_int_b",
+                                    Integer.class)
+                    ));
+
+            assertTrue(Sets.difference(deps1, deps2).isEmpty());
+            assertTrue(Sets.difference(deps2, deps1).isEmpty());
+        }
+
+        { // Checks when the argument dependencies have no common arguments
+            Expression exp1 = TestUtils.asyncExpression(
+                    "$async_int_f > 1.0",
+                    Boolean.class,
+                    session);
+            Expression exp2 = TestUtils.asyncExpression(
+                    "$async_int_g > 1.0",
+                    Boolean.class,
+                    session);
+
+            {
+                Set<Argument> diff = new HashSet<>();
+                Sets.difference(
+                        exp1.info().getDependentArguments(),
+                        exp2.info().getDependentArguments()).copyInto(diff);
+                assertTrue(
+                        Sets.difference(
+                                diff,
+                                exp1.info().getDependentArguments()).isEmpty());
+            }
+
+            {
+                Set<Argument> diff = new HashSet<>();
+                Sets.difference(
+                        exp2.info().getDependentArguments(),
+                        exp1.info().getDependentArguments()).copyInto(diff);
+                assertTrue(
+                        Sets.difference(
+                                diff,
+                                exp2.info().getDependentArguments()).isEmpty());
+            }
+        }
     }
 
     @Test

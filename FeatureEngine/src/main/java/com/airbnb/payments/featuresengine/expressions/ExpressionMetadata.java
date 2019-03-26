@@ -4,7 +4,6 @@ import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.google.common.collect.Sets;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -149,7 +148,6 @@ public class ExpressionMetadata {
     private void loadDependencies() {
         this.commonDependency = false;
         this.dependentArguments = new HashSet<>();
-
         for (Argument argument : this.accessedArguments) {
             if (!Sets.intersection(
                     this.dependentArguments,

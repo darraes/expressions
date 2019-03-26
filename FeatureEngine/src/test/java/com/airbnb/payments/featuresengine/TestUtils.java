@@ -1,5 +1,6 @@
 package com.airbnb.payments.featuresengine;
 
+import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.airbnb.payments.featuresengine.arguments.ArgumentFactory;
 import com.airbnb.payments.featuresengine.arguments.ArgumentRegistry;
 import com.airbnb.payments.featuresengine.arguments.HashMapInputProvider;
@@ -43,6 +44,17 @@ public class TestUtils {
                         type.getName(),
                         isAsync,
                         new String[]{TestUtils.class.getName()}));
+    }
+
+    public static Argument argument(String name, Class<?> type) {
+        return ArgumentFactory.create(
+                new ArgumentRegistry(),
+                new ArgumentConfig(
+                        name,
+                        type.getName(),
+                        true,
+                        false
+                ));
     }
 
     public static EvalSession testSession() {
