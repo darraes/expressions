@@ -333,15 +333,50 @@ public class ExpressionTest {
     }
 
     @Test
-    public void evaluateArgumentMethodCallExpression() {
-        // TODO implement
-        // Calling a method on an argument
+    public void evaluateArgumentMethodCallExpression()
+            throws ExecutionException, InterruptedException {
+        EvalSession session = TestUtils.testSession();
+        Executor executor = Executors.newFixedThreadPool(2);
+        String expText = "(Integer) $sync_map.values().stream()"
+                + ".distinct().findAny().get()";
+        {
+            Expression exp1 = TestUtils.asyncExpression(
+                    expText,
+                    Integer.class,
+                    session);
+            assertEquals(100, exp1.evalAsync(session, executor).get());
+        }
+
+        {
+            Expression exp1 = TestUtils.expression(
+                    expText,
+                    Integer.class,
+                    session);
+            assertEquals(100, exp1.eval(session));
+        }
     }
 
     @Test
-    public void evaluateMultipleArgumentTypeExpression() {
-        // TODO implement
-        // Same expression playing around multiple types
+    public void evaluateMultipleArgumentTypeExpression()
+            throws ExecutionException, InterruptedException {
+        EvalSession session = TestUtils.testSession();
+        Executor executor = Executors.newFixedThreadPool(2);
+
+        {
+            Expression exp1 = TestUtils.asyncExpression(
+                    "$i_int_a > 10 || ($i_string_b == \"sb\" && $i_double_a < 0.4)",
+                    Boolean.class,
+                    session);
+            assertEquals(true, exp1.evalAsync(session, executor).get());
+        }
+
+        {
+            Expression exp1 = TestUtils.expression(
+                    "$i_int_a > 10 || ($i_string_b == \"sb\" && $i_double_a > 0.4)",
+                    Boolean.class,
+                    session);
+            assertEquals(false, exp1.eval(session));
+        }
     }
 
     @Test
@@ -350,7 +385,7 @@ public class ExpressionTest {
         EvalSession session = TestUtils.testSession();
         Executor executor = Executors.newFixedThreadPool(2);
 
-        { // Checks when the same argument appears multiple times
+        {
             Expression exp1 = TestUtils.asyncExpression(
                     "((double)($i_int_a + $i_int_a + $i_int_a))"
                             + " / ($e_int_e + $e_int_e) <= 0.09",
@@ -359,7 +394,7 @@ public class ExpressionTest {
             assertEquals(false, exp1.evalAsync(session, executor).get());
         }
 
-        { // Checks when the same argument appears multiple times
+        {
             Expression exp1 = TestUtils.expression(
                     "((double)($i_int_a + $i_int_a + $i_int_a))"
                             + " / ($e_int_e + $e_int_e) <= 0.1",

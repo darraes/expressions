@@ -75,6 +75,9 @@ public class TestUtils {
         provider.put("i_int_a", 1);
         provider.put("i_int_b", 8);
         provider.put("i_int_c", 30);
+        provider.put("i_string_a", "sa");
+        provider.put("i_string_b", "sb");
+        provider.put("i_double_a", 0.035);
 
         ArgumentRegistry registry = new ArgumentRegistry();
 
@@ -106,6 +109,30 @@ public class TestUtils {
                 new ArgumentConfig(
                         "i_int_missing",
                         Integer.class.getName(),
+                        false,
+                        false));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "i_string_a",
+                        String.class.getName(),
+                        false,
+                        false));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "i_string_b",
+                        String.class.getName(),
+                        false,
+                        false));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        "i_double_a",
+                        Double.class.getName(),
                         false,
                         false));
 
@@ -203,6 +230,16 @@ public class TestUtils {
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
+                        "sync_map",
+                        Map.class.getName(),
+                        "(new TestUtils()).syncMap(\"key_1\", 100)",
+                        true,
+                        false,
+                        new String[]{TestUtils.class.getName()}));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
                         "async_int_from_map",
                         Integer.class.getName(),
                         "(Integer) $async_map.get(\"key_1\")",
@@ -242,9 +279,13 @@ public class TestUtils {
         return result;
     }
 
-    public CompletableFuture<Map> asyncMap(String key, Object value) {
+    public Map syncMap(String key, Object value) {
         Map<String, Object> map = new HashMap<>();
         map.put(key, value);
-        return CompletableFuture.supplyAsync(() -> map);
+        return map;
+    }
+
+    public CompletableFuture<Map> asyncMap(String key, Object value) {
+        return CompletableFuture.supplyAsync(() -> syncMap(key, value));
     }
 }
