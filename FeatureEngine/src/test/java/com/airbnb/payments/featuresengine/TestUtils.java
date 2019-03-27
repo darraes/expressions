@@ -104,6 +104,14 @@ public class TestUtils {
         ArgumentFactory.create(
                 registry,
                 new ArgumentConfig(
+                        "i_int_missing",
+                        Integer.class.getName(),
+                        false,
+                        false));
+
+        ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
                         "e_int_c",
                         Integer.class.getName(),
                         "$i_int_a + $i_int_b"));

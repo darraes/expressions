@@ -105,12 +105,41 @@ public class ExpressionTest {
     @Test
     public void handleExceptions() {
         EvalSession session = TestUtils.testSession();
+        Executor executor = Executors.newFixedThreadPool(2);
+
         {
-            // Argument doesn't exist
+            // Argument not declared
             try {
                 TestUtils.expression("$dont_exists", Integer.class);
                 fail();
             } catch (CompilationException e) {
+            } catch (Exception e) {
+                fail();
+            }
+        }
+
+        {
+            // Argument not found
+            try {
+                Expression exp = TestUtils.expression(
+                        "$i_int_missing", Integer.class, session);
+                exp.eval(session);
+                fail();
+            } catch (EvaluationException e) {
+            } catch (Exception e) {
+                fail();
+            }
+        }
+
+        {
+            // Argument not found (async)
+            try {
+                Expression exp = TestUtils.expression(
+                        "$i_int_missing", Integer.class, session, true);
+                exp.evalAsync(session, executor).get();
+                fail();
+            } catch (ExecutionException e) {
+                assertTrue(e.getCause() instanceof EvaluationException);
             } catch (Exception e) {
                 fail();
             }
@@ -158,14 +187,14 @@ public class ExpressionTest {
         EvalSession session = TestUtils.testSession();
         Executor executor = Executors.newFixedThreadPool(2);
 
-        {
+        { // Grab a primitive type async
             Expression expression = TestUtils.asyncExpression(
                     "TestUtils.asyncPow(10, 2)", Integer.class, session);
             expression.evalAsync(session, executor)
                     .thenAccept(res -> assertEquals(100, res)).get();
         }
 
-        {
+        { // Grab an object async
             Expression expression = TestUtils.asyncExpression(
                     "(new TestUtils()).asyncMap(\"key_1\", 100)",
                     Map.class,
@@ -176,7 +205,7 @@ public class ExpressionTest {
                     }).get();
         }
 
-        {
+        { // Grab the completable future (async as sync)
             Expression expression = TestUtils.expression(
                     "(new TestUtils()).asyncMap(\"key_1\", 100)",
                     CompletableFuture.class,
@@ -187,7 +216,7 @@ public class ExpressionTest {
                     }).get();
         }
 
-        {
+        { // Sync expressions can be evaluated as async
             Expression expression = TestUtils.asyncExpression(
                     "Math.pow(10, 2)",
                     Double.class,
@@ -196,13 +225,22 @@ public class ExpressionTest {
                     .thenAccept(res -> assertEquals(100.0, res)).get();
         }
 
-        {
+        { // Sync expressions can be evaluated as async
             Expression expression = TestUtils.asyncExpression(
                     "new String(\"test\")",
                     String.class,
                     session);
             expression.evalAsync(session, executor)
                     .thenAccept(res -> assertEquals("test", res)).get();
+        }
+
+        { // Sync arguments can be evaluated as async
+            Expression expression = TestUtils.asyncExpression(
+                    "2.0 * $i_int_a",
+                    Double.class,
+                    session);
+            expression.evalAsync(session, executor)
+                    .thenAccept(res -> assertEquals(2.0, res)).get();
         }
     }
 
