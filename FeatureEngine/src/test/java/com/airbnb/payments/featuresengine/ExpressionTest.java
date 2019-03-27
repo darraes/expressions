@@ -314,6 +314,15 @@ public class ExpressionTest {
         }
 
         { // Checks when the same argument appears multiple times
+            Expression exp1 = TestUtils.expression(
+                    "($i_int_a + $i_int_a + $i_int_a)"
+                            + " / ($e_int_e + $e_int_e) < 1.0",
+                    Boolean.class,
+                    session);
+            assertEquals(3, exp1.info().getDependentArguments().size());
+        }
+
+        { // Checks when the same argument appears multiple times
             Expression exp1 = TestUtils.asyncExpression(
                     "($i_int_a + $i_int_a + $i_int_a)"
                             + " / ($e_int_e + $e_int_e) < 1.0",
@@ -336,8 +345,27 @@ public class ExpressionTest {
     }
 
     @Test
-    public void evaluateSameArgumentMultipleTimes() {
-        // TODO implement
-        // Same argument appearing several times on the same expression
+    public void evaluateSameArgumentMultipleTimes()
+            throws ExecutionException, InterruptedException {
+        EvalSession session = TestUtils.testSession();
+        Executor executor = Executors.newFixedThreadPool(2);
+
+        { // Checks when the same argument appears multiple times
+            Expression exp1 = TestUtils.asyncExpression(
+                    "((double)($i_int_a + $i_int_a + $i_int_a))"
+                            + " / ($e_int_e + $e_int_e) <= 0.09",
+                    Boolean.class,
+                    session);
+            assertEquals(false, exp1.evalAsync(session, executor).get());
+        }
+
+        { // Checks when the same argument appears multiple times
+            Expression exp1 = TestUtils.expression(
+                    "((double)($i_int_a + $i_int_a + $i_int_a))"
+                            + " / ($e_int_e + $e_int_e) <= 0.1",
+                    Boolean.class,
+                    session);
+            assertEquals(true, exp1.eval(session));
+        }
     }
 }
