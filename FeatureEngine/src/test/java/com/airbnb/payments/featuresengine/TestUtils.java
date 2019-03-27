@@ -19,21 +19,21 @@ import java.util.function.BiFunction;
 
 public class TestUtils {
 
-    public static Expression expression(String exp, Class<?> type) {
+    static Expression expression(String exp, Class<?> type) {
         return expression(exp, type, null);
     }
 
-    public static Expression expression(
+    static Expression expression(
             String exp, Class<?> type, EvalSession session) {
         return expression(exp, type, session, false);
     }
 
-    public static Expression asyncExpression(
+    static Expression asyncExpression(
             String exp, Class<?> type, EvalSession session) {
         return expression(exp, type, session, true);
     }
 
-    public static Expression expression(
+    static Expression expression(
             String exp, Class<?> type, EvalSession session, boolean isAsync) {
         ArgumentRegistry registry = (session != null)
                 ? session.registry() : new ArgumentRegistry();
@@ -46,22 +46,27 @@ public class TestUtils {
                         new String[]{TestUtils.class.getName()}));
     }
 
-    public static Argument argument(String name, Class<?> type) {
+    static Argument argument(String name, Class<?> type) {
+        return argument(name, type, true, false);
+    }
+
+    static Argument argument(
+            String name, Class<?> type, boolean cacheable, boolean isAsync) {
         return ArgumentFactory.create(
                 new ArgumentRegistry(),
                 new ArgumentConfig(
                         name,
                         type.getName(),
-                        true,
-                        false
+                        cacheable,
+                        isAsync
                 ));
     }
 
-    public static EvalSession testSession() {
+    static EvalSession testSession() {
         return testSession(null);
     }
 
-    public static EvalSession testSession(ICache cache) {
+    static EvalSession testSession(ICache cache) {
         if (cache == null) {
             cache = new HashMapCache();
         }

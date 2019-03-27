@@ -1,7 +1,6 @@
 package com.airbnb.payments.featuresengine;
 
 import com.airbnb.payments.featuresengine.arguments.Argument;
-import com.airbnb.payments.featuresengine.arguments.InputArgument;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
@@ -256,6 +255,15 @@ public class ExpressionTest {
                                 diff,
                                 exp2.info().getDependentArguments()).isEmpty());
             }
+        }
+
+        { // Checks when the same argument appears multiple times
+            Expression exp1 = TestUtils.asyncExpression(
+                    "($i_int_a + $i_int_a + $i_int_a)"
+                            + " / ($e_int_e + $e_int_e) < 1.0",
+                    Boolean.class,
+                    session);
+            assertEquals(3, exp1.info().getDependentArguments().size());
         }
     }
 
