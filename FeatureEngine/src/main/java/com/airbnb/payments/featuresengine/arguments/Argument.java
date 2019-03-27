@@ -190,8 +190,7 @@ public abstract class Argument {
             if (this.returnType.isInstance(result)
                     || this.returnType.isAssignableFrom(result.getClass())
                     || (primitives.containsKey(this.returnType)
-                    && primitives.get(
-                    this.returnType).isInstance(result))) {
+                    && primitives.get(this.returnType).isInstance(result))) {
                 if (this.isCacheable()) {
                     session.cache().put(this.getName(), result);
                 }

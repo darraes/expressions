@@ -23,7 +23,7 @@ public class Expression {
     // Actual expression evaluator
     private IExpressionEvaluator eval;
 
-    public static String[] DEFAULT_IMPORTS = {
+    static String[] DEFAULT_IMPORTS = {
             "java.util.concurrent.CompletableFuture",
     };
 
