@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine;
 import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
+import com.airbnb.payments.featuresengine.errors.EvaluationException;
 import com.airbnb.payments.featuresengine.expressions.Expression;
 import com.google.common.collect.Sets;
 import org.junit.Test;
@@ -103,6 +104,7 @@ public class ExpressionTest {
 
     @Test
     public void handleExceptions() {
+        EvalSession session = TestUtils.testSession();
         {
             // Argument doesn't exist
             try {
@@ -128,6 +130,22 @@ public class ExpressionTest {
                 TestUtils.expression("1L", String.class);
                 fail();
             } catch (CompilationException e) {
+            } catch (Exception e) {
+                fail();
+            }
+        }
+
+        {
+            // Async can't be sync
+            try {
+                Expression exp = TestUtils.expression(
+                        "($async_int_e / 10) < 0.5",
+                        Boolean.class,
+                        session,
+                        true);
+                exp.eval(session);
+                fail();
+            } catch (EvaluationException e) {
             } catch (Exception e) {
                 fail();
             }
@@ -265,12 +283,6 @@ public class ExpressionTest {
                     session);
             assertEquals(3, exp1.info().getDependentArguments().size());
         }
-    }
-
-    @Test
-    public void evaluateExceptionOnSyncEvalForAsyncExpression() {
-        // TODO implement
-        // Making sure only the async methods can serve async expression
     }
 
     @Test
