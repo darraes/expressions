@@ -76,11 +76,6 @@ public class ExpressionFactoryTest {
     }
 
     @Test
-    public void accessedArgumentsDetection() {
-        // TODO Implement
-    }
-
-    @Test
     public void convertDoubleMatch() {
         EvalSession session = createTestSession();
 
@@ -97,7 +92,7 @@ public class ExpressionFactoryTest {
     }
 
     @Test
-    public void convertMultiMatch() throws ClassNotFoundException {
+    public void convertMultiMatch() {
         EvalSession session = createTestSession();
 
         Expression expression = ExpressionFactory.create(
