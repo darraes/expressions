@@ -2,4 +2,4 @@
 ###################
 *.DS_Store
 FeatureEngine/target
-FeatureEngine/.idea
+**/.idea/workspace.xml

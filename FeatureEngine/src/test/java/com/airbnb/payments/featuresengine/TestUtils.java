@@ -50,13 +50,43 @@ public class TestUtils {
         return argument(name, type, true, false);
     }
 
+    static Argument argument(String name, Class<?> type, ArgumentRegistry registry) {
+        return argument(name, type, true, false, registry);
+    }
+
     static Argument argument(
             String name, Class<?> type, boolean cacheable, boolean isAsync) {
+        return argument(name, type, cacheable, isAsync, new ArgumentRegistry());
+    }
+
+    static Argument argument(
+            String name, Class<?> type, boolean cacheable, boolean isAsync, ArgumentRegistry registry) {
         return ArgumentFactory.create(
-                new ArgumentRegistry(),
+                registry,
                 new ArgumentConfig(
                         name,
                         type.getName(),
+                        cacheable,
+                        isAsync
+                ));
+    }
+
+    static Argument argument(String name, Class<?> type, String expression, ArgumentRegistry registry) {
+        return argument(name, type, true, false, expression, registry);
+    }
+
+    static Argument argument(String name,
+                             Class<?> type,
+                             boolean cacheable,
+                             boolean isAsync,
+                             String expression,
+                             ArgumentRegistry registry) {
+        return ArgumentFactory.create(
+                registry,
+                new ArgumentConfig(
+                        name,
+                        type.getName(),
+                        expression,
                         cacheable,
                         isAsync
                 ));

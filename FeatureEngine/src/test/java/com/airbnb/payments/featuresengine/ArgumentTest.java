@@ -129,12 +129,7 @@ public class ArgumentTest {
     public void argumentNotRegistered() throws CompilationException {
         try {
             EvalSession session = TestUtils.testSession();
-            ArgumentFactory.create(
-                    session.registry(),
-                    new ArgumentConfig(
-                            "not_there",
-                            Integer.class.getName(),
-                            "$a + $b"));
+            TestUtils.argument("not_there", Integer.class, "$a + $b", session.registry());
             fail();
         } catch (CompilationException e) {
             assertTrue(e.getMessage().contains("not registered"));
