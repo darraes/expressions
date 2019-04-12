@@ -61,7 +61,7 @@ public class ExpressionFactoryTest {
 
     @Test
     public void expressionInfo() {
-        String expressionText = "1 + 3";
+        String expressionText = "1 + 4";
         Expression expression = ExpressionFactory.create(
                 new ArgumentRegistry(),
                 new ExpressionConfig(expressionText, Integer.class.getName()));
