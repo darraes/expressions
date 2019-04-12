@@ -129,7 +129,10 @@ public class ArgumentTest {
     public void argumentNotRegistered() throws CompilationException {
         try {
             EvalSession session = TestUtils.testSession();
-            TestUtils.argument("not_there", Integer.class, "$a + $b", session.registry());
+            TestUtils.argument("not_there",
+                    Integer.class,
+                    "$a + $b",
+                    session.registry());
             fail();
         } catch (CompilationException e) {
             assertTrue(e.getMessage().contains("not registered"));
@@ -142,12 +145,10 @@ public class ArgumentTest {
             // For sync expressions, we do type checking during compilation
             try {
                 EvalSession session = TestUtils.testSession();
-                ArgumentFactory.create(
-                        session.registry(),
-                        new ArgumentConfig(
-                                "a",
-                                Integer.class.getName(),
-                                "new String(\"there\")"));
+                TestUtils.argument("a",
+                        Integer.class,
+                        "new String(\"there\")",
+                        session.registry());
                 fail();
             } catch (CompilationException e) {
                 assertTrue(
