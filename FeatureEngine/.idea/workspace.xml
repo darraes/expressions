@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="eb29c907-3943-417d-8339-1c31e4f9ebcd" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ArgumentTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ArgumentTest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />

@@ -212,7 +212,7 @@ public class ArgumentTest {
                     new ArgumentConfig(
                             "a",
                             Integer.class.getName(),
-                            "1 + 2"));
+                            "1 + 1"));
 
             ArgumentFactory.create(
                     session.registry(),
