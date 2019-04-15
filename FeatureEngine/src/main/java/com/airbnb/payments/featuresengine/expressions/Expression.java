@@ -17,13 +17,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class Expression {
-    private static Void VOID = null;
+    private static final Void VOID = null;
     // All metadata about the expression
     private ExpressionMetadata info;
     // Actual expression evaluator
     private IExpressionEvaluator eval;
 
-    static String[] DEFAULT_IMPORTS = {
+    private static final String[] DEFAULT_IMPORTS = {
             "java.util.concurrent.CompletableFuture",
     };
 
