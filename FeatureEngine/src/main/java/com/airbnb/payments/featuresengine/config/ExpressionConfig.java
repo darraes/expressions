@@ -1,5 +1,8 @@
 package com.airbnb.payments.featuresengine.config;
 
+import lombok.Getter;
+
+@Getter
 public class ExpressionConfig {
     private String returnType;
     private String expression;
@@ -32,22 +35,5 @@ public class ExpressionConfig {
         this.expression = expression;
         this.isAsync = isAsync;
         this.dependencies = dependencies;
-    }
-
-
-    public String getReturnType() {
-        return returnType;
-    }
-
-    public String getExpression() {
-        return expression;
-    }
-
-    public boolean isAsync() {
-        return isAsync;
-    }
-
-    public String[] getDependencies() {
-        return dependencies;
     }
 }

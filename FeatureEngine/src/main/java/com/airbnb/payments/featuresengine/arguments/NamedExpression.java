@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine.arguments;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.expressions.Expression;
+import lombok.Getter;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -16,6 +17,7 @@ import java.util.concurrent.Executor;
  * <p>
  * Since they have "names", they can be used in the same way as user provided arguments.
  */
+@Getter
 public class NamedExpression extends Argument {
 
     // The expression that evaluates to this argument
@@ -38,10 +40,6 @@ public class NamedExpression extends Argument {
                     boolean isAsync) {
         super(name, returnType, cacheable, isAsync);
         this.expression = expression;
-    }
-
-    public Expression getExpression() {
-        return expression;
     }
 
     /**

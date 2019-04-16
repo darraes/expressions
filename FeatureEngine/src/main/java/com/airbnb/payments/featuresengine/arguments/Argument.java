@@ -3,6 +3,7 @@ package com.airbnb.payments.featuresengine.arguments;
 import com.airbnb.payments.featuresengine.core.EvalSession;
 import com.airbnb.payments.featuresengine.errors.CompilationException;
 import com.airbnb.payments.featuresengine.errors.EvaluationException;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+@Getter
 public abstract class Argument {
     // Name (or key) of the argument
     private String name;
@@ -73,36 +75,6 @@ public abstract class Argument {
                     "Async arguments must be cacheable. Argument %s is not",
                     this.getName());
         }
-    }
-
-    /**
-     * @return the name (or key) of this argument
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return the argument type
-     */
-    public Class<?> getReturnType() {
-        return returnType;
-    }
-
-    /**
-     * Cacheable arguments, once fetched, will never be fetched again
-     *
-     * @return True if the argument is cacheable. False otherwise.
-     */
-    public boolean isCacheable() {
-        return this.cacheable;
-    }
-
-    /**
-     * If the argument requires async fetching
-     */
-    public boolean isAsync() {
-        return this.isAsync;
     }
 
     @Override
