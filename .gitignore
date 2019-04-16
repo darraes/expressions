@@ -3,4 +3,4 @@
 *.DS_Store
 *.iml
 FeatureEngine/target
-FeatureEngine/.idea/workspace.xml
+FeatureEngine/.idea
