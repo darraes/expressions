@@ -2,15 +2,46 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="eb29c907-3943-417d-8339-1c31e4f9ebcd" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureEngine.iml" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureEngine.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/config/ArgumentConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/config/ArgumentConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/core/EvalSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/core/EvalSession.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionMetadata.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionMetadata.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/darraes.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_guava_guava_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_11.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_janino_commons_compiler_3_0_9.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_janino_janino_3_0_9.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_projectlombok_lombok_1_18_6.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FeatureEngine.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/Argument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/ArgumentFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/ArgumentRegistry.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/HashMapInputProvider.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/IInputProvider.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/InputArgument.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/NamedExpression.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/cache/HashMapCache.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/cache/ICache.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/config/ArgumentConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/config/ExpressionConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/core/EvalSession.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/errors/CompilationException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/errors/EvaluationException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/ExpressionMetadata.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ArgumentTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionFactoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestCache.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/TestUtils.java" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -34,18 +65,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/com/airbnb/payments/featuresengine/ExpressionTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5418">
-              <caret line="318" column="20" selection-start-line="318" selection-start-column="20" selection-end-line="318" selection-end-column="20" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/expressions/Expression.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -84,11 +103,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/config/ArgumentConfig.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="18">
               <caret line="1" selection-start-line="1" selection-end-line="1" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/NamedExpression.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1026">
+              <caret line="67" column="7" selection-start-line="67" selection-start-column="7" selection-end-line="67" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -597,11 +625,11 @@
       <window_info id="UI Designer" order="1" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info id="aws.explorer" order="3" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="4" visible="true" weight="0.25946277" />
+      <window_info active="true" content_ui="combo" id="Project" order="4" visible="true" weight="0.25946277" />
       <window_info id="Structure" order="5" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="6" />
       <window_info id="Capture Tool" order="7" />
-      <window_info active="true" anchor="bottom" id="Messages" order="0" visible="true" weight="0.24064171" />
+      <window_info anchor="bottom" id="Messages" order="0" weight="0.24064171" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="2" weight="0.3299363" />
       <window_info anchor="bottom" id="Version Control" order="3" weight="0.3299363" />
@@ -749,13 +777,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/NamedExpression.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1062">
-          <caret line="67" column="7" selection-start-line="67" selection-start-column="7" selection-end-line="67" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/config/ExpressionConfig.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-144">
@@ -880,6 +901,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
           <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/airbnb/payments/featuresengine/arguments/NamedExpression.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1026">
+          <caret line="67" column="7" selection-start-line="67" selection-start-column="7" selection-end-line="67" selection-end-column="7" />
         </state>
       </provider>
     </entry>
