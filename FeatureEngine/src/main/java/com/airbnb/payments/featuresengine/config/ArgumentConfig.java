@@ -1,5 +1,8 @@
 package com.airbnb.payments.featuresengine.config;
 
+import lombok.Getter;
+
+@Getter
 public class ArgumentConfig extends ExpressionConfig {
     private String name;
     private boolean cacheable;
@@ -39,13 +42,5 @@ public class ArgumentConfig extends ExpressionConfig {
         super(expression, returnType, isAsync, dependencies);
         this.name = name;
         this.cacheable = cacheable;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public boolean isCacheable() {
-        return cacheable;
     }
 }

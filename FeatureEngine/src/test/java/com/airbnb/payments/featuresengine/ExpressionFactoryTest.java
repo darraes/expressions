@@ -67,11 +67,11 @@ public class ExpressionFactoryTest {
                 new ExpressionConfig(expressionText, Integer.class.getName()));
 
         assertEquals(expressionText, expression.info().getExpression());
-        assertEquals(expressionText, expression.info().getSrcExpression());
+        assertEquals(expressionText, expression.info().getSourceExpression());
         assertFalse(expression.info().isAsync());
         assertEquals(Integer.class, expression.info().getReturnType());
         assertEquals(0, expression.info().getAccessedArguments().size());
-        assertNotNull(expression.info().getID());
+        assertNotNull(expression.info().getId());
         assertArrayEquals(new String[0], expression.info().getImports());
     }
 

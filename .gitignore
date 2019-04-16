@@ -1,5 +1,6 @@
 # Compiled source #
 ###################
 *.DS_Store
+*.iml
 FeatureEngine/target
-.idea/workspace.xml
+FeatureEngine/.idea/workspace.xml

@@ -2,6 +2,8 @@ package com.airbnb.payments.featuresengine.expressions;
 
 import com.airbnb.payments.featuresengine.arguments.Argument;
 import com.google.common.collect.Sets;
+import lombok.Data;
+import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +12,7 @@ import java.util.Set;
  * Holds on to all information (metadata) specific to a single expression.
  * Anything we want to know about the expression, should be here.
  */
+@Getter
 public class ExpressionMetadata {
     // Unique id given to each individual expression
     private String id;
@@ -56,79 +59,6 @@ public class ExpressionMetadata {
         this.imports = imports;
 
         this.loadDependencies();
-    }
-
-    /**
-     * The expression uniquely generated ID.
-     *
-     * @return The ID.
-     */
-    public String getID() {
-        return id;
-    }
-
-    /**
-     * The final expression, after the argument pre-processing or any other
-     * pre-processing
-     *
-     * @return The expression text
-     */
-    public String getExpression() {
-        return expression;
-    }
-
-    /**
-     * The original user inputted expression.
-     *
-     * @return The source expression text
-     */
-    public String getSrcExpression() {
-        return sourceExpression;
-    }
-
-    /**
-     * The type the expression evaluates to.
-     *
-     * @return The class object for the expression type
-     */
-    public Class<?> getReturnType() {
-        return returnType;
-    }
-
-    /**
-     * The arguments <b>directly</b> accessed by the expression
-     *
-     * @return Set with all unique top top level arguments
-     */
-    public Set<Argument> getAccessedArguments() {
-        return accessedArguments;
-    }
-
-    /**
-     * All arguments in the nested dependencies used on this expression (recursively).
-     *
-     * @return Set with all unique arguments and their child arguments recursively
-     */
-    public Set<Argument> getDependentArguments() {
-        return dependentArguments;
-    }
-
-    /**
-     * If the expression is asynchronous
-     *
-     * @return True if async, false otherwise.
-     */
-    public boolean isAsync() {
-        return isAsync;
-    }
-
-    /**
-     * All classes imports used on this expression
-     *
-     * @return Array with all imports, one per class.
-     */
-    public String[] getImports() {
-        return imports;
     }
 
     /**
